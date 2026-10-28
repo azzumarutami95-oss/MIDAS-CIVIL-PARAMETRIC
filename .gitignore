@@ -1,0 +1,6 @@
+node_modules/
+dist/
+.desktop-test/
+desktop/assets/icon.ico
+desktop/assets/icon.png
+__pycache__/

@@ -1,5 +1,16 @@
 # MIDAS Civil Parametric — Pilar Solid FC30
 
+## Aplikasi Windows (.exe)
+
+**[Unduh installer Civil Hydration NX dari GitHub Releases](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/latest)**
+
+Pilih `Civil-Hydration-NX-Setup-1.0.0-x64.exe` untuk Windows 10/11 64-bit (x64).
+Aplikasi menyertakan runtime dan dapat dipakai offline untuk mengatur material
+termal, mix design, mesh, staging, serta mengekspor `.MCT`, parameter JSON dan
+ringkasan input. Installer belum ditandatangani secara digital.
+
+[Petunjuk instalasi, pemindahan parameter HTML, dan build Windows](desktop/README.md).
+
 ## Aplikasi HTML untuk menyusun input hidrasi
 
 **[Unduh CIVIL_HEAT_HYDRATION_NX.html](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/raw/refs/heads/main/downloads/CIVIL_HEAT_HYDRATION_NX.html)**

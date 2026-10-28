@@ -1,0 +1,89 @@
+{
+  "name": "civil-hydration-nx",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Offline staged concrete hydration input and MCT generator for Windows",
+  "author": "MIDAS-CIVIL-PARAMETRIC contributors",
+  "license": "UNLICENSED",
+  "main": "desktop/main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test tests/engine.test.js tests/thermal.test.js tests/desktop_policy.test.cjs",
+    "build:assets": "python3 scripts/build_desktop_assets.py",
+    "build:win": "npm run build:assets && electron-builder --win nsis --x64 --publish never",
+    "build:linux:test": "electron-builder --linux dir --x64 --publish never"
+  },
+  "devDependencies": {
+    "electron": "45.1.0",
+    "electron-builder": "26.18.0",
+    "playwright": "1.64.1"
+  },
+  "build": {
+    "appId": "io.github.azzumarutami95oss.civilhydrationnx",
+    "productName": "Civil Hydration NX",
+    "copyright": "Independent hydration input tool. Not a MIDAS product.",
+    "asar": true,
+    "compression": "maximum",
+    "directories": {
+      "output": "dist",
+      "buildResources": "desktop/assets"
+    },
+    "files": [
+      "desktop/main.cjs",
+      "desktop/policy.cjs",
+      "desktop/assets/icon.png",
+      "web/index.html",
+      "web/styles.css",
+      "web/thermal.js",
+      "web/engine.js",
+      "web/viewport.js",
+      "web/app.js",
+      "web/nx-ui.js",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "desktop/NOTICE.txt",
+        "to": "PETUNJUK.txt"
+      }
+    ],
+    "electronLanguages": [
+      "en-US",
+      "id"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "executableName": "CivilHydrationNX",
+      "icon": "desktop/assets/icon.ico",
+      "signExecutable": false
+    },
+    "nsis": {
+      "artifactName": "Civil-Hydration-NX-Setup-${version}-${arch}.${ext}",
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true,
+      "shortcutName": "Civil Hydration NX",
+      "deleteAppDataOnUninstall": false,
+      "installerIcon": "desktop/assets/icon.ico",
+      "uninstallerIcon": "desktop/assets/icon.ico"
+    },
+    "linux": {
+      "target": "dir",
+      "executableName": "civil-hydration-nx",
+      "icon": "desktop/assets/icon.png"
+    },
+    "toolsets": {
+      "wine": "1.0.1"
+    }
+  }
+}

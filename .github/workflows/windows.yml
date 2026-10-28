@@ -1,0 +1,69 @@
+name: Windows installer
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  windows-installer:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install build dependencies
+        run: |
+          python -m pip install Pillow==12.3.0
+          npm ci --no-audit --no-fund
+          node node_modules/electron/install.js
+      - name: Verify numeric and desktop policies
+        run: npm test
+      - name: Build Windows x64 installer
+        run: npm run build:win
+      - name: Install and test Windows app
+        shell: pwsh
+        run: |
+          $exe = Get-Item dist/Civil-Hydration-NX-Setup-*-x64.exe
+          $installation = Join-Path $env:RUNNER_TEMP 'CivilHydrationInstalled'
+          $process = Start-Process -FilePath $exe.FullName -ArgumentList '/S', "/D=$installation" -Wait -PassThru
+          if ($process.ExitCode -ne 0) { throw "Installer failed: $($process.ExitCode)" }
+          $application = Join-Path $installation 'CivilHydrationNX.exe'
+          if (!(Test-Path $application)) { throw 'Installed executable is missing' }
+          node tests/desktop_smoke.cjs $application
+          if ($LASTEXITCODE -ne 0) { throw 'Installed desktop app failed smoke tests' }
+          $uninstaller = Get-ChildItem $installation -Filter '*Uninstall*.exe' | Select-Object -First 1
+          if (!$uninstaller) { throw 'Uninstaller is missing' }
+          $process = Start-Process -FilePath $uninstaller.FullName -ArgumentList '/S' -Wait -PassThru
+          if ($process.ExitCode -ne 0) { throw "Uninstaller failed: $($process.ExitCode)" }
+          for ($i = 0; $i -lt 30 -and (Test-Path $application); $i++) { Start-Sleep -Milliseconds 300 }
+          if (Test-Path $application) { throw 'Application executable remains after uninstall' }
+      - name: Create checksum
+        shell: pwsh
+        run: |
+          $exe = Get-Item dist/Civil-Hydration-NX-Setup-*-x64.exe
+          $hash = (Get-FileHash $exe.FullName -Algorithm SHA256).Hash.ToLower()
+          "$hash  $($exe.Name)" | Set-Content dist/SHA256SUMS.txt -Encoding ascii
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Civil-Hydration-NX-Windows-x64
+          path: |
+            dist/Civil-Hydration-NX-Setup-*-x64.exe
+            dist/SHA256SUMS.txt
+          if-no-files-found: error
+      - name: Publish installer for version tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create $env:GITHUB_REF_NAME dist/Civil-Hydration-NX-Setup-*-x64.exe dist/SHA256SUMS.txt --verify-tag --title "Civil Hydration NX $env:GITHUB_REF_NAME — Windows x64" --notes "Installer offline untuk Windows 10/11 64-bit. Memuat geometri, mesh HEX8, perhitungan cp/k, konveksi, staging dan ekspor MCT/JSON/TXT. Aplikasi independen; analisis dilakukan di MIDAS Civil. Installer belum ditandatangani sertifikat penerbit."

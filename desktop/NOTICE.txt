@@ -1,0 +1,26 @@
+CIVIL HYDRATION NX — versi Windows
+
+Penyusun input panas hidrasi beton bertahap, material, konveksi dan mesh HEX8.
+Berjalan lokal/offline. Tidak memerlukan Node, Python atau browser terpisah.
+
+PENGGUNAAN
+1. Buka Civil Hydration NX dari desktop atau Start Menu.
+2. Edit model, mix design, cp/k, konveksi, sumber panas dan jadwal tahap.
+3. Simpan parameter JSON untuk cadangan (Ctrl+S).
+4. Klik Unduh .MCT (Ctrl+Shift+S), pilih lokasi file pada dialog Simpan.
+5. Impor MCT ke model kosong di MIDAS Civil, lalu periksa parser dan unit.
+
+Parameter terakhir disimpan lokal pada profil aplikasi Windows.
+Ekspor JSON untuk memindahkan pekerjaan dari versi HTML atau ke PC lain.
+Uninstall tidak menghapus cadangan JSON atau profil parameter pengguna.
+
+BATAS PENERAPAN
+Aplikasi independen, bukan produk MIDAS/MIDASIT dan bukan solver.
+Pola NX adalah tampilan ruang kerja; file ekspor tetap MCT.
+Nilai contoh perlu kalibrasi data proyek; EC2 adalah acuan beton mengeras.
+Parser/solver native MIDAS belum diuji. Hasil bukan validasi risiko retak.
+
+KOMPONEN
+Installer menyertakan Electron/Chromium dan pemberitahuan lisensinya.
+Installer ini belum ditandatangani dengan sertifikat penerbit Windows.
+Kode sumber dan rumus: https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC
