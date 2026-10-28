@@ -51,9 +51,14 @@ def main():
         for svg in ['mesh-plan','mesh-side','heat-chart']:
             assert page.locator('#'+svg+' path, #'+svg+' polygon').count()>0
 
+        def reveal(locator):
+            pane=locator.evaluate("el => el.closest('.nx-pane')?.id || null")
+            if pane:
+                page.locator('.nx-ribbon-tabs [data-workspace="'+pane+'"]').click()
+                assert page.locator('#'+pane).is_visible()
         def field(key):return page.locator('[data-key="'+key+'"]')
         def edit(key,value):
-            field(key).fill(str(value));page.wait_for_timeout(240)
+            reveal(field(key));field(key).fill(str(value));page.wait_for_timeout(240)
         def download(button,name):
             with page.expect_download() as event:page.locator('#'+button).click()
             item=event.value
@@ -79,7 +84,7 @@ def main():
         assert field('temperature.pour').input_value()=='34'
         assert field('mix.cement').input_value()=='450'
 
-        field('boundary.baseMode').select_option('adiabatic');page.wait_for_timeout(240)
+        reveal(field('boundary.baseMode'));field('boundary.baseMode').select_option('adiabatic');page.wait_for_timeout(240)
         assert field('temperature.base').is_disabled()
         adiabatic=download('export-mct','PILAR_HEAT_HYDRATION.MCT').read_text()
         assert '*HYD-PRTEMPER' not in adiabatic
@@ -109,7 +114,7 @@ def main():
         assert field('mix.cement').input_value()=='432'
         assert field('temperature.pour').input_value()=='30'
         assert field('boundary.baseMode').input_value()=='fixed'
-        page.locator('#use-mix-density').click();page.wait_for_timeout(250)
+        reveal(page.locator('#use-mix-density'));page.locator('#use-mix-density').click();page.wait_for_timeout(250)
         assert field('material.density').input_value()=='2426.26'
         report=download('download-report','RINGKASAN_INPUT_HIDRASI.txt').read_text()
         assert 'bukan hasil analisis' in report and '2426.26' in report

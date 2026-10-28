@@ -1,10 +1,32 @@
-# Civil Hydration — aplikasi HTML offline
+# Civil Hydration — NX workspace HTML offline
 
-Unduh **[CIVIL_HEAT_HYDRATION.html](../downloads/CIVIL_HEAT_HYDRATION.html)**,
+Unduh **[CIVIL_HEAT_HYDRATION_NX.html](../downloads/CIVIL_HEAT_HYDRATION_NX.html)**,
 simpan sebagai `.html`, lalu buka dengan browser desktop modern seperti Chrome
 atau Edge. Tidak perlu Python, Node, server, instalasi, akun MIDAS API, atau
 koneksi internet untuk menggunakan aplikasi. Aplikasi tidak mengirim parameter
-ke server. Tautan referensi hanya dibuka bila diklik.
+ke server. Tautan referensi hanya dibuka bila diklik. Nama file HTML sebelumnya
+tetap tersedia dengan tampilan baru yang sama. Parameter JSON v1 sebelumnya
+tetap dapat dibuka.
+
+## Navigasi ruang kerja NX
+
+- Ribbon dan Model Tree memilih tab Model, Mix Design, Heat of Hydration,
+  Construction Stage, serta Check & Export.
+- Model menampilkan panel geometri/material/mesh dan viewport yang lebih luas.
+- Drag di viewport untuk orbit, scroll untuk zoom, Shift + drag untuk pan.
+  Tombol ISO/Depan/Atas mengganti arah kamera; Fit view atau double-click
+  menyesuaikan skala tanpa mengubah geometri.
+- Tombol Mesh menampilkan/menyembunyikan rusuk. Pilihan Semua/Beton lama/Beton
+  baru memfilter objek untuk pemeriksaan. Filter visual **tidak mengubah**
+  elemen, sumber panas, atau staging pada file ekspor.
+- Panel Output mencatat aktivitas input/ekspor aktual. Panel ini bukan hasil
+  solver NX. Warna viewport menunjukkan segmen beton, bukan temperatur.
+
+Antarmuka ini alat independen yang mengikuti pola ruang kerja perangkat lunak
+analisis struktur, bukan produk MIDAS. Ekspor tetap `.MCT`. Pustaka resmi
+MIDASIT menyediakan [`Model.importMCT()` untuk Civil NX](https://github.com/MIDASIT-Co-Ltd/midas-civil-python/blob/main/midas_civil/_model.py#L797).
+Setelah impor, model dapat disimpan dalam format native oleh aplikasi Civil NX.
+Mengganti ekstensi MCT menjadi `.mcb` bukan konversi format dan tidak dilakukan.
 
 ## Alur penggunaan
 
@@ -19,7 +41,7 @@ ke server. Tautan referensi hanya dibuka bila diklik.
 5. Periksa pratinjau, konversi unit dan pesan pemeriksaan. Klik **Unduh .MCT**.
    Browser menghasilkan `PILAR_HEAT_HYDRATION.MCT` lengkap, berisi semua node,
    elemen, material, sumber panas, konveksi, tahapan dan kontrol analisis.
-6. Impor ke model kosong pada MIDAS Civil klasik melalui MCT Command Shell.
+6. Impor ke model kosong pada MIDAS Civil NX melalui impor MCT atau MCT Command Shell.
    Periksa log parser, unit, aktivasi beton, sumber panas dan kondisi batas.
 
 Gunakan **Simpan parameter JSON** untuk membawa pekerjaan ke perangkat lain.
@@ -83,7 +105,7 @@ Belum ada radiasi matahari, penguapan, bekisting padat, cooling pipe, equivalent
 age, creep/susut, E(t) atau model retak yang terkalibrasi.
 
 Impor native dan solver MIDAS belum tersedia untuk diuji di lingkungan ini.
-Periksa versi klasik yang dipakai, temperatur elemen baru/node sambungan,
+Periksa kartu hidrasi pada rilis Civil NX yang dipakai, temperatur elemen baru/node sambungan,
 kelanjutan umur panas, neraca energi serta konvergensi mesh/waktu. Hasil
 tegangan elastis bukan penilaian retak tervalidasi. Verifikasi jurnal belum
 dilakukan; pola staging mengacu tutorial resmi MIDASIT dan sintaks klasik
@@ -91,7 +113,8 @@ dicocokkan dengan contoh MCT publik yang tercantum di aplikasi.
 
 ## Pengembangan dan pemeriksaan
 
-Sumber: `index.html`, `styles.css`, `engine.js` dan `app.js`, tanpa bundler npm
+Sumber: `index.html`, `styles.css`, `engine.js`, `viewport.js`, `app.js` dan
+`nx-ui.js`, tanpa bundler npm
 atau dependensi runtime eksternal. Mesh dibentuk secara lokal, tidak mengambil
 model MCT dari server. Guard resource: 100.000 elemen / 125.000 node.
 
@@ -99,6 +122,7 @@ model MCT dari server. Guard resource: 100.000 elemen / 125.000 node.
 python3 scripts/build_html.py
 node tests/engine.test.js
 python3 tests/browser_smoke.py
+python3 tests/nx_browser.py
 ```
 
 Builder menggunakan Python standard library. Tes browser memerlukan Python

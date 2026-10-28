@@ -28,6 +28,7 @@
       svgText(180,178,'+','text-anchor="middle" fill="#243e51" font-size="16"');
   }
   function side(section){
+    if(window.HydrationViewport){window.HydrationViewport.render(section,config);return;}
     const c=config,D=c.geometry.diameter,h1=c.geometry.heightOld,H=h1+c.geometry.heightNew;
     const scale=Math.min(220/(H+D*.3),220/(D*1.45)), p=([x,y],z)=>[220+(x-y)*.72*scale,263+(x+y)*.20*scale-z*scale];
     const coord=q=>q.map(x=>x.map(v=>v.toFixed(2)).join(',')).join(' ');
@@ -181,6 +182,7 @@
         'Periksa rilis Civil, suhu awal hanya pada elemen baru, kontinuitas umur sumber panas, neraca energi, serta konvergensi mesh/waktu.',
         'Belum mengkalibrasi creep/susut, E(t), kuat tarik, riwayat tegangan dan batas mekanis aktual; bukan penilaian retak.',
         'REFERENSI INPUT: https://github.com/MIDASIT-Co-Ltd/midas-civil-python/blob/main/examples/python/Tut7%20Heat%20of%20Hydration.py',
+        'IMPOR MCT CIVIL NX: https://github.com/MIDASIT-Co-Ltd/midas-civil-python/blob/main/midas_civil/_model.py#L797',
         'SINTAKS KLASIK: https://github.com/TimmyTran22/Midas/blob/main/generateMct2.py',
         'Verifikasi jurnal belum dilakukan; parameter bukan angka yang diklaim berasal dari jurnal tertentu.','',JSON.stringify(snapshot(),null,2));
       download('RINGKASAN_INPUT_HIDRASI.txt',rows.join('\r\n'),'text/plain;charset=utf-8');notify('Ringkasan input dan parameter berhasil diunduh.');

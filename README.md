@@ -2,7 +2,14 @@
 
 ## Aplikasi HTML untuk menyusun input hidrasi
 
-**[Unduh CIVIL_HEAT_HYDRATION.html](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/raw/refs/heads/main/downloads/CIVIL_HEAT_HYDRATION.html)**
+**[Unduh CIVIL_HEAT_HYDRATION_NX.html](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/raw/refs/heads/main/downloads/CIVIL_HEAT_HYDRATION_NX.html)**
+
+Tampilan baru bergaya ruang kerja NX: ribbon, model tree, panel properti,
+viewport interaktif dengan orbit/zoom/pan, tampak ISO/depan/atas, filter segmen
+dan panel output. Ekspor tetap **MCT** untuk diimpor ke Civil NX. Aplikasi ini
+bukan MIDAS Civil NX dan tidak menghasilkan berkas native `.mcb` langsung.
+
+![Pratinjau ruang kerja NX](web/NX_WORKSPACE_PREVIEW.png)
 
 Buka file HTML di browser. Edit campuran dari foto, geometri, mesh, sifat
 termal, konveksi, sumber panas dan empat tahap, lalu klik **Unduh .MCT**.
