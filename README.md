@@ -1,5 +1,17 @@
 # MIDAS Civil Parametric — Pilar Solid FC30
 
+## Aplikasi HTML untuk menyusun input hidrasi
+
+**[Unduh CIVIL_HEAT_HYDRATION.html](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/raw/refs/heads/main/downloads/CIVIL_HEAT_HYDRATION.html)**
+
+Buka file HTML di browser. Edit campuran dari foto, geometri, mesh, sifat
+termal, konveksi, sumber panas dan empat tahap, lalu klik **Unduh .MCT**.
+Tidak perlu instalasi atau koneksi internet. Tersedia pratinjau mesh/kurva,
+koreksi batch, konversi satuan, simpan/buka JSON dan ringkasan input.
+
+[Petunjuk aplikasi dan batas penggunaan](web/README.md). Angka termal adalah
+asumsi contoh; impor/solver MIDAS dan penilaian retak belum tervalidasi.
+
 ## Model contoh panas hidrasi bertahap
 
 **[Unduh MCT hidrasi + staging](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/raw/refs/heads/main/output/pilar_fc30_hydration/PILAR_FC30_HYDRATION_STAGED_ASSUMED.mct)**
