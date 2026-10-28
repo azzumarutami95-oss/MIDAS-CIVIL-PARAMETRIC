@@ -1,0 +1,15 @@
+{
+  "status": "ILLUSTRATIVE_ASSUMPTIONS_NOT_PROJECT_CALIBRATED",
+  "units": {"force": "N", "length": "M", "heat": "KJ", "temperature": "C", "hydration_time": "hour", "mass": "kg"},
+  "geometry": {"diameter_m": 7.5, "height_old_m": 4.0, "height_new_m": 4.0},
+  "material": {"fc_MPa": 30.0, "E_formula": "4700*sqrt(fc_MPa) MPa, assumed normal-weight concrete", "poisson": 0.2, "density_kg_m3": 2400.0, "gravity_m_s2": 9.80665, "specific_heat_kJ_kg_C": 0.9, "conductivity_W_m_C": 2.4, "thermal_expansion_per_C": 0.00001},
+  "temperatures": {"old_initial_C": 28.0, "new_placing_C": 30.0, "ambient_C": 28.0, "base_C": 28.0},
+  "heat_source": {"law": "adiabatic_rise_C = K_C * (1 - exp(-alpha_per_day * age_hours / 24))", "K_C": 45.0, "alpha_per_day": 0.5, "old_source": "ZERO_ASSUMED_RESIDUAL_NEGLECTED", "equivalent_age": false},
+  "convection": {"old_side_W_m2_C": 10.0, "old_top_before_pour_W_m2_C": 10.0, "new_formwork_effective_W_m2_C": 3.0, "new_side_air_W_m2_C": 10.0, "new_top_curing_effective_W_m2_C": 5.0, "new_top_air_W_m2_C": 10.0},
+  "schedule": {"old_initialization_hours": 1.0, "strip_formwork_at_new_age_hours": 72.0, "end_top_curing_at_new_age_hours": 168.0, "end_analysis_at_new_age_hours": 720.0, "time_step_0_to_24h": 0.5, "time_step_24h_to_stripping": 1.0, "time_step_stripping_to_curing_end": 2.0, "time_step_curing_end_to_analysis_end": 6.0},
+  "base_thermal_condition": "PRESCRIBED_TEMPERATURE_ASSUMED_HEAT_RESERVOIR",
+  "mechanical_restraint": "BASE_TRANSLATIONS_FIXED_ILLUSTRATIVE_ONLY",
+  "old_concrete_age_information": ">2 months supplied by user; initial temperature/history not measured; no AGE field invented in HYD-STAGE",
+  "journal_validation": "NOT_COMPLETED_NETWORK_ACCESS_BLOCKED",
+  "native_midas_import_and_solver": "NOT_EXECUTED"
+}

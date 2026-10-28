@@ -1,0 +1,141 @@
+{
+  "status": "PASS_INPUT_TOPOLOGY_AND_SCHEDULE_AUDIT_ONLY",
+  "hydration_input_cards_written": true,
+  "midas_import_executed": false,
+  "midas_solver_executed": false,
+  "journal_validation_completed": false,
+  "mesh": {
+    "validation": "PASS - standalone geometry/connectivity checks; not a MIDAS import or solver run",
+    "nodes": 26433,
+    "hex8_elements": 24576,
+    "elements_stage1": 12288,
+    "elements_stage2": 12288,
+    "nodes_per_horizontal_plane": 801,
+    "shared_interface_nodes": 801,
+    "shared_interface_faces": 768,
+    "horizontal_layers": 32,
+    "vertical_step_m": 0.25,
+    "circumference_divisions": 64,
+    "min_edge_m": 0.1704393265720994,
+    "max_edge_m": 0.4660308116614771,
+    "max_element_edge_ratio": 1.8641232466459083,
+    "minimum_jacobian_determinant_m3": 0.0007944354736083979,
+    "minimum_scaled_jacobian_corners_gauss_center": 0.7071067811865469,
+    "duplicate_nodes": 0,
+    "duplicate_elements": 0,
+    "orphan_nodes": 0,
+    "exposed_faces": 3584,
+    "internal_cracks": 0,
+    "mesh_volume_m3": 352.7923863630783,
+    "exact_cylinder_volume_m3": 353.4291735288517,
+    "polygon_volume_deficit_percent": 0.18017391134278146,
+    "fc_MPa": 30.0,
+    "E_MPa_assumed_normal_weight": 25742.960202742808
+  },
+  "units": {
+    "force": "N",
+    "length": "M",
+    "heat": "KJ",
+    "temperature": "C",
+    "hydration_time": "hour",
+    "mass": "kg"
+  },
+  "rho_cp_kJ_m3_C": 2160.0,
+  "heat_asymptotic_kJ_m3": 97200.0,
+  "total_new_concrete_heat_asymptotic_kJ": 17145709.977245606,
+  "heat_source_old_is_zero": true,
+  "heat_source_new_activates_once": true,
+  "convection_on_internal_joint_after_new_activation": false,
+  "stages": [
+    {
+      "name": "H0_OLD_INIT",
+      "start_global_h": 0.0,
+      "end_global_h": 1.0,
+      "active_elements": 12288,
+      "active_convection_faces": 1792,
+      "active_boundary_groups": [
+        "BASE_TEMP",
+        "MECH_BASE",
+        "OLD_SIDE",
+        "OLD_TOP"
+      ],
+      "new_element_groups": [
+        "STAGE1_OLD"
+      ],
+      "initial_temperature_override": 28.0,
+      "steps": 1,
+      "joint_convection": true
+    },
+    {
+      "name": "H1_POUR_FORM",
+      "start_global_h": 1.0,
+      "end_global_h": 73.0,
+      "active_elements": 24576,
+      "active_convection_faces": 2816,
+      "active_boundary_groups": [
+        "BASE_TEMP",
+        "MECH_BASE",
+        "NEW_FORM",
+        "OLD_SIDE",
+        "TOP_CURE"
+      ],
+      "new_element_groups": [
+        "STAGE2_NEW"
+      ],
+      "initial_temperature_override": 30.0,
+      "steps": 96,
+      "joint_convection": false
+    },
+    {
+      "name": "H2_STRIP_FORM",
+      "start_global_h": 73.0,
+      "end_global_h": 169.0,
+      "active_elements": 24576,
+      "active_convection_faces": 2816,
+      "active_boundary_groups": [
+        "BASE_TEMP",
+        "MECH_BASE",
+        "NEW_AIR",
+        "OLD_SIDE",
+        "TOP_CURE"
+      ],
+      "new_element_groups": [],
+      "initial_temperature_override": null,
+      "steps": 48,
+      "joint_convection": false
+    },
+    {
+      "name": "H3_END_CURING",
+      "start_global_h": 169.0,
+      "end_global_h": 721.0,
+      "active_elements": 24576,
+      "active_convection_faces": 2816,
+      "active_boundary_groups": [
+        "BASE_TEMP",
+        "MECH_BASE",
+        "NEW_AIR",
+        "OLD_SIDE",
+        "TOP_AIR"
+      ],
+      "new_element_groups": [],
+      "initial_temperature_override": null,
+      "steps": 92,
+      "joint_convection": false
+    }
+  ],
+  "surface_counts": {
+    "BASE": 768,
+    "OLD_SIDE": 1024,
+    "OLD_TOP_PREPOUR": 768,
+    "NEW_SIDE": 1024,
+    "NEW_TOP": 768
+  },
+  "surface_areas_m2": {
+    "BASE": 44.09904829538482,
+    "OLD_SIDE": 94.20530784273922,
+    "OLD_TOP_PREPOUR": 44.09904829538482,
+    "NEW_SIDE": 94.20530784273922,
+    "NEW_TOP": 44.09904829538482
+  },
+  "maximum_MCT_line_length": 446
+}

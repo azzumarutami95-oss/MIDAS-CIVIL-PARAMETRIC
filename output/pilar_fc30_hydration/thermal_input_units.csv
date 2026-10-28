@@ -1,0 +1,10 @@
+parameter,physical_value,physical_unit,MCT_value,MCT_unit
+specific_heat,0.9,kJ/(kg.C),0.9,kJ/(kg.C)
+conductivity,2.4,W/(m.C),8.64,kJ/(m.h.C)
+weight_density,2400.0,kg/m3,23535.96,N/m3
+H_OLD_SIDE,10.0,W/(m2.C),36.0,kJ/(m2.h.C)
+H_OLD_TOP,10.0,W/(m2.C),36.0,kJ/(m2.h.C)
+H_FORM,3.0,W/(m2.C),10.8,kJ/(m2.h.C)
+H_NEW_AIR,10.0,W/(m2.C),36.0,kJ/(m2.h.C)
+H_TOP_CURE,5.0,W/(m2.C),18.0,kJ/(m2.h.C)
+H_TOP_AIR,10.0,W/(m2.C),36.0,kJ/(m2.h.C)
