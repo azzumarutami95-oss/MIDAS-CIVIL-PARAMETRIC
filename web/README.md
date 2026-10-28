@@ -82,6 +82,16 @@ temperatur pengecoran.
 
 ## Model termal yang diekspor
 
+Material Data menyediakan metode **manual / perhitungan** untuk specific heat
+dan heat conduction: cp berbobot massa; k seri/paralel/geometrik berbobot volume;
+serta acuan beton kering EN1992-1-2 pada Tref. Beton lama dapat memakai cp/k manual
+terpisah. Nilai aktif SPHEAT/HEATCO, Cv, difusivitas dan energi sumber ditampilkan.
+
+Lihat **[rumus, rujukan dan batas penerapan](THERMAL_METHODS.md)**. Sifat fase
+adalah asumsi editable; EC2 berasal dari beton mengeras untuk kebakaran. Metode
+tersebut tidak otomatis mengkalibrasi campuran segar. Nilai ekspor konstan pada
+suhu referensi. JSON v1 lama dimigrasikan ke metode manual.
+
 Satuan **N–m–kJ–°C, waktu hidrasi jam, massa kg**. Konduktivitas dan h yang
 diisi dalam W dikonversi ke kJ/jam dengan faktor 3,6. Berat isi = rho ×9,80665.
 E = 4700√f'c MPa, asumsi beton normal. f'c menjadi dasar E/nama; belum merupakan
@@ -113,7 +123,7 @@ dicocokkan dengan contoh MCT publik yang tercantum di aplikasi.
 
 ## Pengembangan dan pemeriksaan
 
-Sumber: `index.html`, `styles.css`, `engine.js`, `viewport.js`, `app.js` dan
+Sumber: `index.html`, `styles.css`, `thermal.js`, `engine.js`, `viewport.js`, `app.js` dan
 `nx-ui.js`, tanpa bundler npm
 atau dependensi runtime eksternal. Mesh dibentuk secara lokal, tidak mengambil
 model MCT dari server. Guard resource: 100.000 elemen / 125.000 node.
@@ -121,8 +131,10 @@ model MCT dari server. Guard resource: 100.000 elemen / 125.000 node.
 ```sh
 python3 scripts/build_html.py
 node tests/engine.test.js
+node tests/thermal.test.js
 python3 tests/browser_smoke.py
 python3 tests/nx_browser.py
+python3 tests/thermal_browser.py
 ```
 
 Builder menggunakan Python standard library. Tes browser memerlukan Python

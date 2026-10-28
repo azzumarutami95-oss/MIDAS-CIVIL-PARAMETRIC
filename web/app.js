@@ -74,14 +74,16 @@
     $('unit-table').innerHTML=E.units(config).map(r=>`<tr><td>${r[0]}</td><td>${format(r[1],3)}<small>${r[2]}</small></td><td><strong>${format(r[3],3)}</strong><small>${r[4]}</small></td></tr>`).join('');
   }
   function preview(c,checks){
-    const s=E.stages(c),m=c.material;
+    const s=E.stages(c),m=c.material,th=E.resolvedThermal(c);
     const lines=['; RINGKASAN INPUT - unduhan MCT berisi seluruh node dan elemen.',
       '; Asumsi contoh, belum diuji dengan parser atau solver MIDAS Civil.',
       '*UNIT','N, M, KJ, C',
       `; NODE=${E.estimate(c).nodes}; SOLID HEX8=${E.estimate(c).elements}; interface nodes=${checks.sharedInterfaceNodes}`,
       `; fc=${m.fc} MPa; E=${(4700*Math.sqrt(m.fc)*1e6).toFixed(3)} N/m2`,
-      '*MATERIAL',`1, CONC, FC_OLD, ${m.cp}, ${m.conductivity*3.6}, , C, NO, 0.05, 2, ${(4700*Math.sqrt(m.fc)*1e6).toFixed(3)}, ${m.poisson}, ${m.expansion}, ${(m.density*9.80665).toFixed(3)}, 0`,
-      '; Material kedua: properti sama, nama FC_NEW.',`*HYD-HEATSRCF`,`FUNC=NEW_ADIABATIC, USER, 1, YES`,
+      `; Metode cp=${th.cpMode}; k=${th.kMode}; old=${th.oldMode}; Tref=${th.referenceTemperature} degC`,
+      '*MATERIAL',`1, CONC, FC_OLD, ${th.oldCpMct.toFixed(9)}, ${th.oldKMct.toFixed(9)}, , C, NO, 0.05, 2, ${(4700*Math.sqrt(m.fc)*1e6).toFixed(3)}, ${m.poisson}, ${m.expansion}, ${(m.density*9.80665).toFixed(3)}, 0`,
+      `2, CONC, FC_NEW, ${th.cpMct.toFixed(9)}, ${th.kMct.toFixed(9)}, , C, NO, 0.05, 2, ${(4700*Math.sqrt(m.fc)*1e6).toFixed(3)}, ${m.poisson}, ${m.expansion}, ${(m.density*9.80665).toFixed(3)}, 0`,
+      `*HYD-HEATSRCF`,`FUNC=NEW_ADIABATIC, USER, 1, YES`,
       '0, 0',`24, ${E.heatRise(c,24).toFixed(6)}`,`${c.schedule.end}, ${E.heatRise(c,c.schedule.end).toFixed(6)}`,
       '; Unduhan menyertakan tabel panas lengkap dan kurva OLD_ZERO.',
       `; Dasar termal: ${c.boundary.baseMode==='fixed'?`${c.temperature.base} degC tetap`:'adiabatik / fluks nol'}`,'*HYD-STAGE'];
@@ -90,6 +92,33 @@
       for(const [field,key]of [['AELEM','ae'],['ABNDR','ab'],['DBNDR','db']])if(t[key].length)lines.push(field+'='+t[key].join(', '));}
     lines.push('*HYD-CTRL',`YES, , 1, ${c.temperature.old}, GAUSS, NO, NO, -1, NO, BOTH, 0, 5, 0.001`);
     $('mct-preview').value=lines.join('\n');
+  }
+  function renderThermal(){
+    const t=config.thermal,cpManual=document.querySelector('[data-key="material.cp"]'),kManual=document.querySelector('[data-key="material.conductivity"]');
+    cpManual.disabled=t.cpMode!=='manual';kManual.disabled=t.kMode!=='manual';
+    $('thermal-old-properties').hidden=t.oldMode!=='manual';
+    for(const key of ['oldCp','oldK'])document.querySelector('[data-key="thermal.'+key+'"]').disabled=t.oldMode!=='manual';
+    const outputs=['thermal-cp-active','thermal-k-active','thermal-spheat','thermal-heatco','thermal-cvol','thermal-diffusivity','thermal-old-cp-active','thermal-old-k-active','thermal-volume-sum','thermal-k-bounds'];
+    try{
+      const r=E.resolvedThermal(config);
+      for(const [id,value,d]of [['thermal-cp-active',r.cp,6],['thermal-k-active',r.k,6],['thermal-spheat',r.cpMct,6],['thermal-heatco',r.kMct,6],['thermal-cvol',r.cv,3],
+        ['thermal-old-cp-active',r.oldCp,6],['thermal-old-k-active',r.oldK,6],['thermal-volume-sum',r.sumVolume,6]])$(id).textContent=format(value,d);
+      $('thermal-diffusivity').textContent=Number.isFinite(r.diffusivity)?r.diffusivity.toExponential(4).replace('.',','):'—';
+      $('thermal-k-bounds').textContent=format(r.series,6)+' – '+format(r.parallel,6);
+      const cpFormula={manual:'cₚ = input manual',mixture:'cₚ = Σ(mᵢ cₚ,ᵢ) / Σmᵢ',ec2_dry:'cₚ = fungsi beton kering EC2(Tref) / 1000 → kJ/kg·°C'};
+      const kFormula={manual:'k = input manual',series:'k = 1 / Σ(vᵢ / kᵢ)',parallel:'k = Σ(vᵢ kᵢ)',geometric:'k = exp[Σ(vᵢ ln kᵢ)]',
+        ec2_lower:'k = 1,36 − 0,136(T/100) + 0,0057(T/100)²',ec2_upper:'k = 2 − 0,2451(T/100) + 0,0107(T/100)²'};
+      $('thermal-formula-cp').textContent=cpFormula[t.cpMode];$('thermal-formula-k').textContent=kFormula[t.kMode];
+      const modeCp=t.cpMode==='manual'?'cₚ manual':t.cpMode==='mixture'?'cₚ campuran':'cₚ acuan EC2';
+      const modeK=t.kMode==='manual'?'k manual':t.kMode.startsWith('ec2_')?'k acuan EC2':'k komposit '+t.kMode;
+      const energy='Dengan K tetap '+format(config.heat.K,1)+'°C, energi asimtotik yang tersirat = '+format(r.heatInfinity,1)+' kJ/m³. Mengubah cₚ juga mengubah energi kurva adiabatik.';
+      $('thermal-method-note').textContent=modeCp+'; '+modeK+'. '+energy+' '+r.warnings.join(' ');
+      for(const row of r.rows){$('thermal-mass-'+row.id).textContent=format(row.mass,3);$('thermal-volume-'+row.id).textContent=format(row.fraction*100,3)+'%';}
+    }catch(error){
+      outputs.forEach(id=>$(id).textContent='—');$('thermal-method-note').textContent=error.message;
+      $('thermal-formula-cp').textContent='Periksa metode dan nilai masukan.';$('thermal-formula-k').textContent='Perhitungan belum tersedia.';
+      for(const [phase]of window.HydrationThermal.phases){$('thermal-mass-'+phase).textContent=format(config.mix[phase],3);$('thermal-volume-'+phase).textContent='—';}
+    }
   }
   function messages(validation,checks){
     const list=$('validation-list');list.replaceChildren();
@@ -113,6 +142,7 @@
     fields.forEach(el=>{const bad=result.errors.some(e=>e.field===el.dataset.key);el.setAttribute('aria-invalid',String(bad));});
     $('export-mct').disabled=!!result.errors.length;$('export-json').disabled=!!result.errors.length;$('download-report').disabled=!!result.errors.length;
     const fixed=config.boundary.baseMode==='fixed';document.querySelector('[data-key="temperature.base"]').disabled=!fixed;
+    renderThermal();
     const mix=E.mixMetrics(config),stats=E.estimate(config);
     for(const [id,value,digits]of [['metrics-nodes',stats.nodes,0],['metrics-elements',stats.elements,0],['metrics-volume',stats.volume,2],['metrics-wb',mix.wb,3],
       ['mix-wc',mix.wc,3],['mix-wb',mix.wb,3],['mix-binder',mix.binder,1],['mix-total',mix.total,2],['mix-flyash',mix.flyash,1]])$(id).textContent=format(value,digits);
@@ -130,7 +160,7 @@
   function download(name,text,type='application/octet-stream'){
     const url=URL.createObjectURL(new Blob([text],{type})),a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);
   }
-  function snapshot(){return {schema:'civil-heat-studio/v1',created_at:new Date().toISOString(),config:structuredClone(config),reference,
+  function snapshot(){return {schema:'civil-heat-studio/v1',created_at:new Date().toISOString(),config:structuredClone(config),reference,thermal_calculation:E.resolvedThermal(config),
     status:{assumptions:true,native_midas_tested:false,journal_validated:false}};}
   fields.forEach(el=>el.addEventListener('input',()=>{clearTimeout(timer);timer=setTimeout(render,160);}));
   fields.filter(el=>el.tagName==='SELECT').forEach(el=>el.addEventListener('change',()=>{clearTimeout(timer);render();}));
@@ -159,7 +189,7 @@
     fill(E.defaults());render();notify('Parameter kembali ke contoh awal.');});
   $('download-report').addEventListener('click',()=>{
     clearTimeout(timer);render();if(E.validate(config).errors.length)return;
-    try{const model=lastModel||E.build(config),mix=E.mixMetrics(config),s=config.schedule;
+    try{const model=lastModel||E.build(config),mix=E.mixMetrics(config),s=config.schedule,thermal=model.thermal;
       const rows=['RINGKASAN INPUT PANAS HIDRASI - CIVIL HYDRATION','Asumsi contoh; bukan hasil analisis suhu/tegangan.',
         'Waktu pembuatan: '+new Date().toLocaleString('id-ID',{timeZone:'Asia/Jakarta'})+' WIB','',
         'SATUAN MCT: N, m, kJ, degC; waktu jam, massa kg.',
@@ -171,11 +201,21 @@
         `Batch ${config.mix.batchVolume}m3: air ditambah ${mix.batchWater}kg, pasir basah ${mix.batchSand}kg, agregat basah ${mix.batchGravel}kg.`,
         'Koreksi batch mengasumsikan air bebas terhadap SSD; absorpsi belum tersedia.',
         '',`SUMBER: DeltaTad(t)=K*(1-exp(-a*t/24)), t jam, K=${config.heat.K}degC, a=${config.heat.alpha}/hari.`,
-        `Energi asimtotik=${config.material.density*config.material.cp*config.heat.K} kJ/m3; bukan suhu pilar.`,
+        `Energi asimtotik=${thermal.heatInfinity} kJ/m3; bukan suhu pilar.`,
         `Beton lama panas nol; awal ${config.temperature.old}degC asumsi; suhu cor ${config.temperature.pour}degC.`,
         `DASAR TERMAL: ${config.boundary.baseMode}; tumpuan translasi dasar tetap (idealisasi mekanis).`,
         '','TAHAP:'];
       model.stages.forEach(t=>rows.push(`${t.name}: global ${t.globalStart}-${t.globalEnd}jam; umur baru ${t.newAgeStart}-${t.newAgeEnd}jam; elemen aktif ${t.activeElements}; muka konveksi ${t.convectionFaces}.`));
+      rows.push('','PERHITUNGAN MATERIAL TERMAL:',
+        `Metode cp=${thermal.cpMode}; k=${thermal.kMode}; Tref=${thermal.referenceTemperature}degC; material lama=${thermal.oldMode}.`,
+        `Beton baru: cp=${thermal.cp}kJ/kgC; k=${thermal.k}W/mC; SPHEAT=${thermal.cpMct}; HEATCO=${thermal.kMct}.`,
+        `Beton lama: cp=${thermal.oldCp}kJ/kgC; k=${thermal.oldK}W/mC; SPHEAT=${thermal.oldCpMct}; HEATCO=${thermal.oldKMct}.`,
+        `Cp_mix=Sigma(mi*cpi)/Sigma(mi)=${thermal.mixtureCp}; Vsum=${thermal.sumVolume}m3; volume dinormalisasi tanpa mengarang udara.`,
+        `k_series/geometric/parallel=${thermal.series}/${thermal.geometric}/${thermal.parallel}W/mC.`,
+        `Cv=${thermal.cv}kJ/m3C; diffusivity=${thermal.diffusivity}m2/s.`,
+        'Properti fase adalah asumsi editable, bukan parameter campuran terukur. EC2 adalah acuan beton mengeras untuk kebakaran; MCT mengekspor konstanta.',...thermal.warnings);
+      for(const phase of thermal.rows)rows.push(`${phase.label}: m=${phase.mass}; rho=${phase.density}; cp=${phase.cp}; k=${phase.k}; v_normalized=${phase.fraction}.`);
+      rows.push('','SUMBER METODE:');for(const source of thermal.sources)rows.push(`${source.id}: ${source.title}\n${source.url}\n${source.scope}`);
       rows.push('','KONVERSI TERMAL:');model.units.forEach(r=>rows.push(`${r[0]}: ${r[1]} ${r[2]} -> ${r[3]} ${r[4]}`));
       rows.push('','MONITOR:');model.monitors.forEach(n=>rows.push(`${n.name}: node ${n.id}; X,Y,Z=${n.coordinates.join(', ')}m (node terdekat target).`));
       rows.push('','VERIFIKASI NATIVE MASIH DIPERLUKAN:',

@@ -1,0 +1,240 @@
+{
+  "schema": "civil-heat-studio/v1",
+  "config": {
+    "geometry": {
+      "diameter": 7.5,
+      "heightOld": 4,
+      "heightNew": 4
+    },
+    "material": {
+      "fc": 30,
+      "density": 2400,
+      "cp": 0.9,
+      "conductivity": 2.4,
+      "poisson": 0.2,
+      "expansion": 0.00001
+    },
+    "temperature": {
+      "old": 28,
+      "pour": 30,
+      "ambient": 28,
+      "base": 28
+    },
+    "heat": {
+      "K": 45,
+      "alpha": 0.5
+    },
+    "convection": {
+      "oldSide": 10,
+      "oldTop": 10,
+      "form": 3,
+      "air": 10,
+      "curing": 5,
+      "topAir": 10
+    },
+    "schedule": {
+      "init": 1,
+      "strip": 72,
+      "cure": 168,
+      "end": 720,
+      "dtEarly": 0.5,
+      "dtMiddle": 1,
+      "dtStrip": 2,
+      "dtLate": 6
+    },
+    "mesh": {
+      "sideDiv": 16,
+      "radialDiv": 8,
+      "layersOld": 16,
+      "layersNew": 16
+    },
+    "mix": {
+      "cement": 432,
+      "flyash": 108,
+      "water": 151,
+      "admixture1": 2.16,
+      "admixture2": 8.1,
+      "sand": 749,
+      "gravel": 976,
+      "batchVolume": 0.035,
+      "sandMoisture": 4,
+      "gravelMoisture": 0.15
+    },
+    "boundary": {
+      "baseMode": "fixed"
+    },
+    "thermal": {
+      "cpMode": "ec2_dry",
+      "kMode": "ec2_lower",
+      "referenceTemperature": 30,
+      "oldMode": "manual",
+      "oldCp": 0.9,
+      "oldK": 2.4
+    },
+    "thermalComponents": {
+      "cementDensity": 3150,
+      "cementCp": 0.84,
+      "cementK": 1.5,
+      "flyashDensity": 2300,
+      "flyashCp": 0.75,
+      "flyashK": 0.7,
+      "waterDensity": 1000,
+      "waterCp": 4.18,
+      "waterK": 0.6,
+      "sandDensity": 2650,
+      "sandCp": 0.8,
+      "sandK": 3,
+      "gravelDensity": 2700,
+      "gravelCp": 0.8,
+      "gravelK": 3,
+      "admixture1Density": 1100,
+      "admixture1Cp": 3.5,
+      "admixture1K": 0.5,
+      "admixture2Density": 1100,
+      "admixture2Cp": 3.5,
+      "admixture2K": 0.5
+    }
+  },
+  "thermal_calculation": {
+    "cp": 0.9,
+    "k": 1.3197130000000001,
+    "oldCp": 0.9,
+    "oldK": 2.4,
+    "cpMct": 0.9,
+    "kMct": 4.7509668000000005,
+    "oldCpMct": 0.9,
+    "oldKMct": 8.64,
+    "cpMode": "ec2_dry",
+    "kMode": "ec2_lower",
+    "oldMode": "manual",
+    "referenceTemperature": 30,
+    "rows": [
+      {
+        "id": "cement",
+        "label": "Semen",
+        "mass": 432,
+        "density": 3150,
+        "cp": 0.84,
+        "k": 1.5,
+        "volume": 0.13714285714285715,
+        "fraction": 0.13873138104890864
+      },
+      {
+        "id": "flyash",
+        "label": "Fly ash",
+        "mass": 108,
+        "density": 2300,
+        "cp": 0.75,
+        "k": 0.7,
+        "volume": 0.04695652173913043,
+        "fraction": 0.04750041851131111
+      },
+      {
+        "id": "water",
+        "label": "Air",
+        "mass": 151,
+        "density": 1000,
+        "cp": 4.18,
+        "k": 0.6,
+        "volume": 0.151,
+        "fraction": 0.15274903100905876
+      },
+      {
+        "id": "sand",
+        "label": "Pasir",
+        "mass": 749,
+        "density": 2650,
+        "cp": 0.8,
+        "k": 3,
+        "volume": 0.28264150943396227,
+        "fraction": 0.2859153423110959
+      },
+      {
+        "id": "gravel",
+        "label": "Agregat kasar",
+        "mass": 976,
+        "density": 2700,
+        "cp": 0.8,
+        "k": 3,
+        "volume": 0.36148148148148146,
+        "fraction": 0.36566851671533324
+      },
+      {
+        "id": "admixture1",
+        "label": "Admixture 1",
+        "mass": 2.16,
+        "density": 1100,
+        "cp": 3.5,
+        "k": 0.5,
+        "volume": 0.0019636363636363636,
+        "fraction": 0.0019863811377457373
+      },
+      {
+        "id": "admixture2",
+        "label": "Admixture 2",
+        "mass": 8.1,
+        "density": 1100,
+        "cp": 3.5,
+        "k": 0.5,
+        "volume": 0.007363636363636363,
+        "fraction": 0.007448929266546514
+      }
+    ],
+    "totalMass": 2426.2599999999998,
+    "sumVolume": 0.9885496425247041,
+    "mixtureCp": 1.0266706783279616,
+    "series": 1.5361165102548373,
+    "parallel": 2.2924660154181495,
+    "geometric": 1.955367943417368,
+    "cv": 2160,
+    "diffusivity": 6.109782407407408e-7,
+    "heatInfinity": 97200,
+    "codeSelected": true,
+    "code": {
+      "cp": 0.9,
+      "lower": 1.3197130000000001,
+      "upper": 1.927433
+    },
+    "warnings": [
+      "Acuan EC2 berasal dari beton mengeras pada desain kebakaran. Hasilnya konstan pada suhu referensi; belum merupakan kalibrasi beton segar/panas hidrasi."
+    ],
+    "sources": [
+      {
+        "id": "MIX-CP",
+        "title": "BAMresearch / FenicsConcrete: constituent volumetric heat-capacity homogenization",
+        "url": "https://github.com/BAMresearch/FenicsConcrete/blob/master/fenics_concrete/mori_tanaka_homogenization.py#L296",
+        "scope": "Energy-balance basis for mass-weighted cp. Constituent properties must be supplied; no calibration of this project."
+      },
+      {
+        "id": "WIENER",
+        "title": "SimPEG Wiener bounds; reference to Torquato, Random Heterogeneous Materials (2002)",
+        "url": "https://github.com/simpeg/simpeg/blob/main/simpeg/maps/_property_maps.py#L1282",
+        "scope": "Generic positive scalar conduction: ideal series/parallel bounds, not concrete-specific measurement. Geometric mean is a separate estimate."
+      },
+      {
+        "id": "EC2",
+        "title": "ConcreteEC2.cpp — OpenSees for Fire implementation of EC2 concrete thermal relations",
+        "url": "https://github.com/OpenSeesforFire/openseesforfire.github.io/blob/OpenSees-SRC/SRC/HeatTransfer/HeatTransferMaterial/ConcreteEC2.cpp",
+        "scope": "Dry, hardened concrete under fire-design temperature; code-reference option only. Constant evaluation at reference temperature, not fresh-concrete calibration."
+      },
+      {
+        "id": "MIDAS-UNIT",
+        "title": "MIDAS unit-system documentation mirror: N (kg), KN (ton)",
+        "url": "https://github.com/python261/midas-civil-NX-API/blob/main/db/project/Unit-System.md",
+        "scope": "Force/mass and heat unit mapping."
+      },
+      {
+        "id": "MIDAS-HOH",
+        "title": "MIDASIT heat-of-hydration tutorial",
+        "url": "https://github.com/MIDASIT-Co-Ltd/midas-civil-python/blob/main/examples/python/Tut7%20Heat%20of%20Hydration.py",
+        "scope": "Staging and thermal boundary workflow."
+      }
+    ]
+  },
+  "status": {
+    "assumptions": true,
+    "native_midas_tested": false,
+    "journal_validated": false
+  },
+  "note": "Dry hardened-concrete fire-code reference at constant Tref, not fresh-concrete calibration."
+}

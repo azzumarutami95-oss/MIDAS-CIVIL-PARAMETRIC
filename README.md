@@ -16,6 +16,16 @@ termal, konveksi, sumber panas dan empat tahap, lalu klik **Unduh .MCT**.
 Tidak perlu instalasi atau koneksi internet. Tersedia pratinjau mesh/kurva,
 koreksi batch, konversi satuan, simpan/buka JSON dan ringkasan input.
 
+**Material Data**: specific heat dan heat conduction dapat diinput manual atau
+dihitung dari sifat fase campuran; tersedia pula acuan EN1992-1-2 pada suhu
+referensi. Beton lama dapat memakai cp/k terpisah. Nilai aktif langsung masuk
+ke SPHEAT/HEATCO MCT. [Rumus dan rujukan metode](web/THERMAL_METHODS.md).
+
+![Pratinjau kalkulator material](web/THERMAL_CALCULATOR_PREVIEW.png)
+
+Contoh JSON untuk tombol **Buka**: [campuran + beton lama manual](examples/THERMAL_MIXTURE.json)
+dan [acuan EC2 pada Tref](examples/THERMAL_EC2_REFERENCE.json).
+
 [Petunjuk aplikasi dan batas penggunaan](web/README.md). Angka termal adalah
 asumsi contoh; impor/solver MIDAS dan penilaian retak belum tervalidasi.
 
