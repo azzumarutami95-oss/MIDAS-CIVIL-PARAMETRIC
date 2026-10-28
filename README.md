@@ -2,6 +2,8 @@
 
 ## Aplikasi Windows (.exe)
 
+**[Unduh installer Windows 64-bit v1.0.0 (.exe)](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/download/v1.0.0/Civil-Hydration-NX-Setup-1.0.0-x64.exe)**
+
 **[Unduh installer Civil Hydration NX dari GitHub Releases](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/latest)**
 
 Pilih `Civil-Hydration-NX-Setup-1.0.0-x64.exe` untuk Windows 10/11 64-bit (x64).

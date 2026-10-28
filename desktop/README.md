@@ -2,6 +2,8 @@
 
 **[Buka halaman unduh installer di GitHub Releases](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/latest)**
 
+**[Unduh langsung installer v1.0.0 (.exe)](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/download/v1.0.0/Civil-Hydration-NX-Setup-1.0.0-x64.exe)**
+
 Berkas versi 1.0.0: `Civil-Hydration-NX-Setup-1.0.0-x64.exe`.
 Paket ini ditujukan untuk Windows 10/11 64-bit dengan prosesor x64. Aplikasi
 menyertakan Electron/Chromium sehingga penggunaan normal tidak memerlukan
@@ -62,8 +64,11 @@ serta [petunjuk input](../web/README.md).
 Paket ini merupakan aplikasi independen. File keluaran berbentuk `.MCT`;
 setelah impor, model native disimpan melalui MIDAS Civil. Keberhasilan build
 installer tidak membuktikan kompatibilitas seluruh kartu MCT atau validitas
-hasil solver. Pengujian instalasi dan penggunaan pada Windows aktual masih
-perlu dicatat terpisah dari pengujian numerik dan antarmuka di lingkungan build.
+hasil solver. [Pengujian Windows v1.0.0](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/actions/runs/40722485089)
+berhasil: instalasi per pengguna, pembukaan aplikasi terpasang, ekspor MCT/JSON/TXT,
+pembatalan penyimpanan, impor JSON, pemulihan parameter setelah restart, dan
+uninstall. Berkas yang diterbitkan dilengkapi `SHA256SUMS.txt`. Pengujian ini
+tidak menjalankan parser atau solver MIDAS.
 
 ## Build dari source
 
