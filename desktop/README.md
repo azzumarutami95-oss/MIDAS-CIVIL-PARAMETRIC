@@ -102,14 +102,13 @@ serta [petunjuk input](../web/README.md).
 Paket ini merupakan aplikasi independen. File keluaran berbentuk `.MCT`;
 setelah impor, model native disimpan melalui MIDAS Civil. Keberhasilan build
 installer tidak membuktikan kompatibilitas seluruh kartu MCT atau validitas
-hasil solver. [Pengujian Windows v1.0.0](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/actions/runs/40722485089)
-berhasil: instalasi per pengguna, pembukaan aplikasi terpasang, ekspor MCT/JSON/TXT,
-pembatalan penyimpanan, impor JSON, pemulihan parameter setelah restart, dan
-uninstall. Berkas yang diterbitkan dilengkapi `SHA256SUMS.txt`. Pengujian ini
-tidak menjalankan parser atau solver MIDAS.
-
-Pengujian Windows untuk fitur Open/Save/Save As versi 1.1.0 belum dicatat pada
-dokumen ini; status build tersedia di halaman Actions repository.
+hasil solver. [Pengujian Windows v1.1.0](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/actions/runs/40728766613)
+berhasil: instalasi per pengguna, pembukaan aplikasi terpasang, Save ke file aktif,
+Save As dengan file asal tetap utuh, pembatalan dan kegagalan Save As, membuka
+proyek lalu menyimpan editnya, penolakan JSON rusak, pengingat perubahan sebelum
+Open/close, simpan sebelum membuka proyek lain atau menutup aplikasi, ekspor
+MCT/TXT, pemulihan parameter setelah restart, dan uninstall. Berkas rilis dilengkapi
+`SHA256SUMS.txt`. Pengujian ini tidak menjalankan parser atau solver MIDAS.
 
 ## Build dari source
 
