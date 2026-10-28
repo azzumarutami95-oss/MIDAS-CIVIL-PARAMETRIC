@@ -27,9 +27,12 @@
 @media(max-width:1250px){.thermal-results{grid-template-columns:repeat(3,minmax(0,1fr))}.thermal-result:nth-child(3){border-right:0}.thermal-result:nth-child(-n+3){border-bottom:1px solid #e0e9f0}.thermal-method-grid{grid-template-columns:1fr 1fr}.thermal-method-grid>.field:last-child{grid-column:1/-1;max-width:260px}}
 @media(max-width:700px){.thermal-method-grid{grid-template-columns:1fr}.thermal-method-grid>.field:last-child{max-width:none}.thermal-formulas{grid-template-columns:1fr;gap:8px}.thermal-results{grid-template-columns:repeat(2,minmax(0,1fr))}.thermal-result{padding:12px}.thermal-result:nth-child(3){border-right:1px solid #e0e9f0}.thermal-result:nth-child(2n){border-right:0}.thermal-result:nth-child(-n+4){border-bottom:1px solid #e0e9f0}.thermal-result strong{font-size:18px}.thermal-result-main strong{font-size:22px}.thermal-result>span{font-size:9px}.thermal-old-setup{align-items:stretch;flex-direction:column;gap:14px}.thermal-old-setup>.field{max-width:none}.thermal-old-results{justify-content:space-between;gap:15px}.thermal-badge{font-size:8px;padding:4px 6px}.thermal-calculator>.card-heading{gap:10px}.thermal-calculator>.card-heading h3{font-size:12px;line-height:1.5}.thermal-component-table{min-width:700px}.thermal-method-note{font-size:9px}.thermal-audit-row{gap:13px;flex-direction:column}.thermal-audit-row>span{grid-template-columns:1fr auto}.thermal-audit-row strong{font-size:11px}.thermal-sources .details-content{font-size:9px}}
 
+/* Desktop project name and explicit file-save state. */
+#project-file-name{min-width:0;overflow:hidden;text-overflow:ellipsis}#project-dirty{color:#ffd293;flex-shrink:0;font-size:15px}.nx-document-state.has-unsaved{background:#fff3dd;color:#9c6424;border-color:#e8cf9f}#save-as[hidden],#project-dirty[hidden]{display:none!important}
+
 </style></head>
 <body class="nx-app">
-<header class="nx-titlebar" id="overview"><a class="nx-appmark" href="#model" data-workspace="model" aria-label="Civil Hydration model"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 9 5v10l-9 5-9-5V7zM3 7l9 5 9-5M12 12v10"/></svg><span>CIVIL <b>HYDRATION</b><small>NX WORKSPACE</small></span></a><div class="nx-project-title"><span class="project-indicator"></span>Pilar dua tahap<span class="nx-title-separator">—</span>Heat of Hydration</div><div class="nx-quick-actions"><button id="import-json" type="button" title="Buka parameter JSON">↥ <span>Buka</span></button><button id="export-json" type="button" title="Simpan parameter JSON">▣ <span>Simpan</span></button><button id="reset-defaults" type="button" title="Reset ke parameter contoh">↺ <span>Reset</span></button><input type="file" id="import-file" accept=".json,application/json" hidden></div></header>
+<header class="nx-titlebar" id="overview"><a class="nx-appmark" href="#model" data-workspace="model" aria-label="Civil Hydration model"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 9 5v10l-9 5-9-5V7zM3 7l9 5 9-5M12 12v10"/></svg><span>CIVIL <b>HYDRATION</b><small>NX WORKSPACE</small></span></a><div class="nx-project-title"><span class="project-indicator"></span><span id="project-file-name">Pilar dua tahap</span><strong id="project-dirty" title="Perubahan belum disimpan" aria-label="Perubahan belum disimpan" hidden>*</strong><span class="nx-title-separator">—</span>Heat of Hydration</div><div class="nx-quick-actions"><button id="import-json" type="button" title="Buka parameter JSON">↥ <span>Buka</span></button><button id="export-json" type="button" title="Simpan parameter JSON">▣ <span>Simpan</span></button><button id="save-as" type="button" title="Save As — simpan proyek dengan nama atau lokasi baru (Ctrl+Shift+S)" hidden>▣ <span>Save As</span></button><button id="reset-defaults" type="button" title="Reset ke parameter contoh">↺ <span>Reset</span></button><input type="file" id="import-file" accept=".json,application/json" hidden></div></header>
 <div class="nx-ribbon"><nav class="nx-ribbon-tabs" aria-label="Workspace"><button type="button" data-workspace="model" class="is-active" aria-selected="true">Model</button><button type="button" data-workspace="campuran" aria-selected="false">Mix Design</button><button type="button" data-workspace="termal" aria-selected="false">Heat of Hydration</button><button type="button" data-workspace="tahapan" aria-selected="false">Construction Stage</button><button type="button" data-workspace="ekspor" aria-selected="false">Check & Export</button><span class="nx-ribbon-target">MIDAS Civil NX · ekspor .MCT</span></nav>
 <div class="nx-ribbon-tools"><div class="ribbon-group"><button class="ribbon-command" type="button" data-workspace="model"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 9 5v10l-9 5-9-5V7zM3 7l9 5 9-5M12 12v10"/></svg><span>Solid model</span></button><button class="ribbon-command" type="button" data-workspace="campuran"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M7 5v5l-4 9a2 2 0 0 0 2 3h14a2 2 0 0 0 2-3l-4-9V5M7 15h10M8 2h8"/></svg><span>Mix design</span></button><span class="ribbon-group-label">MODEL INPUT</span></div><div class="ribbon-group"><button class="ribbon-command" type="button" data-workspace="termal"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14V5a3 3 0 0 1 6 0v9a5 5 0 1 1-6 0zM13 7v10"/></svg><span>Thermal & heat</span></button><button class="ribbon-command" type="button" data-workspace="tahapan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h6v4H3zM9 10h6v4H9zM15 15h6v4h-6zM9 7h11M3 12h6M3 17h12"/></svg><span>Stages</span></button><span class="ribbon-group-label">ANALYSIS INPUT</span></div><div class="ribbon-group"><button class="ribbon-command" type="button" data-workspace="ekspor"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 2h9l5 5v15H5zM14 2v6h5M8 12h8M8 16h8"/></svg><span>Check input</span></button><button class="ribbon-command" type="button" id="download-report"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 2h9l5 5v15H5zM14 2v6h5M8 12h8M8 16h8"/></svg><span>Input report</span></button><span class="ribbon-group-label">VALIDATION</span></div><div class="nx-export-group"><span id="save-status" class="save-status" role="status">Tersimpan di browser</span><button class="button button-primary" id="export-mct" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M4 16v5h16v-5"/></svg><span>Unduh .MCT</span></button><small>Periksa impor pada versi NX Anda</small></div></div></div>
 <div class="nx-workbench">
@@ -696,10 +699,11 @@
 (function () {
   'use strict';
   const E=window.MidasEngine, $=id=>document.getElementById(id), storageKey='civil-heat-studio.v1';
-  const fields=[...document.querySelectorAll('[data-key]')];
+  const fields=[...document.querySelectorAll('[data-key]')], desktop=window.hydrationDesktop;
   const format=(v,d=2)=>Number.isFinite(v)?new Intl.NumberFormat('id-ID',{minimumFractionDigits:d,maximumFractionDigits:d}).format(v):'—';
   const integer=v=>format(v,0);
   let config=E.defaults(),lastModel=null,timer,saveAvailable=true;
+  let savedFingerprint=JSON.stringify(E.defaults()),projectName='',projectPath='',saveBusy=false,openBusy=false;
   const reference={source:'Transkripsi foto tabel campuran pengguna; satuan kg/m3.',
     strength:{days3:[21.8,27.2],days7:[44.7,50.4,32.3],reportedMean3:24.5,reportedMean7:42.4,days28:null},
     temperatureLab:[{minutes:15,C:31.1},{minutes:60,C:32.3}],reportedSA:49,reportedRatio:28,
@@ -709,6 +713,24 @@
   function persist(c){
     try{localStorage.setItem(storageKey,JSON.stringify({schema:'civil-heat-studio/v1',config:c}));$('save-status').textContent='Tersimpan di browser';}
     catch(_){saveAvailable=false;$('save-status').textContent='Gunakan JSON untuk menyimpan';}
+  }
+  function projectStatus(current=read()){
+    if(!desktop)return;
+    const dirty=JSON.stringify(current)!==savedFingerprint;
+    const filename=projectName||'Tanpa nama.json';
+    $('project-file-name').textContent=filename;
+    $('project-file-name').title=projectPath||'Proyek JSON belum memiliki lokasi penyimpanan';
+    $('project-dirty').hidden=!dirty;
+    $('save-status').textContent=saveBusy?'Menyimpan…':dirty?'Perubahan belum disimpan':projectName?'Tersimpan ke file':'Belum disimpan ke file';
+    $('save-status').title=projectPath||'Gunakan Save / Save As untuk menyimpan proyek JSON.';
+    $('save-as').disabled=saveBusy||!!E.validate(current).errors.length;
+    if(saveBusy)$('export-json').disabled=true;
+    $('import-json').disabled=openBusy||saveBusy;
+    const state=document.querySelector('.nx-document-state');
+    state.textContent=dirty?'BELUM DISIMPAN':projectName?'TERSIMPAN':'PARAMETER CONTOH';
+    state.classList.toggle('has-unsaved',dirty);
+    document.title=filename+(dirty?' *':'')+' — Civil Hydration NX';
+    desktop.setDirty(dirty);
   }
   let loaded=false;
   try{const saved=localStorage.getItem(storageKey);if(saved){const c=E.cleanConfig(JSON.parse(saved));if(!E.validate(c).errors.length){config=c;loaded=true;}}}
@@ -849,7 +871,7 @@
         plan(section);side(section);heatChart();renderStages();preview(config,checks);persist(config);}
       catch(error){result.errors.push({message:error.message});$('export-mct').disabled=true;$('download-report').disabled=true;}
     }else{$('save-status').textContent='Perubahan belum disimpan';$('mct-preview').value='Perbaiki masukan yang ditandai sebelum mengekspor file .MCT.';}
-    messages(result,checks);
+    messages(result,checks);projectStatus(config);
   }
   function notify(message){$('export-status').textContent=message;}
   function download(name,text,type='application/octet-stream'){
@@ -857,7 +879,7 @@
   }
   function snapshot(){return {schema:'civil-heat-studio/v1',created_at:new Date().toISOString(),config:structuredClone(config),reference,thermal_calculation:E.resolvedThermal(config),
     status:{assumptions:true,native_midas_tested:false,journal_validated:false}};}
-  fields.forEach(el=>el.addEventListener('input',()=>{clearTimeout(timer);timer=setTimeout(render,160);}));
+  fields.forEach(el=>el.addEventListener('input',()=>{projectStatus();clearTimeout(timer);timer=setTimeout(render,160);}));
   fields.filter(el=>el.tagName==='SELECT').forEach(el=>el.addEventListener('change',()=>{clearTimeout(timer);render();}));
   $('use-mix-density').addEventListener('click',()=>{config=read();const sum=E.mixMetrics(config).total;if(!Number.isFinite(sum))return;
     document.querySelector('[data-key="material.density"]').value=sum.toFixed(2);clearTimeout(timer);render();notify('Massa jenis diisi dari jumlah massa campuran. Ini perkiraan, bukan hasil pengukuran massa jenis.');});
@@ -870,10 +892,50 @@
     catch(error){notify('Ekspor belum berhasil: '+error.message);}
     finally{$('export-mct').disabled=!!E.validate(read()).errors.length;}
   });
-  $('export-json').addEventListener('click',()=>{clearTimeout(timer);render();if(E.validate(config).errors.length)return;
-    download('PARAMETER_HEAT_HYDRATION.json',JSON.stringify(snapshot(),null,2),'application/json');notify('Parameter disimpan sebagai JSON.');});
-  $('import-json').addEventListener('click',()=>$('import-file').click());
+  async function saveProject(saveAs=false){
+    if(saveBusy)return false;
+    clearTimeout(timer);render();if(E.validate(config).errors.length){notify('Perbaiki input yang ditandai sebelum menyimpan proyek.');return false;}
+    if(!desktop){download('PARAMETER_HEAT_HYDRATION.json',JSON.stringify(snapshot(),null,2),'application/json');notify('Parameter disimpan sebagai JSON.');return true;}
+    const captured=JSON.stringify(config),text=JSON.stringify(snapshot(),null,2);
+    saveBusy=true;projectStatus();
+    try{
+      const result=await desktop.saveProject(text,saveAs);
+      if(result.status==='cancelled'){notify('Penyimpanan dibatalkan. File aktif tetap sama.');return false;}
+      if(result.status!=='saved')throw Error(result.message||'File belum berhasil disimpan.');
+      savedFingerprint=captured;projectName=result.name;projectPath=result.filePath||'';
+      const unchanged=JSON.stringify(read())===captured;
+      notify(unchanged?'Proyek '+projectName+' berhasil disimpan.':'Versi proyek tersimpan; perubahan terbaru masih perlu disimpan.');
+      return unchanged;
+    }catch(error){notify('Proyek belum disimpan: '+error.message);return false;}
+    finally{saveBusy=false;render();}
+  }
+  async function openProject(){
+    if(!desktop){$('import-file').click();return;}
+    if(openBusy||saveBusy)return;
+    openBusy=true;projectStatus();
+    try{
+      const result=await desktop.openProject();
+      if(result.status==='cancelled')return;
+      if(result.status!=='opened')throw Error(result.message||'File belum berhasil dibuka.');
+      const next=E.cleanConfig(JSON.parse(result.text)),valid=E.validate(next);
+      if(valid.errors.length)throw Error(valid.errors[0].message);
+      savedFingerprint=JSON.stringify(next);projectName=result.name;projectPath=result.filePath||'';
+      fill(next);clearTimeout(timer);render();notify('Proyek '+projectName+' berhasil dimuat. Save akan memperbarui file ini.');
+    }catch(error){notify('JSON tidak dimuat: '+error.message+' Parameter sebelumnya dipertahankan.');}
+    finally{openBusy=false;projectStatus();}
+  }
+  $('export-json').addEventListener('click',()=>{void saveProject();});
+  $('save-as').addEventListener('click',()=>{void saveProject(true);});
+  $('import-json').addEventListener('click',()=>{void openProject();});
+  if(desktop){
+    $('save-as').hidden=false;
+    $('export-json').title='Save — simpan perubahan ke file proyek aktif (Ctrl+S)';
+    $('export-json').querySelector('span').textContent='Save';
+    $('import-json').title='Buka proyek JSON (Ctrl+O)';
+    window.CivilHydrationProject=Object.freeze({save:()=>saveProject()});
+  }
   $('import-file').addEventListener('change',async event=>{
+    if(desktop){event.target.value='';return;}
     const file=event.target.files[0];if(!file)return;
     try{if(file.size>1024*1024)throw Error('Ukuran JSON maksimum 1 MB.');const next=E.cleanConfig(JSON.parse(await file.text()));const valid=E.validate(next);
       if(valid.errors.length)throw Error(valid.errors[0].message);fill(next);render();notify('Parameter JSON berhasil dimuat.');}
@@ -927,8 +989,8 @@
     const observer=new IntersectionObserver(entries=>{for(const e of entries)if(e.isIntersecting)document.querySelectorAll('.section-nav a').forEach(a=>a.classList.toggle('active',a.hash==='#'+e.target.id));},{rootMargin:'-15% 0px -65% 0px'});
     document.querySelectorAll('.app-section').forEach(s=>observer.observe(s));
   }
-  render();if(loaded)notify('Parameter pekerjaan sebelumnya dimuat dari browser ini.');
-  if(!saveAvailable)$('save-status').textContent='Gunakan JSON untuk menyimpan';
+  render();if(loaded)notify(desktop?'Parameter lokal dipulihkan. Buka proyek JSON untuk melanjutkan file atau gunakan Save As untuk menyimpan salinan.':'Parameter pekerjaan sebelumnya dimuat dari browser ini.');
+  if(!saveAvailable&&!desktop)$('save-status').textContent='Gunakan JSON untuk menyimpan';
 })();
 
 </script><script>

@@ -1,4 +1,4 @@
-CIVIL HYDRATION NX — versi Windows
+CIVIL HYDRATION NX — versi Windows 1.1.0
 
 Penyusun input panas hidrasi beton bertahap, material, konveksi dan mesh HEX8.
 Berjalan lokal/offline. Tidak memerlukan Node, Python atau browser terpisah.
@@ -6,19 +6,40 @@ Berjalan lokal/offline. Tidak memerlukan Node, Python atau browser terpisah.
 PENGGUNAAN
 1. Buka Civil Hydration NX dari desktop atau Start Menu.
 2. Edit model, mix design, cp/k, konveksi, sumber panas dan jadwal tahap.
-3. Simpan parameter JSON untuk cadangan (Ctrl+S).
-4. Klik Unduh .MCT (Ctrl+Shift+S), pilih lokasi file pada dialog Simpan.
+3. Save proyek JSON (Ctrl+S); proyek baru meminta nama dan lokasi.
+4. Klik Unduh .MCT (Ctrl+Alt+E), pilih lokasi file pada dialog Simpan.
 5. Impor MCT ke model kosong di MIDAS Civil, lalu periksa parser dan unit.
 
-Parameter terakhir disimpan lokal pada profil aplikasi Windows.
-Ekspor JSON untuk memindahkan pekerjaan dari versi HTML atau ke PC lain.
-Uninstall tidak menghapus cadangan JSON atau profil parameter pengguna.
+FILE PROYEK
+Open (Ctrl+O): buka JSON melalui dialog Windows sebagai file proyek aktif.
+Save (Ctrl+S): simpan perubahan ke file aktif; pertama kali meminta lokasi.
+Save As (Ctrl+Shift+S): simpan dengan nama/lokasi baru; file asli dipertahankan.
+Nama file dan tanda * pada header menunjukkan proyek dan perubahan belum disimpan.
+Saat membuka proyek lain atau menutup aplikasi dengan perubahan, pilih simpan,
+buang perubahan, atau batalkan pada dialog yang ditampilkan.
+
+JSON menyimpan seluruh parameter, termasuk mix design, geometri/mesh, cp/k,
+properti fase, temperatur, konveksi, sumber panas, kondisi batas dan staging.
+Buka JSON untuk mengedit parameter dan mengekspor model MCT kembali.
+Aplikasi tidak membaca atau mengedit file MCT yang sudah ada.
+
+PEMULIHAN DAN PEMINDAHAN
+Parameter valid juga disimpan lokal pada profil aplikasi untuk pemulihan.
+Salinan lokal terpisah dari file proyek. Setelah aplikasi dijalankan ulang,
+lokasi file sebelumnya tidak otomatis menjadi file aktif. Gunakan Open untuk
+melanjutkan file tersebut; Save tanpa file aktif meminta lokasi penyimpanan.
+
+JSON versi HTML dapat dibuka di aplikasi Windows atau dipindahkan ke PC lain.
+Save/Save As langsung ke file aktif tersedia di aplikasi Windows; versi HTML
+tetap mengunduh JSON melalui browser. Simpan cadangan JSON untuk pekerjaan Anda.
+Uninstaller dikonfigurasi mempertahankan profil parameter pengguna.
 
 BATAS PENERAPAN
 Aplikasi independen, bukan produk MIDAS/MIDASIT dan bukan solver.
 Pola NX adalah tampilan ruang kerja; file ekspor tetap MCT.
 Nilai contoh perlu kalibrasi data proyek; EC2 adalah acuan beton mengeras.
 Parser/solver native MIDAS belum diuji. Hasil bukan validasi risiko retak.
+Pengujian Open/Save/Save As pada Windows versi 1.1.0 belum dicatat di dokumen ini.
 
 KOMPONEN
 Installer menyertakan Electron/Chromium dan pemberitahuan lisensinya.

@@ -1,6 +1,6 @@
 {
   "name": "civil-hydration-nx",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "description": "Offline staged concrete hydration input and MCT generator for Windows",
   "author": "MIDAS-CIVIL-PARAMETRIC contributors",
@@ -8,7 +8,7 @@
   "main": "desktop/main.cjs",
   "scripts": {
     "start": "electron .",
-    "test": "node --test tests/engine.test.js tests/thermal.test.js tests/desktop_policy.test.cjs",
+    "test": "node --test tests/engine.test.js tests/thermal.test.js tests/desktop_policy.test.cjs tests/project_files.test.cjs",
     "build:assets": "python3 scripts/build_desktop_assets.py",
     "build:win": "npm run build:assets && electron-builder --win nsis --x64 --publish never",
     "build:linux:test": "electron-builder --linux dir --x64 --publish never"
@@ -31,6 +31,8 @@
     "files": [
       "desktop/main.cjs",
       "desktop/policy.cjs",
+      "desktop/project-files.cjs",
+      "desktop/preload.cjs",
       "desktop/assets/icon.png",
       "web/index.html",
       "web/styles.css",

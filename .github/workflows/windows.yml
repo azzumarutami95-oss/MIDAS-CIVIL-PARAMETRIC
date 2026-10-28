@@ -66,4 +66,4 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create $env:GITHUB_REF_NAME dist/Civil-Hydration-NX-Setup-*-x64.exe dist/SHA256SUMS.txt --verify-tag --title "Civil Hydration NX $env:GITHUB_REF_NAME — Windows x64" --notes "Installer offline untuk Windows 10/11 64-bit. Memuat geometri, mesh HEX8, perhitungan cp/k, konveksi, staging dan ekspor MCT/JSON/TXT. Aplikasi independen; analisis dilakukan di MIDAS Civil. Installer belum ditandatangani sertifikat penerbit."
+          gh release create $env:GITHUB_REF_NAME dist/Civil-Hydration-NX-Setup-*-x64.exe dist/SHA256SUMS.txt --verify-tag --title "Civil Hydration NX $env:GITHUB_REF_NAME — Windows x64" --notes "Installer offline untuk Windows 10/11 64-bit. Memuat Save/Save As proyek JSON, geometri, mesh HEX8, perhitungan cp/k, konveksi, staging dan ekspor MCT/JSON/TXT. Aplikasi independen; analisis dilakukan di MIDAS Civil. Installer belum ditandatangani sertifikat penerbit."

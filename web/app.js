@@ -1,10 +1,11 @@
 (function () {
   'use strict';
   const E=window.MidasEngine, $=id=>document.getElementById(id), storageKey='civil-heat-studio.v1';
-  const fields=[...document.querySelectorAll('[data-key]')];
+  const fields=[...document.querySelectorAll('[data-key]')], desktop=window.hydrationDesktop;
   const format=(v,d=2)=>Number.isFinite(v)?new Intl.NumberFormat('id-ID',{minimumFractionDigits:d,maximumFractionDigits:d}).format(v):'—';
   const integer=v=>format(v,0);
   let config=E.defaults(),lastModel=null,timer,saveAvailable=true;
+  let savedFingerprint=JSON.stringify(E.defaults()),projectName='',projectPath='',saveBusy=false,openBusy=false;
   const reference={source:'Transkripsi foto tabel campuran pengguna; satuan kg/m3.',
     strength:{days3:[21.8,27.2],days7:[44.7,50.4,32.3],reportedMean3:24.5,reportedMean7:42.4,days28:null},
     temperatureLab:[{minutes:15,C:31.1},{minutes:60,C:32.3}],reportedSA:49,reportedRatio:28,
@@ -14,6 +15,24 @@
   function persist(c){
     try{localStorage.setItem(storageKey,JSON.stringify({schema:'civil-heat-studio/v1',config:c}));$('save-status').textContent='Tersimpan di browser';}
     catch(_){saveAvailable=false;$('save-status').textContent='Gunakan JSON untuk menyimpan';}
+  }
+  function projectStatus(current=read()){
+    if(!desktop)return;
+    const dirty=JSON.stringify(current)!==savedFingerprint;
+    const filename=projectName||'Tanpa nama.json';
+    $('project-file-name').textContent=filename;
+    $('project-file-name').title=projectPath||'Proyek JSON belum memiliki lokasi penyimpanan';
+    $('project-dirty').hidden=!dirty;
+    $('save-status').textContent=saveBusy?'Menyimpan…':dirty?'Perubahan belum disimpan':projectName?'Tersimpan ke file':'Belum disimpan ke file';
+    $('save-status').title=projectPath||'Gunakan Save / Save As untuk menyimpan proyek JSON.';
+    $('save-as').disabled=saveBusy||!!E.validate(current).errors.length;
+    if(saveBusy)$('export-json').disabled=true;
+    $('import-json').disabled=openBusy||saveBusy;
+    const state=document.querySelector('.nx-document-state');
+    state.textContent=dirty?'BELUM DISIMPAN':projectName?'TERSIMPAN':'PARAMETER CONTOH';
+    state.classList.toggle('has-unsaved',dirty);
+    document.title=filename+(dirty?' *':'')+' — Civil Hydration NX';
+    desktop.setDirty(dirty);
   }
   let loaded=false;
   try{const saved=localStorage.getItem(storageKey);if(saved){const c=E.cleanConfig(JSON.parse(saved));if(!E.validate(c).errors.length){config=c;loaded=true;}}}
@@ -154,7 +173,7 @@
         plan(section);side(section);heatChart();renderStages();preview(config,checks);persist(config);}
       catch(error){result.errors.push({message:error.message});$('export-mct').disabled=true;$('download-report').disabled=true;}
     }else{$('save-status').textContent='Perubahan belum disimpan';$('mct-preview').value='Perbaiki masukan yang ditandai sebelum mengekspor file .MCT.';}
-    messages(result,checks);
+    messages(result,checks);projectStatus(config);
   }
   function notify(message){$('export-status').textContent=message;}
   function download(name,text,type='application/octet-stream'){
@@ -162,7 +181,7 @@
   }
   function snapshot(){return {schema:'civil-heat-studio/v1',created_at:new Date().toISOString(),config:structuredClone(config),reference,thermal_calculation:E.resolvedThermal(config),
     status:{assumptions:true,native_midas_tested:false,journal_validated:false}};}
-  fields.forEach(el=>el.addEventListener('input',()=>{clearTimeout(timer);timer=setTimeout(render,160);}));
+  fields.forEach(el=>el.addEventListener('input',()=>{projectStatus();clearTimeout(timer);timer=setTimeout(render,160);}));
   fields.filter(el=>el.tagName==='SELECT').forEach(el=>el.addEventListener('change',()=>{clearTimeout(timer);render();}));
   $('use-mix-density').addEventListener('click',()=>{config=read();const sum=E.mixMetrics(config).total;if(!Number.isFinite(sum))return;
     document.querySelector('[data-key="material.density"]').value=sum.toFixed(2);clearTimeout(timer);render();notify('Massa jenis diisi dari jumlah massa campuran. Ini perkiraan, bukan hasil pengukuran massa jenis.');});
@@ -175,10 +194,50 @@
     catch(error){notify('Ekspor belum berhasil: '+error.message);}
     finally{$('export-mct').disabled=!!E.validate(read()).errors.length;}
   });
-  $('export-json').addEventListener('click',()=>{clearTimeout(timer);render();if(E.validate(config).errors.length)return;
-    download('PARAMETER_HEAT_HYDRATION.json',JSON.stringify(snapshot(),null,2),'application/json');notify('Parameter disimpan sebagai JSON.');});
-  $('import-json').addEventListener('click',()=>$('import-file').click());
+  async function saveProject(saveAs=false){
+    if(saveBusy)return false;
+    clearTimeout(timer);render();if(E.validate(config).errors.length){notify('Perbaiki input yang ditandai sebelum menyimpan proyek.');return false;}
+    if(!desktop){download('PARAMETER_HEAT_HYDRATION.json',JSON.stringify(snapshot(),null,2),'application/json');notify('Parameter disimpan sebagai JSON.');return true;}
+    const captured=JSON.stringify(config),text=JSON.stringify(snapshot(),null,2);
+    saveBusy=true;projectStatus();
+    try{
+      const result=await desktop.saveProject(text,saveAs);
+      if(result.status==='cancelled'){notify('Penyimpanan dibatalkan. File aktif tetap sama.');return false;}
+      if(result.status!=='saved')throw Error(result.message||'File belum berhasil disimpan.');
+      savedFingerprint=captured;projectName=result.name;projectPath=result.filePath||'';
+      const unchanged=JSON.stringify(read())===captured;
+      notify(unchanged?'Proyek '+projectName+' berhasil disimpan.':'Versi proyek tersimpan; perubahan terbaru masih perlu disimpan.');
+      return unchanged;
+    }catch(error){notify('Proyek belum disimpan: '+error.message);return false;}
+    finally{saveBusy=false;render();}
+  }
+  async function openProject(){
+    if(!desktop){$('import-file').click();return;}
+    if(openBusy||saveBusy)return;
+    openBusy=true;projectStatus();
+    try{
+      const result=await desktop.openProject();
+      if(result.status==='cancelled')return;
+      if(result.status!=='opened')throw Error(result.message||'File belum berhasil dibuka.');
+      const next=E.cleanConfig(JSON.parse(result.text)),valid=E.validate(next);
+      if(valid.errors.length)throw Error(valid.errors[0].message);
+      savedFingerprint=JSON.stringify(next);projectName=result.name;projectPath=result.filePath||'';
+      fill(next);clearTimeout(timer);render();notify('Proyek '+projectName+' berhasil dimuat. Save akan memperbarui file ini.');
+    }catch(error){notify('JSON tidak dimuat: '+error.message+' Parameter sebelumnya dipertahankan.');}
+    finally{openBusy=false;projectStatus();}
+  }
+  $('export-json').addEventListener('click',()=>{void saveProject();});
+  $('save-as').addEventListener('click',()=>{void saveProject(true);});
+  $('import-json').addEventListener('click',()=>{void openProject();});
+  if(desktop){
+    $('save-as').hidden=false;
+    $('export-json').title='Save — simpan perubahan ke file proyek aktif (Ctrl+S)';
+    $('export-json').querySelector('span').textContent='Save';
+    $('import-json').title='Buka proyek JSON (Ctrl+O)';
+    window.CivilHydrationProject=Object.freeze({save:()=>saveProject()});
+  }
   $('import-file').addEventListener('change',async event=>{
+    if(desktop){event.target.value='';return;}
     const file=event.target.files[0];if(!file)return;
     try{if(file.size>1024*1024)throw Error('Ukuran JSON maksimum 1 MB.');const next=E.cleanConfig(JSON.parse(await file.text()));const valid=E.validate(next);
       if(valid.errors.length)throw Error(valid.errors[0].message);fill(next);render();notify('Parameter JSON berhasil dimuat.');}
@@ -232,6 +291,6 @@
     const observer=new IntersectionObserver(entries=>{for(const e of entries)if(e.isIntersecting)document.querySelectorAll('.section-nav a').forEach(a=>a.classList.toggle('active',a.hash==='#'+e.target.id));},{rootMargin:'-15% 0px -65% 0px'});
     document.querySelectorAll('.app-section').forEach(s=>observer.observe(s));
   }
-  render();if(loaded)notify('Parameter pekerjaan sebelumnya dimuat dari browser ini.');
-  if(!saveAvailable)$('save-status').textContent='Gunakan JSON untuk menyimpan';
+  render();if(loaded)notify(desktop?'Parameter lokal dipulihkan. Buka proyek JSON untuk melanjutkan file atau gunakan Save As untuk menyimpan salinan.':'Parameter pekerjaan sebelumnya dimuat dari browser ini.');
+  if(!saveAvailable&&!desktop)$('save-status').textContent='Gunakan JSON untuk menyimpan';
 })();

@@ -2,14 +2,17 @@
 
 ## Aplikasi Windows (.exe)
 
-**[Unduh installer Windows 64-bit v1.0.0 (.exe)](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/download/v1.0.0/Civil-Hydration-NX-Setup-1.0.0-x64.exe)**
+**[Unduh installer Windows 64-bit v1.1.0 (.exe)](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/download/v1.1.0/Civil-Hydration-NX-Setup-1.1.0-x64.exe)**
 
 **[Unduh installer Civil Hydration NX dari GitHub Releases](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/latest)**
 
-Pilih `Civil-Hydration-NX-Setup-1.0.0-x64.exe` untuk Windows 10/11 64-bit (x64).
+Pilih `Civil-Hydration-NX-Setup-1.1.0-x64.exe` untuk Windows 10/11 64-bit (x64).
 Aplikasi menyertakan runtime dan dapat dipakai offline untuk mengatur material
 termal, mix design, mesh, staging, serta mengekspor `.MCT`, parameter JSON dan
-ringkasan input. Installer belum ditandatangani secara digital.
+ringkasan input. **Save (Ctrl+S)** memperbarui proyek JSON aktif; **Save As
+(Ctrl+Shift+S)** menyimpan dengan nama/lokasi baru. Nama file dan tanda perubahan
+ditampilkan, dengan pengingat saat menutup atau membuka proyek lain. Installer
+belum ditandatangani secara digital.
 
 [Petunjuk instalasi, pemindahan parameter HTML, dan build Windows](desktop/README.md).
 
