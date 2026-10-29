@@ -36,7 +36,7 @@
 <div class="nx-ribbon"><nav class="nx-ribbon-tabs" aria-label="Workspace"><button type="button" data-workspace="model" class="is-active" aria-selected="true">Model</button><button type="button" data-workspace="campuran" aria-selected="false">Mix Design</button><button type="button" data-workspace="termal" aria-selected="false">Heat of Hydration</button><button type="button" data-workspace="tahapan" aria-selected="false">Construction Stage</button><button type="button" data-workspace="ekspor" aria-selected="false">Check & Export</button><span class="nx-ribbon-target">MIDAS Civil NX · ekspor .MCT</span></nav>
 <div class="nx-ribbon-tools"><div class="ribbon-group"><button class="ribbon-command" type="button" data-workspace="model"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 9 5v10l-9 5-9-5V7zM3 7l9 5 9-5M12 12v10"/></svg><span>Solid model</span></button><button class="ribbon-command" type="button" data-workspace="campuran"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M7 5v5l-4 9a2 2 0 0 0 2 3h14a2 2 0 0 0 2-3l-4-9V5M7 15h10M8 2h8"/></svg><span>Mix design</span></button><span class="ribbon-group-label">MODEL INPUT</span></div><div class="ribbon-group"><button class="ribbon-command" type="button" data-workspace="termal"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14V5a3 3 0 0 1 6 0v9a5 5 0 1 1-6 0zM13 7v10"/></svg><span>Thermal & heat</span></button><button class="ribbon-command" type="button" data-workspace="tahapan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h6v4H3zM9 10h6v4H9zM15 15h6v4h-6zM9 7h11M3 12h6M3 17h12"/></svg><span>Stages</span></button><span class="ribbon-group-label">ANALYSIS INPUT</span></div><div class="ribbon-group"><button class="ribbon-command" type="button" data-workspace="ekspor"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 2h9l5 5v15H5zM14 2v6h5M8 12h8M8 16h8"/></svg><span>Check input</span></button><button class="ribbon-command" type="button" id="download-report"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 2h9l5 5v15H5zM14 2v6h5M8 12h8M8 16h8"/></svg><span>Input report</span></button><span class="ribbon-group-label">VALIDATION</span></div><div class="nx-export-group"><span id="save-status" class="save-status" role="status">Tersimpan di browser</span><button class="button button-primary" id="export-mct" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M4 16v5h16v-5"/></svg><span>Unduh .MCT</span></button><small>Periksa impor pada versi NX Anda</small></div></div></div>
 <div class="nx-workbench">
-<aside class="nx-model-tree"><div class="nx-dock-heading"><strong>Model Tree</strong><span>▤</span></div><div class="tree-file"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 2h9l5 5v15H5zM14 2v6h5M8 12h8M8 16h8"/></svg><strong>Pilar_Heat_Hydration</strong></div><nav class="section-nav" aria-label="Pohon model"><details open class="tree-folder"><summary>Model</summary><div class="tree-children"><a href="#model" data-workspace="model" class="is-active"><i class="tree-icon blue">•</i>Nodes<span id="nx-model-node-count">26.433</span></a><a href="#model" data-workspace="model"><i class="tree-icon blue">▦</i>Solid elements<span id="nx-model-element-count">24.576</span></a><a href="#model" data-workspace="model"><i class="tree-icon cyan">◈</i>Geometry & mesh</a></div></details><details open class="tree-folder"><summary>Properties</summary><div class="tree-children"><a href="#campuran" data-workspace="campuran"><i class="tree-icon purple">▤</i>Mix design</a><a href="#termal" data-workspace="termal"><i class="tree-icon red">♨</i>Thermal materials</a><a href="#termal" data-workspace="termal"><i class="tree-icon cyan">↗</i>Convection boundaries</a></div></details><details open class="tree-folder"><summary>Hydration stages</summary><div class="tree-children"><a href="#tahapan" data-workspace="tahapan"><i class="tree-icon gray">■</i>H0 · Old concrete</a><a href="#tahapan" data-workspace="tahapan"><i class="tree-icon orange">■</i>H1 · New placement</a><a href="#tahapan" data-workspace="tahapan"><i class="tree-icon cyan">■</i>H2 · Formwork removal</a><a href="#tahapan" data-workspace="tahapan"><i class="tree-icon blue">■</i>H3 · Cooling</a></div></details><a class="tree-export" href="#ekspor" data-workspace="ekspor"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M4 16v5h16v-5"/></svg>Check & export .MCT</a></nav><div class="nx-tree-note"><span class="tiny-label">INPUT PRESET</span><strong>Data campuran dari foto</strong><p>Beton lama dipertahankan. Beton baru diaktifkan sekali.</p><span class="tree-offline"><i></i>Offline workspace</span></div></aside>
+<aside class="nx-model-tree"><div class="nx-dock-heading"><strong>Model Tree</strong><span>▤</span></div><div class="tree-file"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 2h9l5 5v15H5zM14 2v6h5M8 12h8M8 16h8"/></svg><strong>Pilar_Heat_Hydration</strong></div><nav class="section-nav" aria-label="Pohon model"><details open class="tree-folder"><summary>Model</summary><div class="tree-children"><a href="#model" data-workspace="model" class="is-active"><i class="tree-icon blue">•</i>Nodes<span id="nx-model-node-count">26.433</span></a><a href="#model" data-workspace="model"><i class="tree-icon blue">▦</i>Solid elements<span id="nx-model-element-count">24.576</span></a><a href="#model" data-workspace="model"><i class="tree-icon cyan">◈</i>Geometry & mesh</a></div></details><details open class="tree-folder"><summary>Properties</summary><div class="tree-children"><a href="#campuran" data-workspace="campuran"><i class="tree-icon purple">▤</i>Mix design</a><a href="#termal" data-workspace="termal"><i class="tree-icon red">♨</i>Thermal materials</a><a href="#termal" data-workspace="termal"><i class="tree-icon cyan">↗</i>Convection boundaries</a></div></details><details open class="tree-folder"><summary>Loads</summary><div class="tree-children"><a href="#model" data-workspace="model"><i class="tree-icon blue">↓</i>SW · Dead Load</a><a href="#model" data-workspace="model"><i class="tree-icon gray">▤</i>LG_SW</a></div></details><details open class="tree-folder"><summary>Hydration stages</summary><div class="tree-children"><a href="#tahapan" data-workspace="tahapan"><i class="tree-icon gray">■</i>H0 · Old concrete</a><a href="#tahapan" data-workspace="tahapan"><i class="tree-icon orange">■</i>H1 · New placement</a><a href="#tahapan" data-workspace="tahapan"><i class="tree-icon cyan">■</i>H2 · Formwork removal</a><a href="#tahapan" data-workspace="tahapan"><i class="tree-icon blue">■</i>H3 · Cooling</a></div></details><a class="tree-export" href="#ekspor" data-workspace="ekspor"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M4 16v5h16v-5"/></svg>Check & export .MCT</a></nav><div class="nx-tree-note"><span class="tiny-label">INPUT PRESET</span><strong>Data campuran dari foto</strong><p>Beton lama dipertahankan. Beton baru diaktifkan sekali.</p><span class="tree-offline"><i></i>Offline workspace</span></div></aside>
 <main class="nx-workspace"><div class="nx-documentbar"><span><i class="document-square"></i><strong id="nx-active-tab">Model</strong></span><span class="document-subtitle">Pilar dua tahap / hydration input</span><span class="nx-document-state">PARAMETER CONTOH</span></div><div class="metric-grid" aria-label="Ringkasan model"><div class="metric"><span>Nodes</span><strong id="metrics-nodes">26.433</strong></div><div class="metric"><span>Solid HEX8</span><strong id="metrics-elements">24.576</strong></div><div class="metric"><span>Volume ideal</span><strong><span id="metrics-volume">353,43</span><em>m³</em></strong></div><div class="metric"><span>Water / binder</span><strong id="metrics-wb">0,280</strong></div><span class="metric-info">Shared nodes · joint bonded</span></div><div class="nx-content">
 <section class="app-section nx-pane" id="model" aria-labelledby="model-title">
         <div class="section-heading"><div><div class="eyebrow">MODEL WORKSPACE</div><h2 id="model-title">Model & properti</h2></div><span class="section-badge">Satuan geometri: meter</span></div>
@@ -55,6 +55,15 @@
               <label class="field"><span>Muai termal</span><span class="input-unit"><input type="number" data-key="material.expansion" value="0.00001" min="0" step="0.000001"><span>/°C</span></span></label>
             </div>
             <p class="field-help">Modulus elastisitas dihitung dengan asumsi beton normal: E = 4.700 √f’c MPa. Hasil uji pada foto tidak otomatis mengganti f’c rencana.</p>
+            <div class="subsection-heading" id="self-weight-title">Berat sendiri / self weight</div>
+            <p class="field-help" id="self-weight-summary"><strong>SW</strong> · Dead Load (D) · grup <strong>LG_SW</strong></p>
+            <div class="form-grid three-fields" aria-labelledby="self-weight-title">
+              <label class="field"><span>Faktor global X</span><input type="number" data-key="selfWeight.factorX" value="0" step="0.1"></label>
+              <label class="field"><span>Faktor global Y</span><input type="number" data-key="selfWeight.factorY" value="0" step="0.1"></label>
+              <label class="field"><span>Faktor global Z</span><input type="number" data-key="selfWeight.factorZ" value="-1" step="0.1"></label>
+            </div>
+            <p class="field-help">Faktor tanpa satuan terhadap berat isi material (ρ × 9,80665). Nilai awal (0, 0, −1) bekerja ke arah −Z.</p>
+            <p class="field-help">SW aktif sejak awal H0 dan tetap aktif saat beton baru diaktifkan pada H1. Berat sendiri otomatis analisis hidrasi dinonaktifkan agar tidak dihitung ganda.</p>
             <div class="subsection-heading">Kerapatan mesh</div>
             <div class="form-grid two-fields">
               <label class="field"><span>Pembagian per sisi blok pusat</span><input type="number" data-key="mesh.sideDiv" value="16" min="4" max="32" step="2"></label>
@@ -166,7 +175,7 @@
           <div class="card"><div class="card-heading"><h3>Pemeriksaan masukan</h3><span class="validation-summary" id="validation-summary">Memeriksa…</span></div><ul class="validation-list" id="validation-list" aria-live="polite"></ul><div class="scope-note"><strong>Batas penggunaan</strong><p>Nilai termal dan curing adalah asumsi contoh. Ekspor menyiapkan input; impor native dan solver MIDAS belum diuji. E konstan dan tumpuan dasar ideal bukan dasar penilaian retak yang tervalidasi.</p></div></div>
           <div class="card"><div class="card-heading"><h3>Konversi ke unit MCT</h3><span class="quiet-label">Massa: kg</span></div><div class="table-scroll"><table class="unit-table"><thead><tr><th>Parameter</th><th>Nilai fisik</th><th>Input MCT</th></tr></thead><tbody id="unit-table"></tbody></table></div><p class="field-help">W → kJ/jam dikalikan 3,6. Berat isi = massa jenis × 9,80665. File memakai N agar panas jenis tetap dalam kJ/kg·°C.</p></div>
         </div>
-        <div class="card export-card"><div class="card-heading"><div><h3>Pratinjau perintah MCT</h3><p class="card-subtitle">Ringkasan kartu material, sumber panas, dan tahapan. Unduhan menyertakan seluruh node dan elemen solid.</p></div><span class="code-badge">.MCT</span></div><textarea id="mct-preview" readonly spellcheck="false" aria-label="Pratinjau perintah MCT"></textarea><div class="export-footer"><p id="export-status" role="status">Belum ada file diekspor.</p><a class="text-link" href="#model" data-workspace="model">Unduh .MCT melalui ribbon <span aria-hidden="true">↗</span></a></div></div>
+        <div class="card export-card"><div class="card-heading"><div><h3>Pratinjau perintah MCT</h3><p class="card-subtitle">Ringkasan kartu material, berat sendiri SW, sumber panas, dan tahapan. Unduhan menyertakan seluruh node dan elemen solid.</p></div><span class="code-badge">.MCT</span></div><textarea id="mct-preview" readonly spellcheck="false" aria-label="Pratinjau perintah MCT"></textarea><div class="export-footer"><p id="export-status" role="status">Belum ada file diekspor.</p><a class="text-link" href="#model" data-workspace="model">Unduh .MCT melalui ribbon <span aria-hidden="true">↗</span></a></div></div>
         <div class="project-actions"><div><h3>Simpan dan lanjutkan pekerjaan</h3><p>Parameter tersimpan di browser ini. Gunakan JSON untuk memindahkannya ke perangkat lain.</p></div><div class="action-buttons"></div></div>
       <details class="references"><summary>Dasar staging & rujukan teknis <span aria-hidden="true">↗</span></summary><p>Urutan aktivasi dan penghentian konveksi pada bidang internal dicocokkan dengan <a href="https://github.com/MIDASIT-Co-Ltd/midas-civil-python/blob/main/examples/python/Tut7%20Heat%20of%20Hydration.py" target="_blank" rel="noopener noreferrer">tutorial resmi panas hidrasi MIDASIT</a>. <a href="https://github.com/MIDASIT-Co-Ltd/midas-civil-python/blob/main/midas_civil/_heat_of_hydration.py" target="_blank" rel="noopener noreferrer">Dokumentasi modul hidrasi MIDASIT</a> menyatakan waktu langkah hidrasi dalam jam. Kurva dan angka termal di aplikasi ini merupakan asumsi yang masih perlu dikalibrasi terhadap campuran aktual; belum dinyatakan tervalidasi berdasarkan jurnal atau solver MIDAS.</p><p>Dukungan impor .MCT pada Civil NX tercantum dalam <a href="https://github.com/MIDASIT-Co-Ltd/midas-civil-python/blob/main/midas_civil/_model.py#L797" target="_blank" rel="noopener noreferrer">metode resmi MIDASIT Model.importMCT()</a>. Simpan model native melalui Civil NX setelah impor, dan periksa penerimaan kartu hidrasi pada versi NX Anda. File aplikasi ini tetap mengekspor .MCT; impor dan solver native belum diuji.</p></details></section></div></main></div>
 <details class="nx-output" open><summary><span><i></i>Output & pemeriksaan</span><small>Input generator · bukan solver NX</small></summary><div id="nx-console" class="nx-console" role="log" aria-live="polite"><p><time>INPUT</time><span>Workspace siap. Atur parameter, periksa model, lalu ekspor .MCT.</span></p><p><time>NOTE</time><span>Parameter termal merupakan asumsi contoh; impor dan solver MIDAS perlu diverifikasi.</span></p></div></details>
@@ -286,6 +295,7 @@
     mix: {cement:432, flyash:108, water:151, admixture1:2.16, admixture2:8.1, sand:749, gravel:976,
           batchVolume:0.035, sandMoisture:4, gravelMoisture:0.15},
     boundary: {baseMode:'fixed'},
+    selfWeight: {caseName:'SW', caseType:'D', groupName:'LG_SW', factorX:0, factorY:0, factorZ:-1},
     ...Thermal.defaults()
   };
   const clone = obj => JSON.parse(JSON.stringify(obj));
@@ -299,6 +309,8 @@
     const legacyThermal=source.thermal===undefined&&source.thermalComponents===undefined;
     for (const group of Object.keys(DEFAULTS)) {
       if(legacyThermal&&(group==='thermal'||group==='thermalComponents'))continue;
+      // Projects saved before SW was introduced inherit the requested load.
+      if(group==='selfWeight'&&source[group]===undefined)continue;
       if (!source[group] || typeof source[group] !== 'object') throw Error('Kelompok parameter tidak lengkap: '+group);
       for (const key of Object.keys(DEFAULTS[group])) {
         const x = source[group][key];
@@ -370,6 +382,11 @@
     range('mix','batchVolume',0,20,true);
     range('mix','sandMoisture',0,100);range('mix','gravelMoisture',0,100);
     if (!['fixed','adiabatic'].includes(c.boundary.baseMode)) err('boundary.baseMode','Kondisi dasar tidak dikenal.');
+    for(const key of ['caseName','caseType','groupName'])
+      if(c.selfWeight?.[key]!==DEFAULTS.selfWeight[key])
+        err('selfWeight.'+key,'Beban berat sendiri harus memakai SW, tipe Dead Load (D), dan grup LG_SW.');
+    for(const key of ['factorX','factorY','factorZ'])
+      if(!number(c.selfWeight?.[key]))err('selfWeight.'+key,'Faktor berat sendiri harus berupa angka berhingga.');
     const stats=estimate(c);
     if (stats.elements>100000 || stats.nodes>125000) err('mesh.sideDiv','Mesh terlalu besar untuk ekspor lokal: batas 100.000 elemen / 125.000 node.');
     if (number(c.schedule.end/c.schedule.dtEarly) && c.schedule.end/Math.min(c.schedule.dtEarly,c.schedule.dtMiddle,c.schedule.dtStrip,c.schedule.dtLate)>20000)
@@ -491,10 +508,10 @@
   function stages(c) {
     const s=c.schedule,early=Math.min(24,s.strip),fixed=c.boundary.baseMode==='fixed';
     return [
-      {name:'H0_OLD_INIT',label:'Kondisi awal beton lama',temp:c.temperature.old,steps:[s.init],ae:['STAGE1_OLD'],ab:['MECH_BASE',...(fixed?['BASE_TEMP']:[]),'OLD_SIDE','OLD_TOP'],db:[]},
-      {name:'H1_POUR_FORM',label:'Pengecoran + bekisting',temp:c.temperature.pour,steps:steps(early,s.dtEarly).concat(steps(s.strip,s.dtMiddle,early)),ae:['STAGE2_NEW'],ab:['NEW_FORM','TOP_CURE'],db:['OLD_TOP']},
-      {name:'H2_STRIP_FORM',label:'Bongkar bekisting',temp:null,steps:steps(s.cure-s.strip,s.dtStrip),ae:[],ab:['NEW_AIR'],db:['NEW_FORM']},
-      {name:'H3_END_CURING',label:'Akhir curing / pendinginan',temp:null,steps:steps(s.end-s.cure,s.dtLate),ae:[],ab:['TOP_AIR'],db:['TOP_CURE']}
+      {name:'H0_OLD_INIT',label:'Kondisi awal beton lama',temp:c.temperature.old,steps:[s.init],ae:['STAGE1_OLD'],ab:['MECH_BASE',...(fixed?['BASE_TEMP']:[]),'OLD_SIDE','OLD_TOP'],db:[],al:[c.selfWeight.groupName]},
+      {name:'H1_POUR_FORM',label:'Pengecoran + bekisting',temp:c.temperature.pour,steps:steps(early,s.dtEarly).concat(steps(s.strip,s.dtMiddle,early)),ae:['STAGE2_NEW'],ab:['NEW_FORM','TOP_CURE'],db:['OLD_TOP'],al:[]},
+      {name:'H2_STRIP_FORM',label:'Bongkar bekisting',temp:null,steps:steps(s.cure-s.strip,s.dtStrip),ae:[],ab:['NEW_AIR'],db:['NEW_FORM'],al:[]},
+      {name:'H3_END_CURING',label:'Akhir curing / pendinginan',temp:null,steps:steps(s.end-s.cure,s.dtLate),ae:[],ab:['TOP_AIR'],db:['TOP_CURE'],al:[]}
     ];
   }
   function units(c) {
@@ -509,6 +526,11 @@
     ];
   }
   function heatRise(c,hours) {return c.heat.K*(-Math.expm1(-c.heat.alpha*hours/24));}
+  function selfWeightCards(c) {
+    const w=c.selfWeight;
+    return ['*LOAD-GROUP',w.groupName,'','*STLDCASE',`${w.caseName}, ${w.caseType}, Self weight`,'',
+      `*USE-STLD, ${w.caseName}`,'*SELFWEIGHT',`${w.factorX}, ${w.factorY}, ${w.factorZ}, ${w.groupName}`];
+  }
   function build(c) {
     const validation=validate(c);if(validation.errors.length)throw Error(validation.errors.map(x=>x.message).join('\n'));
     const data=mesh(c),{nodes,cells,nn,nq,oldElements}=data,stageData=stages(c),baseFixed=c.boundary.baseMode==='fixed';
@@ -523,12 +545,13 @@
     surfaces.NEW_TOP=Array.from({length:nq},(_,i)=>cells.length-nq+i+1);
     const bc={OLD_SIDE:['OLD_SIDE','H_OLD_SIDE',4],OLD_TOP:['OLD_TOP','H_OLD_TOP',2],NEW_FORM:['NEW_SIDE','H_FORM',4],NEW_AIR:['NEW_SIDE','H_AIR',4],TOP_CURE:['NEW_TOP','H_CURING',2],TOP_AIR:['NEW_TOP','H_TOP_AIR',2]};
     // Audit boundary changes using actual element faces at each stage.
-    const activeE=new Set(),activeB=new Set(),auditStages=[];let elapsed=0;
+    const activeE=new Set(),activeB=new Set(),activeL=new Set(),auditStages=[];let elapsed=0;
     const faceKey=(e,f)=>faceNodes[f-1].map(i=>cells[e-1][i]).sort((a,b)=>a-b).join(':');
     for(const stage of stageData){
       for(const name of stage.ae)for(const id of groups[name].elements){if(activeE.has(id))throw Error('Elemen diaktifkan ulang.');activeE.add(id);}
       for(const name of stage.db){if(!activeB.delete(name))throw Error('Grup batas belum aktif: '+name);}
       for(const name of stage.ab){if(activeB.has(name))throw Error('Grup batas aktif dua kali.');activeB.add(name);}
+      for(const name of stage.al){if(activeL.has(name))throw Error('Grup beban aktif dua kali.');activeL.add(name);}
       const assigned=new Set();
       for(const name of activeB){if(!bc[name])continue;const [surface,,face]=bc[name];
         if(name==='OLD_TOP' && activeE.size>oldElements)throw Error('Konveksi pada sambungan internal.');
@@ -540,7 +563,7 @@
       const end=stage.steps[stage.steps.length-1];
       auditStages.push({name:stage.name,label:stage.label,globalStart:elapsed,globalEnd:elapsed+end,
         newAgeStart:elapsed-c.schedule.init,newAgeEnd:elapsed+end-c.schedule.init,activeElements:activeE.size,
-        convectionFaces:assigned.size,activeBoundaries:[...activeB],temperatureOverride:stage.temp,steps:stage.steps.length});
+        convectionFaces:assigned.size,activeBoundaries:[...activeB],activeLoadGroups:[...activeL],temperatureOverride:stage.temp,steps:stage.steps.length});
       elapsed+=end;
     }
     const E=4700*Math.sqrt(c.material.fc)*1e6,m=c.material,T=c.temperature,thermal=resolvedThermal(c);
@@ -552,7 +575,8 @@
       '; Mix information is provenance; it does NOT calibrate heat curve or strength development.',
       `; MIX kg/m3: cement=${c.mix.cement}, flyash=${c.mix.flyash}, water=${c.mix.water}, sand=${c.mix.sand}, gravel=${c.mix.gravel}`,
       `; MIX kg/m3 admixtures=${c.mix.admixture1}+${c.mix.admixture2}; w/b=${mixMetrics(c).wb.toFixed(8)}`,
-      `; fc=${m.fc}MPa basis for E; no nonlinear strength/age law. Creep/equivalent age/selfweight disabled.`,
+      `; fc=${m.fc}MPa basis for E; no nonlinear strength/age law. Creep/equivalent age disabled.`,
+      '; Explicit SW (Dead Load) in LG_SW is activated once at H0 local time 0 and retained.',
       `; Thermal methods: cp=${thermal.cpMode}, k=${thermal.kMode}, old=${thermal.oldMode}, Tref=${thermal.referenceTemperature}degC.`,
       '; Effective properties are CONSTANT MCT inputs; not temperature/age dependent functions.',
       `; Selected cp_new=${thermal.cp}, k_new=${thermal.k}W/mK; cp_old=${thermal.oldCp}, k_old=${thermal.oldK}W/mK.`,
@@ -569,6 +593,7 @@
     lines.push(`JOINT, ${c.mesh.layersOld*nn+1}to${(c.mesh.layersOld+1)*nn}, , 0`,'','*BNDR-GROUP');
     ['MECH_BASE',...(baseFixed?['BASE_TEMP']:[]),...Object.keys(bc)].forEach(name=>lines.push(`${name}, 0`));
     lines.push('','*CONSTRAINT',`1to${nn}, 111000, MECH_BASE`);
+    lines.push('',...selfWeightCards(c));
     if(baseFixed)lines.push('','*HYD-PRTEMPER',`1to${nn}, ${T.base}, BASE_TEMP`);
     lines.push('','*HYD-HEATSRCF','; USER + YES: adiabatic temperature RISE table vs material age in HOURS.',
       'FUNC=OLD_ZERO, USER, 1, YES','0, 0',`${c.schedule.end+48}, 0`,'FUNC=NEW_ADIABATIC, USER, 1, YES');
@@ -587,8 +612,10 @@
       // Keep STEP on one conservative line rather than inventing continuation.
       lines.push('STEP='+stage.steps.join(', '));
       for(const [field,key] of [['AELEM','ae'],['ABNDR','ab'],['DBNDR','db']])if(stage[key].length)lines.push(field+'='+stage[key].join(', '));
+      for(const name of stage.al)lines.push(`ALOAD=${name}, 0`);
     }
     lines.push('','*HYD-CTRL','; TYPE=BOTH is disabled creep/shrinkage selection, not thermal/stress mode.',
+      '; bINCSW=NO avoids adding automatic selfweight on top of explicit SW / LG_SW.',
       `YES, , 1, ${T.old}, GAUSS, NO, NO, -1, NO, BOTH, 0, 5, 0.001`,'','*HYD-NODE');
     const monitors=[];
     for(const [name,target] of [['OLD_CORE',[0,0,c.geometry.heightOld/2]],['JOINT_CORE',[0,0,c.geometry.heightOld]],
@@ -603,7 +630,7 @@
       stats:estimate(c),stages:auditStages,monitors,units:units(c),checks:data.audit,
       config:clone(c),thermal,nativeMidasTested:false,journalValidated:false};
   }
-  root.MidasEngine={defaults:()=>clone(DEFAULTS),cleanConfig,resolvedThermal,mixMetrics,estimate,validate,crossSection,auditCross,mesh,ranges,stages,units,heatRise,build};
+  root.MidasEngine={defaults:()=>clone(DEFAULTS),cleanConfig,resolvedThermal,mixMetrics,estimate,validate,crossSection,auditCross,mesh,ranges,stages,units,heatRise,selfWeightCards,build};
   if(typeof module!=='undefined' && module.exports)module.exports=root.MidasEngine;
 })(typeof window!=='undefined'?window:globalThis);
 
@@ -800,13 +827,15 @@
       `; Metode cp=${th.cpMode}; k=${th.kMode}; old=${th.oldMode}; Tref=${th.referenceTemperature} degC`,
       '*MATERIAL',`1, CONC, FC_OLD, ${th.oldCpMct.toFixed(9)}, ${th.oldKMct.toFixed(9)}, , C, NO, 0.05, 2, ${(4700*Math.sqrt(m.fc)*1e6).toFixed(3)}, ${m.poisson}, ${m.expansion}, ${(m.density*9.80665).toFixed(3)}, 0`,
       `2, CONC, FC_NEW, ${th.cpMct.toFixed(9)}, ${th.kMct.toFixed(9)}, , C, NO, 0.05, 2, ${(4700*Math.sqrt(m.fc)*1e6).toFixed(3)}, ${m.poisson}, ${m.expansion}, ${(m.density*9.80665).toFixed(3)}, 0`,
+      ...E.selfWeightCards(c),
       `*HYD-HEATSRCF`,`FUNC=NEW_ADIABATIC, USER, 1, YES`,
       '0, 0',`24, ${E.heatRise(c,24).toFixed(6)}`,`${c.schedule.end}, ${E.heatRise(c,c.schedule.end).toFixed(6)}`,
       '; Unduhan menyertakan tabel panas lengkap dan kurva OLD_ZERO.',
       `; Dasar termal: ${c.boundary.baseMode==='fixed'?`${c.temperature.base} degC tetap`:'adiabatik / fluks nol'}`,'*HYD-STAGE'];
     for(const t of s){lines.push(`NAME=${t.name}, ${t.temp===null?'NO, 0':`YES, ${t.temp}`}`);
       lines.push('; '+t.steps.length+' waktu lokal, akhir '+t.steps[t.steps.length-1]+' jam');
-      for(const [field,key]of [['AELEM','ae'],['ABNDR','ab'],['DBNDR','db']])if(t[key].length)lines.push(field+'='+t[key].join(', '));}
+      for(const [field,key]of [['AELEM','ae'],['ABNDR','ab'],['DBNDR','db']])if(t[key].length)lines.push(field+'='+t[key].join(', '));
+      for(const group of t.al)lines.push('ALOAD='+group+', 0');}
     lines.push('*HYD-CTRL',`YES, , 1, ${c.temperature.old}, GAUSS, NO, NO, -1, NO, BOTH, 0, 5, 0.001`);
     $('mct-preview').value=lines.join('\n');
   }
@@ -953,6 +982,11 @@
         `MODEL: diameter ${config.geometry.diameter} m; beton lama ${config.geometry.heightOld} m; baru ${config.geometry.heightNew} m.`,
         `MESH: ${model.stats.nodes} node, ${model.stats.elements} HEX8; interface ${model.mesh.nn} node bersama.`,
         `Mesh volume=${model.checks.volume}m3, scaled Jacobian min=${model.checks.minScaled}.`,
+        '',`BERAT SENDIRI: ${config.selfWeight.caseName}; tipe Dead Load (${config.selfWeight.caseType}); grup ${config.selfWeight.groupName}.`,
+        `Faktor global X, Y, Z = ${config.selfWeight.factorX}, ${config.selfWeight.factorY}, ${config.selfWeight.factorZ} (tanpa satuan).`,
+        `Berat isi material = ${config.material.density*9.80665} N/m3; rho = ${config.material.density} kg/m3; g = 9.80665 m/s2.`,
+        `Grup ${config.selfWeight.groupName} aktif pada H0 waktu lokal 0 dan dipertahankan saat beton baru aktif pada H1.`,
+        'Berat sendiri otomatis HYD-CTRL nonaktif; SW diterapkan melalui grup beban agar tidak dihitung ganda.',
         '',`CAMPURAN: binder ${mix.binder} kg/m3; w/c=${mix.wc}; w/b=${mix.wb}; fly ash ${mix.flyash}%.`,
         `Total massa bahan ${mix.total} kg/m3; density termal terpisah ${config.material.density} kg/m3.`,
         `Batch ${config.mix.batchVolume}m3: air ditambah ${mix.batchWater}kg, pasir basah ${mix.batchSand}kg, agregat basah ${mix.batchGravel}kg.`,
@@ -962,7 +996,7 @@
         `Beton lama panas nol; awal ${config.temperature.old}degC asumsi; suhu cor ${config.temperature.pour}degC.`,
         `DASAR TERMAL: ${config.boundary.baseMode}; tumpuan translasi dasar tetap (idealisasi mekanis).`,
         '','TAHAP:'];
-      model.stages.forEach(t=>rows.push(`${t.name}: global ${t.globalStart}-${t.globalEnd}jam; umur baru ${t.newAgeStart}-${t.newAgeEnd}jam; elemen aktif ${t.activeElements}; muka konveksi ${t.convectionFaces}.`));
+      model.stages.forEach(t=>rows.push(`${t.name}: global ${t.globalStart}-${t.globalEnd}jam; umur baru ${t.newAgeStart}-${t.newAgeEnd}jam; elemen aktif ${t.activeElements}; muka konveksi ${t.convectionFaces}; grup beban aktif ${t.activeLoadGroups.join(', ')}.`));
       rows.push('','PERHITUNGAN MATERIAL TERMAL:',
         `Metode cp=${thermal.cpMode}; k=${thermal.kMode}; Tref=${thermal.referenceTemperature}degC; material lama=${thermal.oldMode}.`,
         `Beton baru: cp=${thermal.cp}kJ/kgC; k=${thermal.k}W/mC; SPHEAT=${thermal.cpMct}; HEATCO=${thermal.kMct}.`,

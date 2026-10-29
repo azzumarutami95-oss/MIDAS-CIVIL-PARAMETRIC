@@ -62,6 +62,51 @@ test('actual material cards use mass kg and hour heat units consistently',()=>{
   assert.match(f,/FUNC=H_FORM, CONST, 10\.800000000/);assert.match(f,/FUNC=H_AIR, CONST, 36\.000000000/);
 });
 
+test('SW is a Dead Load in LG_SW and is activated once throughout hydration stages',()=>{
+  assert.deepEqual(E.defaults().selfWeight,{caseName:'SW',caseType:'D',groupName:'LG_SW',factorX:0,factorY:0,factorZ:-1});
+  assert.deepEqual(sections['*LOAD-GROUP'],['LG_SW']);
+  assert.deepEqual(sections['*STLDCASE'][0].split(',').slice(0,2).map(s=>s.trim()),['SW','D']);
+  assert.ok(Object.hasOwn(sections,'*USE-STLD, SW'));
+  assert.deepEqual(sections['*SELFWEIGHT'],['0, 0, -1, LG_SW']);
+  assert.equal((model.text.match(/^\*SELFWEIGHT$/gm)||[]).length,1);
+  const stageLines=sections['*HYD-STAGE'];
+  const activation=stageLines.indexOf('ALOAD=LG_SW, 0');
+  assert.ok(activation>stageLines.findIndex(s=>s.startsWith('NAME=H0_OLD_INIT,')));
+  assert.ok(activation<stageLines.findIndex(s=>s.startsWith('NAME=H1_POUR_FORM,')));
+  assert.equal(stageLines.filter(s=>s.startsWith('ALOAD=')).length,1);
+  assert.ok(!stageLines.some(s=>s.startsWith('DLOAD=')));
+  assert.ok(model.stages.every(s=>s.activeLoadGroups.length===1&&s.activeLoadGroups[0]==='LG_SW'));
+  // Explicit SW must not also enable automatic hydration self-weight.
+  assert.equal(sections['*HYD-CTRL'][0].split(',')[6].trim(),'NO');
+});
+
+test('edited self-weight factors survive JSON and drive actual MCT cards',()=>{
+  const c=E.defaults();Object.assign(c.mesh,{sideDiv:4,radialDiv:2,layersOld:1,layersNew:1});
+  Object.assign(c.selfWeight,{factorX:0.25,factorY:-0.5,factorZ:-1.2});
+  const restored=E.cleanConfig(JSON.parse(JSON.stringify({schema:'civil-heat-studio/v1',config:c})));
+  assert.deepEqual(restored.selfWeight,c.selfWeight);
+  const updated=E.build(restored),s=parseMCT(updated.text);
+  assert.deepEqual(s['*SELFWEIGHT'],['0.25, -0.5, -1.2, LG_SW']);
+  assert.deepEqual(updated.config.selfWeight,c.selfWeight);
+});
+
+test('old JSON receives SW defaults while malformed self-weight parameters are rejected',()=>{
+  const legacy=E.defaults();delete legacy.selfWeight;
+  assert.deepEqual(E.cleanConfig({schema:'civil-heat-studio/v1',config:legacy}).selfWeight,E.defaults().selfWeight);
+  // The migration must also work for JSON preceding the thermal calculator.
+  delete legacy.thermal;delete legacy.thermalComponents;
+  assert.deepEqual(E.cleanConfig(legacy).selfWeight,E.defaults().selfWeight);
+  for(const bad of [null,[],{}, {...E.defaults().selfWeight,factorZ:'-1'}, {...E.defaults().selfWeight,factorZ:Infinity}]){
+    const c=E.defaults();c.selfWeight=bad;
+    assert.throws(()=>E.cleanConfig({schema:'civil-heat-studio/v1',config:c}));
+  }
+  for(const [key,value] of [['caseName','SW\n*ENDDATA'],['caseType','L'],['groupName','OTHER'],['factorX',NaN],['factorZ',Infinity]]){
+    const c=E.defaults();c.selfWeight[key]=value;
+    assert.ok(E.validate(c).errors.some(e=>e.field==='selfWeight.'+key),key);
+    assert.throws(()=>E.build(c));
+  }
+});
+
 test('source cards assign zero heat to old lift and adiabatic rise to fresh lift only',()=>{
   assert.deepEqual(sections['*HYD-HEATSRC'],['1to12288, OLD_ZERO','12289to24576, NEW_ADIABATIC']);
   const source=sections['*HYD-HEATSRCF'];

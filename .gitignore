@@ -4,3 +4,4 @@ dist/
 desktop/assets/icon.ico
 desktop/assets/icon.png
 __pycache__/
+/work/

@@ -2,11 +2,11 @@
 
 ## Aplikasi Windows (.exe)
 
-**[Unduh installer Windows 64-bit v1.1.0 (.exe)](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/download/v1.1.0/Civil-Hydration-NX-Setup-1.1.0-x64.exe)**
+**[Unduh installer Windows 64-bit v1.1.1 (.exe)](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/download/v1.1.1/Civil-Hydration-NX-Setup-1.1.1-x64.exe)**
 
 **[Unduh installer Civil Hydration NX dari GitHub Releases](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/latest)**
 
-Pilih `Civil-Hydration-NX-Setup-1.1.0-x64.exe` untuk Windows 10/11 64-bit (x64).
+Pilih `Civil-Hydration-NX-Setup-1.1.1-x64.exe` untuk Windows 10/11 64-bit (x64).
 Aplikasi menyertakan runtime dan dapat dipakai offline untuk mengatur material
 termal, mix design, mesh, staging, serta mengekspor `.MCT`, parameter JSON dan
 ringkasan input. **Save (Ctrl+S)** memperbarui proyek JSON aktif; **Save As
@@ -15,6 +15,11 @@ ditampilkan, dengan pengingat saat menutup atau membuka proyek lain. Installer
 belum ditandatangani secara digital.
 
 [Petunjuk instalasi, pemindahan parameter HTML, dan build Windows](desktop/README.md).
+
+Rilis v1.1.1 menambahkan **SW · Dead Load (D) · LG_SW** dengan faktor global
+default **(0, 0, −1)** pada aplikasi, JSON, pratinjau, laporan TXT, dan ekspor
+MCT. Grup beban diaktifkan mulai H0; JSON v1 lama dimigrasikan otomatis.
+[Rincian parameter dan aktivasi SW](web/README.md#berat-sendiri-sw).
 
 ## Aplikasi HTML untuk menyusun input hidrasi
 

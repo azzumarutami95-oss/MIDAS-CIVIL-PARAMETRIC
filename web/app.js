@@ -102,13 +102,15 @@
       `; Metode cp=${th.cpMode}; k=${th.kMode}; old=${th.oldMode}; Tref=${th.referenceTemperature} degC`,
       '*MATERIAL',`1, CONC, FC_OLD, ${th.oldCpMct.toFixed(9)}, ${th.oldKMct.toFixed(9)}, , C, NO, 0.05, 2, ${(4700*Math.sqrt(m.fc)*1e6).toFixed(3)}, ${m.poisson}, ${m.expansion}, ${(m.density*9.80665).toFixed(3)}, 0`,
       `2, CONC, FC_NEW, ${th.cpMct.toFixed(9)}, ${th.kMct.toFixed(9)}, , C, NO, 0.05, 2, ${(4700*Math.sqrt(m.fc)*1e6).toFixed(3)}, ${m.poisson}, ${m.expansion}, ${(m.density*9.80665).toFixed(3)}, 0`,
+      ...E.selfWeightCards(c),
       `*HYD-HEATSRCF`,`FUNC=NEW_ADIABATIC, USER, 1, YES`,
       '0, 0',`24, ${E.heatRise(c,24).toFixed(6)}`,`${c.schedule.end}, ${E.heatRise(c,c.schedule.end).toFixed(6)}`,
       '; Unduhan menyertakan tabel panas lengkap dan kurva OLD_ZERO.',
       `; Dasar termal: ${c.boundary.baseMode==='fixed'?`${c.temperature.base} degC tetap`:'adiabatik / fluks nol'}`,'*HYD-STAGE'];
     for(const t of s){lines.push(`NAME=${t.name}, ${t.temp===null?'NO, 0':`YES, ${t.temp}`}`);
       lines.push('; '+t.steps.length+' waktu lokal, akhir '+t.steps[t.steps.length-1]+' jam');
-      for(const [field,key]of [['AELEM','ae'],['ABNDR','ab'],['DBNDR','db']])if(t[key].length)lines.push(field+'='+t[key].join(', '));}
+      for(const [field,key]of [['AELEM','ae'],['ABNDR','ab'],['DBNDR','db']])if(t[key].length)lines.push(field+'='+t[key].join(', '));
+      for(const group of t.al)lines.push('ALOAD='+group+', 0');}
     lines.push('*HYD-CTRL',`YES, , 1, ${c.temperature.old}, GAUSS, NO, NO, -1, NO, BOTH, 0, 5, 0.001`);
     $('mct-preview').value=lines.join('\n');
   }
@@ -255,6 +257,11 @@
         `MODEL: diameter ${config.geometry.diameter} m; beton lama ${config.geometry.heightOld} m; baru ${config.geometry.heightNew} m.`,
         `MESH: ${model.stats.nodes} node, ${model.stats.elements} HEX8; interface ${model.mesh.nn} node bersama.`,
         `Mesh volume=${model.checks.volume}m3, scaled Jacobian min=${model.checks.minScaled}.`,
+        '',`BERAT SENDIRI: ${config.selfWeight.caseName}; tipe Dead Load (${config.selfWeight.caseType}); grup ${config.selfWeight.groupName}.`,
+        `Faktor global X, Y, Z = ${config.selfWeight.factorX}, ${config.selfWeight.factorY}, ${config.selfWeight.factorZ} (tanpa satuan).`,
+        `Berat isi material = ${config.material.density*9.80665} N/m3; rho = ${config.material.density} kg/m3; g = 9.80665 m/s2.`,
+        `Grup ${config.selfWeight.groupName} aktif pada H0 waktu lokal 0 dan dipertahankan saat beton baru aktif pada H1.`,
+        'Berat sendiri otomatis HYD-CTRL nonaktif; SW diterapkan melalui grup beban agar tidak dihitung ganda.',
         '',`CAMPURAN: binder ${mix.binder} kg/m3; w/c=${mix.wc}; w/b=${mix.wb}; fly ash ${mix.flyash}%.`,
         `Total massa bahan ${mix.total} kg/m3; density termal terpisah ${config.material.density} kg/m3.`,
         `Batch ${config.mix.batchVolume}m3: air ditambah ${mix.batchWater}kg, pasir basah ${mix.batchSand}kg, agregat basah ${mix.batchGravel}kg.`,
@@ -264,7 +271,7 @@
         `Beton lama panas nol; awal ${config.temperature.old}degC asumsi; suhu cor ${config.temperature.pour}degC.`,
         `DASAR TERMAL: ${config.boundary.baseMode}; tumpuan translasi dasar tetap (idealisasi mekanis).`,
         '','TAHAP:'];
-      model.stages.forEach(t=>rows.push(`${t.name}: global ${t.globalStart}-${t.globalEnd}jam; umur baru ${t.newAgeStart}-${t.newAgeEnd}jam; elemen aktif ${t.activeElements}; muka konveksi ${t.convectionFaces}.`));
+      model.stages.forEach(t=>rows.push(`${t.name}: global ${t.globalStart}-${t.globalEnd}jam; umur baru ${t.newAgeStart}-${t.newAgeEnd}jam; elemen aktif ${t.activeElements}; muka konveksi ${t.convectionFaces}; grup beban aktif ${t.activeLoadGroups.join(', ')}.`));
       rows.push('','PERHITUNGAN MATERIAL TERMAL:',
         `Metode cp=${thermal.cpMode}; k=${thermal.kMode}; Tref=${thermal.referenceTemperature}degC; material lama=${thermal.oldMode}.`,
         `Beton baru: cp=${thermal.cp}kJ/kgC; k=${thermal.k}W/mC; SPHEAT=${thermal.cpMct}; HEATCO=${thermal.kMct}.`,

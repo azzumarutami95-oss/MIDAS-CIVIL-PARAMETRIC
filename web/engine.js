@@ -13,6 +13,7 @@
     mix: {cement:432, flyash:108, water:151, admixture1:2.16, admixture2:8.1, sand:749, gravel:976,
           batchVolume:0.035, sandMoisture:4, gravelMoisture:0.15},
     boundary: {baseMode:'fixed'},
+    selfWeight: {caseName:'SW', caseType:'D', groupName:'LG_SW', factorX:0, factorY:0, factorZ:-1},
     ...Thermal.defaults()
   };
   const clone = obj => JSON.parse(JSON.stringify(obj));
@@ -26,6 +27,8 @@
     const legacyThermal=source.thermal===undefined&&source.thermalComponents===undefined;
     for (const group of Object.keys(DEFAULTS)) {
       if(legacyThermal&&(group==='thermal'||group==='thermalComponents'))continue;
+      // Projects saved before SW was introduced inherit the requested load.
+      if(group==='selfWeight'&&source[group]===undefined)continue;
       if (!source[group] || typeof source[group] !== 'object') throw Error('Kelompok parameter tidak lengkap: '+group);
       for (const key of Object.keys(DEFAULTS[group])) {
         const x = source[group][key];
@@ -97,6 +100,11 @@
     range('mix','batchVolume',0,20,true);
     range('mix','sandMoisture',0,100);range('mix','gravelMoisture',0,100);
     if (!['fixed','adiabatic'].includes(c.boundary.baseMode)) err('boundary.baseMode','Kondisi dasar tidak dikenal.');
+    for(const key of ['caseName','caseType','groupName'])
+      if(c.selfWeight?.[key]!==DEFAULTS.selfWeight[key])
+        err('selfWeight.'+key,'Beban berat sendiri harus memakai SW, tipe Dead Load (D), dan grup LG_SW.');
+    for(const key of ['factorX','factorY','factorZ'])
+      if(!number(c.selfWeight?.[key]))err('selfWeight.'+key,'Faktor berat sendiri harus berupa angka berhingga.');
     const stats=estimate(c);
     if (stats.elements>100000 || stats.nodes>125000) err('mesh.sideDiv','Mesh terlalu besar untuk ekspor lokal: batas 100.000 elemen / 125.000 node.');
     if (number(c.schedule.end/c.schedule.dtEarly) && c.schedule.end/Math.min(c.schedule.dtEarly,c.schedule.dtMiddle,c.schedule.dtStrip,c.schedule.dtLate)>20000)
@@ -218,10 +226,10 @@
   function stages(c) {
     const s=c.schedule,early=Math.min(24,s.strip),fixed=c.boundary.baseMode==='fixed';
     return [
-      {name:'H0_OLD_INIT',label:'Kondisi awal beton lama',temp:c.temperature.old,steps:[s.init],ae:['STAGE1_OLD'],ab:['MECH_BASE',...(fixed?['BASE_TEMP']:[]),'OLD_SIDE','OLD_TOP'],db:[]},
-      {name:'H1_POUR_FORM',label:'Pengecoran + bekisting',temp:c.temperature.pour,steps:steps(early,s.dtEarly).concat(steps(s.strip,s.dtMiddle,early)),ae:['STAGE2_NEW'],ab:['NEW_FORM','TOP_CURE'],db:['OLD_TOP']},
-      {name:'H2_STRIP_FORM',label:'Bongkar bekisting',temp:null,steps:steps(s.cure-s.strip,s.dtStrip),ae:[],ab:['NEW_AIR'],db:['NEW_FORM']},
-      {name:'H3_END_CURING',label:'Akhir curing / pendinginan',temp:null,steps:steps(s.end-s.cure,s.dtLate),ae:[],ab:['TOP_AIR'],db:['TOP_CURE']}
+      {name:'H0_OLD_INIT',label:'Kondisi awal beton lama',temp:c.temperature.old,steps:[s.init],ae:['STAGE1_OLD'],ab:['MECH_BASE',...(fixed?['BASE_TEMP']:[]),'OLD_SIDE','OLD_TOP'],db:[],al:[c.selfWeight.groupName]},
+      {name:'H1_POUR_FORM',label:'Pengecoran + bekisting',temp:c.temperature.pour,steps:steps(early,s.dtEarly).concat(steps(s.strip,s.dtMiddle,early)),ae:['STAGE2_NEW'],ab:['NEW_FORM','TOP_CURE'],db:['OLD_TOP'],al:[]},
+      {name:'H2_STRIP_FORM',label:'Bongkar bekisting',temp:null,steps:steps(s.cure-s.strip,s.dtStrip),ae:[],ab:['NEW_AIR'],db:['NEW_FORM'],al:[]},
+      {name:'H3_END_CURING',label:'Akhir curing / pendinginan',temp:null,steps:steps(s.end-s.cure,s.dtLate),ae:[],ab:['TOP_AIR'],db:['TOP_CURE'],al:[]}
     ];
   }
   function units(c) {
@@ -236,6 +244,11 @@
     ];
   }
   function heatRise(c,hours) {return c.heat.K*(-Math.expm1(-c.heat.alpha*hours/24));}
+  function selfWeightCards(c) {
+    const w=c.selfWeight;
+    return ['*LOAD-GROUP',w.groupName,'','*STLDCASE',`${w.caseName}, ${w.caseType}, Self weight`,'',
+      `*USE-STLD, ${w.caseName}`,'*SELFWEIGHT',`${w.factorX}, ${w.factorY}, ${w.factorZ}, ${w.groupName}`];
+  }
   function build(c) {
     const validation=validate(c);if(validation.errors.length)throw Error(validation.errors.map(x=>x.message).join('\n'));
     const data=mesh(c),{nodes,cells,nn,nq,oldElements}=data,stageData=stages(c),baseFixed=c.boundary.baseMode==='fixed';
@@ -250,12 +263,13 @@
     surfaces.NEW_TOP=Array.from({length:nq},(_,i)=>cells.length-nq+i+1);
     const bc={OLD_SIDE:['OLD_SIDE','H_OLD_SIDE',4],OLD_TOP:['OLD_TOP','H_OLD_TOP',2],NEW_FORM:['NEW_SIDE','H_FORM',4],NEW_AIR:['NEW_SIDE','H_AIR',4],TOP_CURE:['NEW_TOP','H_CURING',2],TOP_AIR:['NEW_TOP','H_TOP_AIR',2]};
     // Audit boundary changes using actual element faces at each stage.
-    const activeE=new Set(),activeB=new Set(),auditStages=[];let elapsed=0;
+    const activeE=new Set(),activeB=new Set(),activeL=new Set(),auditStages=[];let elapsed=0;
     const faceKey=(e,f)=>faceNodes[f-1].map(i=>cells[e-1][i]).sort((a,b)=>a-b).join(':');
     for(const stage of stageData){
       for(const name of stage.ae)for(const id of groups[name].elements){if(activeE.has(id))throw Error('Elemen diaktifkan ulang.');activeE.add(id);}
       for(const name of stage.db){if(!activeB.delete(name))throw Error('Grup batas belum aktif: '+name);}
       for(const name of stage.ab){if(activeB.has(name))throw Error('Grup batas aktif dua kali.');activeB.add(name);}
+      for(const name of stage.al){if(activeL.has(name))throw Error('Grup beban aktif dua kali.');activeL.add(name);}
       const assigned=new Set();
       for(const name of activeB){if(!bc[name])continue;const [surface,,face]=bc[name];
         if(name==='OLD_TOP' && activeE.size>oldElements)throw Error('Konveksi pada sambungan internal.');
@@ -267,7 +281,7 @@
       const end=stage.steps[stage.steps.length-1];
       auditStages.push({name:stage.name,label:stage.label,globalStart:elapsed,globalEnd:elapsed+end,
         newAgeStart:elapsed-c.schedule.init,newAgeEnd:elapsed+end-c.schedule.init,activeElements:activeE.size,
-        convectionFaces:assigned.size,activeBoundaries:[...activeB],temperatureOverride:stage.temp,steps:stage.steps.length});
+        convectionFaces:assigned.size,activeBoundaries:[...activeB],activeLoadGroups:[...activeL],temperatureOverride:stage.temp,steps:stage.steps.length});
       elapsed+=end;
     }
     const E=4700*Math.sqrt(c.material.fc)*1e6,m=c.material,T=c.temperature,thermal=resolvedThermal(c);
@@ -279,7 +293,8 @@
       '; Mix information is provenance; it does NOT calibrate heat curve or strength development.',
       `; MIX kg/m3: cement=${c.mix.cement}, flyash=${c.mix.flyash}, water=${c.mix.water}, sand=${c.mix.sand}, gravel=${c.mix.gravel}`,
       `; MIX kg/m3 admixtures=${c.mix.admixture1}+${c.mix.admixture2}; w/b=${mixMetrics(c).wb.toFixed(8)}`,
-      `; fc=${m.fc}MPa basis for E; no nonlinear strength/age law. Creep/equivalent age/selfweight disabled.`,
+      `; fc=${m.fc}MPa basis for E; no nonlinear strength/age law. Creep/equivalent age disabled.`,
+      '; Explicit SW (Dead Load) in LG_SW is activated once at H0 local time 0 and retained.',
       `; Thermal methods: cp=${thermal.cpMode}, k=${thermal.kMode}, old=${thermal.oldMode}, Tref=${thermal.referenceTemperature}degC.`,
       '; Effective properties are CONSTANT MCT inputs; not temperature/age dependent functions.',
       `; Selected cp_new=${thermal.cp}, k_new=${thermal.k}W/mK; cp_old=${thermal.oldCp}, k_old=${thermal.oldK}W/mK.`,
@@ -296,6 +311,7 @@
     lines.push(`JOINT, ${c.mesh.layersOld*nn+1}to${(c.mesh.layersOld+1)*nn}, , 0`,'','*BNDR-GROUP');
     ['MECH_BASE',...(baseFixed?['BASE_TEMP']:[]),...Object.keys(bc)].forEach(name=>lines.push(`${name}, 0`));
     lines.push('','*CONSTRAINT',`1to${nn}, 111000, MECH_BASE`);
+    lines.push('',...selfWeightCards(c));
     if(baseFixed)lines.push('','*HYD-PRTEMPER',`1to${nn}, ${T.base}, BASE_TEMP`);
     lines.push('','*HYD-HEATSRCF','; USER + YES: adiabatic temperature RISE table vs material age in HOURS.',
       'FUNC=OLD_ZERO, USER, 1, YES','0, 0',`${c.schedule.end+48}, 0`,'FUNC=NEW_ADIABATIC, USER, 1, YES');
@@ -314,8 +330,10 @@
       // Keep STEP on one conservative line rather than inventing continuation.
       lines.push('STEP='+stage.steps.join(', '));
       for(const [field,key] of [['AELEM','ae'],['ABNDR','ab'],['DBNDR','db']])if(stage[key].length)lines.push(field+'='+stage[key].join(', '));
+      for(const name of stage.al)lines.push(`ALOAD=${name}, 0`);
     }
     lines.push('','*HYD-CTRL','; TYPE=BOTH is disabled creep/shrinkage selection, not thermal/stress mode.',
+      '; bINCSW=NO avoids adding automatic selfweight on top of explicit SW / LG_SW.',
       `YES, , 1, ${T.old}, GAUSS, NO, NO, -1, NO, BOTH, 0, 5, 0.001`,'','*HYD-NODE');
     const monitors=[];
     for(const [name,target] of [['OLD_CORE',[0,0,c.geometry.heightOld/2]],['JOINT_CORE',[0,0,c.geometry.heightOld]],
@@ -330,6 +348,6 @@
       stats:estimate(c),stages:auditStages,monitors,units:units(c),checks:data.audit,
       config:clone(c),thermal,nativeMidasTested:false,journalValidated:false};
   }
-  root.MidasEngine={defaults:()=>clone(DEFAULTS),cleanConfig,resolvedThermal,mixMetrics,estimate,validate,crossSection,auditCross,mesh,ranges,stages,units,heatRise,build};
+  root.MidasEngine={defaults:()=>clone(DEFAULTS),cleanConfig,resolvedThermal,mixMetrics,estimate,validate,crossSection,auditCross,mesh,ranges,stages,units,heatRise,selfWeightCards,build};
   if(typeof module!=='undefined' && module.exports)module.exports=root.MidasEngine;
 })(typeof window!=='undefined'?window:globalThis);

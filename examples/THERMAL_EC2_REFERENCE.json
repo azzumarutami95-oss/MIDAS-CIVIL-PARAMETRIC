@@ -60,6 +60,14 @@
       "sandMoisture": 4,
       "gravelMoisture": 0.15
     },
+    "selfWeight": {
+      "caseName": "SW",
+      "caseType": "D",
+      "groupName": "LG_SW",
+      "factorX": 0,
+      "factorY": 0,
+      "factorZ": -1
+    },
     "boundary": {
       "baseMode": "fixed"
     },

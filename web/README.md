@@ -51,6 +51,22 @@ lama generator Python memakai format berbeda dan bukan format impor aplikasi.
 **Unduh ringkasan input** menyimpan `.txt` berisi parameter, unit, jadwal,
 node pemantauan dan batas interpretasi. Tombol reset meminta konfirmasi.
 
+## Berat sendiri SW
+
+Panel **Model → Berat sendiri / self weight** menampilkan kasus **SW**, tipe
+**Dead Load (D)**, dan grup **LG_SW**. Faktor arah global default **X=0, Y=0,
+Z=−1** dapat diedit dan disimpan di `config.selfWeight` pada JSON. JSON v1 lama
+yang belum memiliki kelompok tersebut memakai nilai default ini saat dibuka;
+parameter SW yang ada tetapi tidak lengkap atau tidak valid ditolak.
+
+Pratinjau, laporan TXT, serta ekspor MCT menggunakan parameter yang sama.
+MCT memuat `*LOAD-GROUP`, `*STLDCASE`, `*USE-STLD, SW`, dan `*SELFWEIGHT`.
+Grup diaktifkan sekali melalui `ALOAD=LG_SW, 0` pada awal H0 dan tetap aktif
+saat elemen beton baru diaktifkan pada H1. Berat isi material menggunakan
+`rho × 9,80665` N/m³. Berat sendiri otomatis `HYD-CTRL.bINCSW` tetap `NO`
+untuk menghindari beban ganda. Penerimaan kartu dan penerapannya pada elemen
+yang baru aktif tetap perlu diperiksa melalui impor/solver MIDAS Civil.
+
 Penyimpanan lokal browser digunakan bila tersedia. Pengaturan browser/file
 lokal dapat membatasi penyimpanan atau unduhan; gunakan ekspor JSON dan izinkan
 unduhan untuk berkas HTML lokal jika browser memintanya. Jangan mengandalkan

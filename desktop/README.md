@@ -2,9 +2,9 @@
 
 **[Buka halaman unduh installer di GitHub Releases](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/latest)**
 
-**[Unduh langsung installer v1.1.0 (.exe)](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/download/v1.1.0/Civil-Hydration-NX-Setup-1.1.0-x64.exe)**
+**[Unduh langsung installer v1.1.1 (.exe)](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/download/v1.1.1/Civil-Hydration-NX-Setup-1.1.1-x64.exe)**
 
-Berkas versi 1.1.0: `Civil-Hydration-NX-Setup-1.1.0-x64.exe`.
+Berkas versi 1.1.1: `Civil-Hydration-NX-Setup-1.1.1-x64.exe`.
 Paket ini ditujukan untuk Windows 10/11 64-bit dengan prosesor x64. Aplikasi
 menyertakan Electron/Chromium sehingga penggunaan normal tidak memerlukan
 instalasi Node.js, Python, browser tambahan, atau koneksi internet.
@@ -38,6 +38,13 @@ design, material mekanis, specific heat dan heat conduction beserta metode
 perhitungan dan properti fasenya, material beton lama, temperatur, konveksi,
 sumber panas, kondisi batas dan staging. Membuka JSON mengisi kembali parameter
 tersebut agar dapat diedit dan diekspor menjadi MCT baru.
+
+Rilis v1.1.1 menambahkan **SW · Dead Load (D) · LG_SW** dengan faktor global
+default **(0, 0, −1)**. Faktor tersedia di panel Model dan ikut tersimpan pada
+JSON, pratinjau, laporan TXT serta ekspor MCT. Proyek JSON v1 lama memperoleh
+parameter SW default saat dibuka. Grup aktif mulai H0 dan dipertahankan pada
+tahap berikutnya; berat sendiri otomatis hidrasi tetap nonaktif agar beban
+tidak dihitung ganda. Lihat [rincian SW](../web/README.md#berat-sendiri-sw).
 
 - **Open / Buka (`Ctrl+O`)** memilih proyek melalui dialog Windows. JSON yang
   dibuka menjadi file proyek aktif.
@@ -138,7 +145,7 @@ npx electron-builder --win nsis --x64 --publish never
 Hasil installer berada di:
 
 ```text
-dist/Civil-Hydration-NX-Setup-1.1.0-x64.exe
+dist/Civil-Hydration-NX-Setup-1.1.1-x64.exe
 ```
 
 `npm start` membuka versi pengembangan setelah dependensi dan aset tersedia.

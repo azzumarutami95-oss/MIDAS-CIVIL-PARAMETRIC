@@ -72,6 +72,29 @@ def main():
         assert 'N, M, KJ, C' in mct
         assert 'NAME=H2_STRIP_FORM, NO, 0' in mct
         assert '1to12288, OLD_ZERO' in mct
+        assert section(mct,'*LOAD-GROUP')==['LG_SW']
+        assert section(mct,'*STLDCASE')[0].split(',')[:2]==['SW',' D']
+        assert '*USE-STLD, SW' in mct
+        assert section(mct,'*SELFWEIGHT')==['0, 0, -1, LG_SW']
+        assert section(mct,'*HYD-STAGE').count('ALOAD=LG_SW, 0')==1
+        assert section(mct,'*HYD-CTRL')[0].split(',')[6].strip()=='NO'
+        assert 'SW' in page.locator('#self-weight-summary').inner_text()
+        assert 'Dead Load' in page.locator('#self-weight-summary').inner_text()
+        assert 'LG_SW' in page.locator('#self-weight-summary').inner_text()
+        preview=page.locator('#mct-preview').input_value()
+        assert section(preview,'*SELFWEIGHT')==section(mct,'*SELFWEIGHT')
+        assert section(preview,'*HYD-STAGE').count('ALOAD=LG_SW, 0')==1
+
+        edit('selfWeight.factorX',0.25)
+        edit('selfWeight.factorY',-0.5)
+        edit('selfWeight.factorZ',-1.2)
+        weighted=download('export-mct','PILAR_HEAT_HYDRATION.MCT').read_text()
+        assert section(weighted,'*SELFWEIGHT')==['0.25, -0.5, -1.2, LG_SW']
+        assert section(page.locator('#mct-preview').input_value(),'*SELFWEIGHT')==section(weighted,'*SELFWEIGHT')
+        weighted_report=download('download-report','RINGKASAN_INPUT_HIDRASI.txt').read_text()
+        assert 'BERAT SENDIRI: SW; tipe Dead Load (D); grup LG_SW.' in weighted_report
+        assert 'Faktor global X, Y, Z = 0.25, -0.5, -1.2' in weighted_report
+        assert 'H0 waktu lokal 0' in weighted_report
 
         edit('mix.cement',450)
         assert field('heat.K').input_value()=='45'
@@ -83,6 +106,9 @@ def main():
         page.reload();page.wait_for_function("document.querySelector('#validation-summary').textContent === 'Input dapat diekspor'")
         assert field('temperature.pour').input_value()=='34'
         assert field('mix.cement').input_value()=='450'
+        assert field('selfWeight.factorX').input_value()=='0.25'
+        assert field('selfWeight.factorY').input_value()=='-0.5'
+        assert field('selfWeight.factorZ').input_value()=='-1.2'
 
         reveal(field('boundary.baseMode'));field('boundary.baseMode').select_option('adiabatic');page.wait_for_timeout(240)
         assert field('temperature.base').is_disabled()
@@ -94,14 +120,43 @@ def main():
         snap=json.loads(saved.read_text());assert snap['config']['temperature']['pour']==34
         assert snap['config']['boundary']['baseMode']=='adiabatic'
         assert snap['reference']['strength']['reportedMean7']==42.4
+        assert snap['config']['selfWeight']==dict(caseName='SW',caseType='D',groupName='LG_SW',factorX=0.25,factorY=-0.5,factorZ=-1.2)
         edit('temperature.pour',31)
+        edit('selfWeight.factorZ',-2)
         page.locator('#import-file').set_input_files(saved)
         page.wait_for_function("document.querySelector('#export-status').textContent.includes('berhasil dimuat')")
         assert field('temperature.pour').input_value()=='34'
+        assert field('selfWeight.factorZ').input_value()=='-1.2'
         bad=folder/'bad.json';bad.write_text('{"schema":"unknown","config":{}}')
         page.locator('#import-file').set_input_files(bad)
         page.wait_for_function("document.querySelector('#export-status').textContent.includes('tidak dimuat')")
         assert field('temperature.pour').input_value()=='34'
+
+        malformed=json.loads(json.dumps(snap))
+        del malformed['config']['selfWeight']['factorZ']
+        bad_sw=folder/'bad-self-weight.json';bad_sw.write_text(json.dumps(malformed))
+        page.locator('#import-file').set_input_files(bad_sw)
+        page.wait_for_timeout(240)
+        assert 'tidak dimuat' in page.locator('#export-status').inner_text()
+        assert field('selfWeight.factorZ').input_value()=='-1.2'
+        assert field('temperature.pour').input_value()=='34'
+
+        legacy=json.loads(json.dumps(snap));del legacy['config']['selfWeight']
+        old_project=folder/'legacy.json';old_project.write_text(json.dumps(legacy))
+        page.locator('#import-file').set_input_files(old_project)
+        page.wait_for_function("document.querySelector('#export-status').textContent.includes('berhasil dimuat')")
+        assert [field('selfWeight.'+key).input_value() for key in ['factorX','factorY','factorZ']]==['0','0','-1']
+        migrated=json.loads(download('export-json','PARAMETER_HEAT_HYDRATION.json').read_text())
+        assert migrated['config']['selfWeight']==dict(caseName='SW',caseType='D',groupName='LG_SW',factorX=0,factorY=0,factorZ=-1)
+        assert section(download('export-mct','PILAR_HEAT_HYDRATION.MCT').read_text(),'*SELFWEIGHT')==['0, 0, -1, LG_SW']
+
+        # An empty numeric SW field must block every export until corrected.
+        edit('selfWeight.factorZ','')
+        assert page.locator('#export-mct').is_disabled()
+        assert page.locator('#export-json').is_disabled()
+        assert page.locator('#download-report').is_disabled()
+        assert field('selfWeight.factorZ').get_attribute('aria-invalid')=='true'
+        edit('selfWeight.factorZ',-1)
 
         edit('schedule.strip',200)
         assert page.locator('#export-mct').is_disabled()
@@ -114,16 +169,19 @@ def main():
         assert field('mix.cement').input_value()=='432'
         assert field('temperature.pour').input_value()=='30'
         assert field('boundary.baseMode').input_value()=='fixed'
+        assert [field('selfWeight.'+key).input_value() for key in ['factorX','factorY','factorZ']]==['0','0','-1']
         reveal(page.locator('#use-mix-density'));page.locator('#use-mix-density').click();page.wait_for_timeout(250)
         assert field('material.density').input_value()=='2426.26'
         report=download('download-report','RINGKASAN_INPUT_HIDRASI.txt').read_text()
         assert 'bukan hasil analisis' in report and '2426.26' in report
+        assert 'BERAT SENDIRI: SW; tipe Dead Load (D); grup LG_SW.' in report
+        assert 'Faktor global X, Y, Z = 0, 0, -1' in report
 
         assert not requests, requests
         assert not errors, errors
         context.close();browser.close()
     server.shutdown();server.server_close()
-    print('PASS: no external assets, actual MCT downloads, editable inputs, JSON round trip/rejection, persistence, reset and report. file:// unavailable under managed browser policy.')
+    print('PASS: no external assets, actual MCT downloads, SW factors/preview/staging/report, legacy JSON migration, editable inputs, JSON round trip/rejection, persistence and reset. file:// unavailable under managed browser policy.')
 
 
 if __name__=='__main__':main()
