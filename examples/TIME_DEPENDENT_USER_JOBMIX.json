@@ -1,0 +1,145 @@
+{
+  "schema": "civil-heat-studio/v1",
+  "config": {
+    "geometry": {
+      "diameter": 7.5,
+      "heightOld": 4,
+      "heightNew": 4
+    },
+    "material": {
+      "fc": 30,
+      "density": 2400,
+      "cp": 0.9,
+      "conductivity": 2.4,
+      "poisson": 0.2,
+      "expansion": 0.00001
+    },
+    "temperature": {
+      "old": 28,
+      "pour": 30,
+      "ambient": 28,
+      "base": 28
+    },
+    "heat": {
+      "K": 45,
+      "alpha": 0.5
+    },
+    "convection": {
+      "oldSide": 10,
+      "oldTop": 10,
+      "form": 3,
+      "air": 10,
+      "curing": 5,
+      "topAir": 10
+    },
+    "schedule": {
+      "init": 1,
+      "strip": 72,
+      "cure": 168,
+      "end": 720,
+      "dtEarly": 0.5,
+      "dtMiddle": 1,
+      "dtStrip": 2,
+      "dtLate": 6
+    },
+    "mesh": {
+      "sideDiv": 16,
+      "radialDiv": 8,
+      "layersOld": 16,
+      "layersNew": 16
+    },
+    "mix": {
+      "cement": 432,
+      "flyash": 108,
+      "water": 151,
+      "admixture1": 2.16,
+      "admixture2": 8.1,
+      "sand": 749,
+      "gravel": 976,
+      "batchVolume": 0.035,
+      "sandMoisture": 4,
+      "gravelMoisture": 0.15
+    },
+    "boundary": {
+      "baseMode": "fixed"
+    },
+    "selfWeight": {
+      "caseName": "SW",
+      "caseType": "D",
+      "groupName": "LG_SW",
+      "factorX": 0,
+      "factorY": 0,
+      "factorZ": -1
+    },
+    "thermal": {
+      "cpMode": "manual",
+      "kMode": "manual",
+      "referenceTemperature": 30,
+      "oldMode": "same",
+      "oldCp": 0.9,
+      "oldK": 2.4
+    },
+    "thermalComponents": {
+      "cementDensity": 3150,
+      "cementCp": 0.84,
+      "cementK": 1.5,
+      "flyashDensity": 2300,
+      "flyashCp": 0.75,
+      "flyashK": 0.7,
+      "waterDensity": 1000,
+      "waterCp": 4.18,
+      "waterK": 0.6,
+      "sandDensity": 2650,
+      "sandCp": 0.8,
+      "sandK": 3,
+      "gravelDensity": 2700,
+      "gravelCp": 0.8,
+      "gravelK": 3,
+      "admixture1Density": 1100,
+      "admixture1Cp": 3.5,
+      "admixture1K": 0.5,
+      "admixture2Density": 1100,
+      "admixture2Cp": 3.5,
+      "admixture2K": 0.5
+    },
+    "timeDependent": {
+      "enabled": "yes",
+      "creepModel": "USER",
+      "strengthModel": "USER",
+      "humidity": 70,
+      "notionalSize": 3.75,
+      "volumeSurface": 1.875,
+      "shrinkageAge": 3,
+      "cementType": "NR",
+      "aciA": 4,
+      "aciB": 0.85,
+      "aciCuring": "MOIST",
+      "aciUltimate": "CODE",
+      "aciSlump": 100,
+      "aciFineAggregate": 43.42,
+      "aciAir": 2,
+      "aciMixSource": "jobmix",
+      "aciCementContent": 432,
+      "ultimateCreep": 2.35,
+      "ultimateShrinkage": 780,
+      "aashtoExposed": "no",
+      "cebMeanOffset": 8,
+      "csMode": "BOTH",
+      "iterations": 10,
+      "tolerance": 0.001,
+      "linkOldCreep": "no",
+      "linkOldStrength": "no",
+      "linkNewCreep": "yes",
+      "linkNewStrength": "yes",
+      "strengthScale": 1,
+      "creepModulusSource": "material",
+      "creepReferenceModulus": 25742.96020274281,
+      "customStrength": "0, 0, 0, 0\n1, 8, 0.6, 13000\n3, 16, 1.2, 19000\n7, 23, 1.8, 23000\n28, 30, 2.5, 25743\n90, 34, 2.8, 27500",
+      "customCreep": "3, 0, 0\n3, 1, 0.25\n3, 7, 0.7\n3, 28, 1.1\n3, 90, 1.5\n3, 365, 1.9\n7, 0, 0\n7, 1, 0.2173913043478261\n7, 7, 0.6086956521739131\n7, 28, 0.9565217391304349\n7, 90, 1.3043478260869565\n7, 365, 1.6521739130434783\n14, 0, 0\n14, 1, 0.1923076923076923\n14, 7, 0.5384615384615384\n14, 28, 0.8461538461538461\n14, 90, 1.1538461538461537\n14, 365, 1.4615384615384615\n28, 0, 0\n28, 1, 0.1724137931034483\n28, 7, 0.48275862068965514\n28, 28, 0.7586206896551725\n28, 90, 1.0344827586206897\n28, 365, 1.3103448275862069\n60, 0, 0\n60, 1, 0.15625\n60, 7, 0.43749999999999994\n60, 28, 0.6875\n60, 90, 0.9375\n60, 365, 1.1874999999999998",
+      "customShrinkage": "0, 0\n3, 0\n7, 80\n28, 220\n90, 380\n365, 550"
+    }
+  },
+  "reference": {
+    "note": "Contoh parameter yang dapat diedit; tabel USER adalah asumsi, bukan hasil pengujian jobmix."
+  }
+}

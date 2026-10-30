@@ -30,6 +30,8 @@ jobs:
         run: npm test
       - name: Build standalone HTML
         run: python scripts/build_html.py
+      - name: Build importable MCT and JSON examples
+        run: node scripts/build_material_examples.cjs
       - name: Build Windows x64 installer
         run: npm run build:win
       - name: Install and test Windows app
@@ -52,7 +54,7 @@ jobs:
       - name: Create checksum
         shell: pwsh
         run: |
-          $files = @(Get-Item dist/Civil-Hydration-NX-Setup-*-x64.exe) + @(Get-Item downloads/CIVIL_HEAT_HYDRATION*.html)
+          $files = @(Get-Item dist/Civil-Hydration-NX-Setup-*-x64.exe) + @(Get-Item downloads/CIVIL_HEAT_HYDRATION*.html) + @(Get-Item dist/PILAR_TIME_DEPENDENT_EXAMPLE.MCT,dist/PARAMETER_TIME_DEPENDENT_EXAMPLE.json)
           $files | ForEach-Object {
             $hash = (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower()
             "$hash  $($_.Name)"
@@ -64,6 +66,8 @@ jobs:
             dist/Civil-Hydration-NX-Setup-*-x64.exe
             dist/SHA256SUMS.txt
             downloads/CIVIL_HEAT_HYDRATION*.html
+            dist/PILAR_TIME_DEPENDENT_EXAMPLE.MCT
+            dist/PARAMETER_TIME_DEPENDENT_EXAMPLE.json
           if-no-files-found: error
       - name: Publish installer for version tag
         if: startsWith(github.ref, 'refs/tags/v')
@@ -72,11 +76,14 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           $notes = @'
-          Menambahkan SW bertipe Dead Load (D), grup LG_SW, dan faktor global default (0, 0, -1) pada program, JSON, pratinjau, laporan TXT, dan ekspor MCT. Faktor dapat diedit; JSON v1 lama menerima nilai SW default. Grup aktif mulai H0 dan dipertahankan pada tahap berikutnya, dengan berat sendiri otomatis hidrasi tetap nonaktif untuk menghindari beban ganda.
+          Pembaruan material untuk aplikasi v1.1.1: creep/shrinkage ACI 209, CEB-FIP 1990, AASHTO 2006, dan USER; perkembangan kuat tekan ACI 209R-92, CEB-FIP 1990, serta tabel jobmix USER. Pilihan kuat tekan AASHTO memakai ACI 209R-92 sesuai konvensi WSDOT karena AASHTO tidak menetapkan model perkembangan kuat tekan sendiri.
+
+          Parameter kode, tabel custom, modulus acuan creep, dan link independen untuk FC_OLD/FC_NEW tersimpan di JSON serta ikut dalam pratinjau, laporan TXT, dan MCT (TDM-FUNC, TDM-TYPE, TDM-ELAST, TDM-LINK). Default baru menghubungkan beton baru; JSON lama mempertahankan material konstan sampai fitur diaktifkan. SW Dead Load / LG_SW dengan faktor (0, 0, -1) tetap tersedia.
 
           Unduh installer untuk Windows 10/11 x64 atau HTML standalone untuk penggunaan offline. Rilis menyertakan SHA256SUMS.txt. Workflow memeriksa instalasi, pembukaan aplikasi, Save/Save As, ekspor, persistensi, dan uninstall pada Windows sebelum menerbitkan rilis.
 
           Aplikasi independen; parser/solver MIDAS belum diuji. Installer belum ditandatangani sertifikat penerbit.
           '@
           $notes | Set-Content dist/RELEASE_NOTES.md -Encoding utf8
-          gh release create $env:GITHUB_REF_NAME dist/Civil-Hydration-NX-Setup-*-x64.exe dist/SHA256SUMS.txt downloads/CIVIL_HEAT_HYDRATION_NX.html downloads/CIVIL_HEAT_HYDRATION.html --verify-tag --title "Civil Hydration NX $env:GITHUB_REF_NAME — SW Dead Load / Windows x64" --notes-file dist/RELEASE_NOTES.md
+          $packageVersion = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          gh release create $env:GITHUB_REF_NAME dist/Civil-Hydration-NX-Setup-*-x64.exe dist/SHA256SUMS.txt downloads/CIVIL_HEAT_HYDRATION_NX.html downloads/CIVIL_HEAT_HYDRATION.html dist/PILAR_TIME_DEPENDENT_EXAMPLE.MCT dist/PARAMETER_TIME_DEPENDENT_EXAMPLE.json --verify-tag --latest --title "Civil Hydration NX v$packageVersion — Time Dependent Material / Windows x64" --notes-file dist/RELEASE_NOTES.md

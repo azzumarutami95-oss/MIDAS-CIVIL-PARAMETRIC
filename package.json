@@ -8,7 +8,7 @@
   "main": "desktop/main.cjs",
   "scripts": {
     "start": "electron .",
-    "test": "node --test tests/engine.test.js tests/thermal.test.js tests/desktop_policy.test.cjs tests/project_files.test.cjs",
+    "test": "node --test tests/engine.test.js tests/thermal.test.js tests/time-dependent.test.js tests/desktop_policy.test.cjs tests/project_files.test.cjs",
     "build:assets": "python3 scripts/build_desktop_assets.py",
     "build:win": "npm run build:assets && electron-builder --win nsis --x64 --publish never",
     "build:linux:test": "electron-builder --linux dir --x64 --publish never"
@@ -37,6 +37,7 @@
       "web/index.html",
       "web/styles.css",
       "web/thermal.js",
+      "web/time-dependent.js",
       "web/engine.js",
       "web/viewport.js",
       "web/app.js",

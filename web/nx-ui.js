@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   const $=id=>document.getElementById(id),panes=[...document.querySelectorAll('.nx-pane')];
-  const labels={model:'Model',campuran:'Mix Design',termal:'Heat of Hydration',tahapan:'Construction Stage',ekspor:'Check & Export'};
+  const labels={model:'Model',campuran:'Mix Design','material-waktu':'Material Time',termal:'Heat of Hydration',tahapan:'Construction Stage',ekspor:'Check & Export'};
   let lastValidation='',lastExport='';
   function log(type,message){
     const line=document.createElement('p'),time=document.createElement('time'),tag=document.createElement('b'),text=document.createElement('span');

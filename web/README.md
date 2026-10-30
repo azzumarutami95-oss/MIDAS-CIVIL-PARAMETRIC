@@ -11,7 +11,7 @@ tetap dapat dibuka.
 ## Navigasi ruang kerja NX
 
 - Ribbon dan Model Tree memilih tab Model, Mix Design, Heat of Hydration,
-  Construction Stage, serta Check & Export.
+  Time Dependent Material, Construction Stage, serta Check & Export.
 - Model menampilkan panel geometri/material/mesh dan viewport yang lebih luas.
 - Drag di viewport untuk orbit, scroll untuk zoom, Shift + drag untuk pan.
   Tombol ISO/Depan/Atas mengganti arah kamera; Fit view atau double-click
@@ -37,11 +37,15 @@ Mengganti ekstensi MCT menjadi `.mcb` bukan konversi format dan tidak dilakukan.
 3. Atur sifat termal, suhu awal/pengecoran, K/a, konveksi dan kondisi dasar.
    Opsi dasar **temperatur tetap** menghasilkan `HYD-PRTEMPER`. Opsi
    **adiabatik** menghilangkan kondisi temperatur tetap; fluks dasar nol.
-4. Atur jam bongkar bekisting, akhir curing, akhir analisis dan langkah waktu.
-5. Periksa pratinjau, konversi unit dan pesan pemeriksaan. Klik **Unduh .MCT**.
+4. Pada **Time Dependent Material**, pilih model creep/shrinkage dan
+   perkembangan kuat tekan. Periksa input atau isi tabel custom jobmix,
+   lalu tentukan link ke material dasar beton lama/baru.
+5. Atur jam bongkar bekisting, akhir curing, akhir analisis dan langkah waktu.
+6. Periksa pratinjau, konversi unit dan pesan pemeriksaan. Klik **Unduh .MCT**.
    Browser menghasilkan `PILAR_HEAT_HYDRATION.MCT` lengkap, berisi semua node,
-   elemen, material, sumber panas, konveksi, tahapan dan kontrol analisis.
-6. Impor ke model kosong pada MIDAS Civil NX melalui impor MCT atau MCT Command Shell.
+   elemen, material, sumber panas, konveksi, tahapan, definisi/link material
+   bergantung waktu yang aktif, dan kontrol analisis.
+7. Impor ke model kosong pada MIDAS Civil NX melalui impor MCT atau MCT Command Shell.
    Periksa log parser, unit, aktivasi beton, sumber panas dan kondisi batas.
 
 Gunakan **Simpan parameter JSON** untuk membawa pekerjaan ke perangkat lain.
@@ -66,6 +70,44 @@ saat elemen beton baru diaktifkan pada H1. Berat isi material menggunakan
 `rho × 9,80665` N/m³. Berat sendiri otomatis `HYD-CTRL.bINCSW` tetap `NO`
 untuk menghindari beban ganda. Penerimaan kartu dan penerapannya pada elemen
 yang baru aktif tetap perlu diperiksa melalui impor/solver MIDAS Civil.
+
+## Material bergantung waktu dan link
+
+Tab **Time Dependent Material** pada pembaruan versi aplikasi **1.1.1**
+menyediakan Creep & Shrinkage (C&S), Compression Strength, serta link ke
+material **1 · FC_OLD** dan **2 · FC_NEW**. Pilihan, parameter, tabel custom,
+dan link disimpan pada `config.timeDependent`; pratinjau dan laporan memakai
+masukan yang sama dengan ekspor MCT.
+
+C&S menyediakan ACI209 native MIDAS, CEB-FIP 1990, AASHTO LRFD 2006, serta
+fungsi user. Parameter mencakup kelembapan, umur mulai susut, ukuran nosional
+atau V/S, metode curing, dan parameter campuran yang sesuai model. Kandungan
+semen ACI dapat diambil secara eksplisit dari Mix Design aktif atau diisi
+manual. Pilihan ultimit USER pada model ACI berbeda dari tabel USER penuh.
+
+Compression Strength menyediakan ACI 209R-92, CEB-FIP 1990, konvensi
+AASHTO/WSDOT yang menggunakan model ACI 209R-92, serta tabel user berisi
+**umur (hari), fc, ft, E (MPa)**. AASHTO tidak memiliki model perkembangan
+kuat tekan terhadap umur tersendiri; ekspornya memakai kode ACI yang
+didokumentasikan, bukan token MCT AASHTO yang tidak tersedia untuk kekuatan.
+Untuk CEB, kuat tekan rata-rata 28 hari adalah `fcm,28 = fck,28 + selisih`
+dengan selisih yang dapat diperiksa/diedit. Data uji pada foto tidak otomatis
+menentukan selisih ini atau kurva umur 28 hari.
+
+Default proyek baru menghubungkan C&S dan kekuatan ke **beton baru saja**.
+Link beton lama dapat diubah, tetapi umur matang dan riwayat tegangan/susutnya
+tidak direkonstruksi oleh tahap hidrasi aplikasi ini. JSON lama yang belum
+memiliki kelompok `timeDependent` dimigrasikan dengan fitur **nonaktif**;
+aktifkan secara eksplisit setelah meninjau parameternya. Kelompok yang sudah
+ada tetapi rusak atau tidak lengkap ditolak.
+
+MCT aktif memuat `*TDM-TYPE`, `*TDM-ELAST`, `*TDM-LINK`, serta `*TDM-FUNC`
+untuk fungsi C&S user. Umur fungsi material tetap **hari**, sedangkan tahap
+panas hidrasi memakai **jam**. MPa dikonversi ke N/m² dan microstrain ke
+regangan tak berdimensi. Kontrol creep/shrinkage hidrasi mengikuti mode dan
+link yang dipilih; definisi dan link tetap perlu diverifikasi setelah impor.
+
+[Rumus, format CSV, rujukan primer, konversi, dan batas penerapan](TIME_DEPENDENT_METHODS.md).
 
 Penyimpanan lokal browser digunakan bila tersedia. Pengaturan browser/file
 lokal dapat membatasi penyimpanan atau unduhan; gunakan ekspor JSON dan izinkan
@@ -111,7 +153,8 @@ suhu referensi. JSON v1 lama dimigrasikan ke metode manual.
 Satuan **N–m–kJ–°C, waktu hidrasi jam, massa kg**. Konduktivitas dan h yang
 diisi dalam W dikonversi ke kJ/jam dengan faktor 3,6. Berat isi = rho ×9,80665.
 E = 4700√f'c MPa, asumsi beton normal. f'c menjadi dasar E/nama; belum merupakan
-kurva tegangan-regangan atau model perkembangan kuat tekan/tarik.
+kurva tegangan-regangan nonlinier. Saat material bergantung waktu diaktifkan
+dan dihubungkan, fungsi kuat tekan/E(t) dipakai melalui definisi TDM terpisah.
 
 Default K45°C, a0,5/hari: ΔTad(t)=K[1−exp(−a t/24)], t dalam jam. Tabel MCT
 memakai **kenaikan** adiabatik (`USER,YES`), bukan suhu absolut atau tambahan
@@ -127,8 +170,9 @@ yang terpisah dari opsi kondisi termal dasar.
 Beton lama diasumsikan matang dengan sumber panas nol dan suhu awal seragam;
 riwayat termal/stres >2 bulan tidak direkonstruksi. Umur tidak membuktikan inti
 beton telah mencapai suhu udara. K/a dan properti termal perlu data uji.
-Belum ada radiasi matahari, penguapan, bekisting padat, cooling pipe, equivalent
-age, creep/susut, E(t) atau model retak yang terkalibrasi.
+Radiasi matahari, penguapan, bekisting padat, cooling pipe, dan equivalent age
+belum dimodelkan. Creep/susut serta perkembangan kuat tekan/E(t) yang tersedia
+memerlukan data proyek; memilih kode tidak mengkalibrasi model retak.
 
 Impor native dan solver MIDAS belum tersedia untuk diuji di lingkungan ini.
 Periksa kartu hidrasi pada rilis Civil NX yang dipakai, temperatur elemen baru/node sambungan,
@@ -139,7 +183,7 @@ dicocokkan dengan contoh MCT publik yang tercantum di aplikasi.
 
 ## Pengembangan dan pemeriksaan
 
-Sumber: `index.html`, `styles.css`, `thermal.js`, `engine.js`, `viewport.js`, `app.js` dan
+Sumber: `index.html`, `styles.css`, `thermal.js`, `time-dependent.js`, `engine.js`, `viewport.js`, `app.js` dan
 `nx-ui.js`, tanpa bundler npm
 atau dependensi runtime eksternal. Mesh dibentuk secara lokal, tidak mengambil
 model MCT dari server. Guard resource: 100.000 elemen / 125.000 node.

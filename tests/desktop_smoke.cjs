@@ -152,6 +152,7 @@ const {setTimeout: delay} = require('node:timers/promises');
     assert.equal(await page.evaluate(() => typeof require), 'undefined');
     assert.equal(await page.evaluate(() => typeof process), 'undefined');
     assert.equal(await page.locator('#metrics-elements').innerText(), '24.576');
+    assert.equal(await page.locator('[data-key="timeDependent.enabled"]').inputValue(), 'yes');
     const security = await application.evaluate(({BrowserWindow}) => {
       const preferences = BrowserWindow.getAllWindows()[0].webContents.getLastWebPreferences();
       return {sandbox: preferences.sandbox, nodeIntegration: preferences.nodeIntegration,
@@ -167,6 +168,7 @@ const {setTimeout: delay} = require('node:timers/promises');
     await page.locator('#export-json').click();
     await waitSaved(page, path.basename(projectA));
     assert.equal(JSON.parse(await fs.readFile(projectA, 'utf8')).schema, 'civil-heat-studio/v1');
+    assert.equal(JSON.parse(await fs.readFile(projectA, 'utf8')).config.timeDependent.creepModel, 'CEB1990');
     assert.equal((await calls('save')).length, 1);
     await setCp(page, 1.11);
     await page.waitForFunction(() => document.title.includes('*'));
@@ -265,17 +267,41 @@ const {setTimeout: delay} = require('node:timers/promises');
     assert.match(mct, /7\.039324596/);
     assert.match(mct, /H0_OLD_INIT/);
     assert.match(mct, /H3_END_CURING/);
+    assert.match(mct, /\*TDM-TYPE/);
+    assert.match(mct, /NAME=TD_FC, CODE, CEB-FIP\(1990\), 38000000, 2/);
+    assert.match(mct, /2, TD_CS, TD_FC/);
     const report = await download(page, 'download-report', 'report.txt');
     assert.ok(report.includes('1.02667') || report.includes('1,02667'));
+    assert.ok(report.includes('TIME DEPENDENT MATERIAL LINK:'));
     await download(page, 'download-report', 'cancelled-report.txt', true);
+
+    // Native project persistence and exports include custom TD data, not only the form values.
+    await page.locator('.nx-ribbon-tabs [data-workspace="material-waktu"]').click();
+    await page.locator('[data-key="timeDependent.creepModel"]').selectOption('USER');
+    await page.locator('[data-key="timeDependent.strengthModel"]').selectOption('USER');
+    await page.locator('[data-key="timeDependent.creepModulusSource"]').selectOption('user');
+    await page.locator('[data-key="timeDependent.creepReferenceModulus"]').fill('35000');
+    const customStrength = '0, 0, 0, 0\n1, 9, 0.7, 12500\n30, 35, 2.6, 32000\n90, 39, 2.9, 35000';
+    await page.locator('[data-key="timeDependent.customStrength"]').fill(customStrength);
+    await page.locator('[data-key="timeDependent.strengthScale"]').fill('1.25');
+    await page.waitForFunction(() => !document.querySelector('#export-mct').disabled);
+    const customMct = await download(page, 'export-mct', 'custom-model.MCT');
+    assert.match(customMct, /FUNC=TD_CREEP_1, CREEP, 1, CC, 35000000000/);
+    assert.match(customMct, /NAME=TD_FC, USER, 1.25/);
+    assert.match(customMct, /1, 9000000, 700000, 12500000000/);
+    const customReport = await download(page, 'download-report', 'custom-report.txt');
+    assert.ok(customReport.includes('Modulus acuan creep USER=35000 MPa'));
+    assert.ok(customReport.includes(customStrength));
 
     // Save on close persists the last edits. Discard leaves the saved file intact.
     await setCp(page, 1.17);
     await queue('message', 'save');
     await closeWindow();
     assert.equal(JSON.parse(await fs.readFile(projectB, 'utf8')).config.material.cp, 1.17);
+    assert.equal(JSON.parse(await fs.readFile(projectB, 'utf8')).config.timeDependent.customStrength, customStrength);
     page = await launch();
     await page.waitForFunction(() => document.querySelector('[data-key="material.cp"]').value === '1.17');
+    assert.equal(await page.locator('[data-key="timeDependent.customStrength"]').inputValue(), customStrength);
     await queue('message', 'discard');
     await open(page, projectB);
     await waitSaved(page, path.basename(projectB));
@@ -284,7 +310,7 @@ const {setTimeout: delay} = require('node:timers/promises');
     await closeWindow();
     assert.equal(JSON.parse(await fs.readFile(projectB, 'utf8')).config.material.cp, 1.17);
     assert.deepEqual(errors, []);
-    console.log('PASS: protected offline desktop; native Save/Save As, overwrite/copy/cancellation, existing JSON editing, invalid-open preservation, unsaved close/Open guards, save/discard on close, restart persistence and MCT/TXT exports.');
+    console.log('PASS: protected offline desktop; native Save/Save As, overwrite/copy/cancellation, existing JSON editing, invalid-open preservation, unsaved close/Open guards, save/discard on close, restart persistence, code/custom TD materials and MCT/TXT exports.');
   } finally {
     if (application) {
       await application.evaluate(({BrowserWindow}) => {

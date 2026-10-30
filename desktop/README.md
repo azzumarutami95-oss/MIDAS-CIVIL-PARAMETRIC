@@ -2,7 +2,7 @@
 
 **[Buka halaman unduh installer di GitHub Releases](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/latest)**
 
-**[Unduh langsung installer v1.1.1 (.exe)](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/download/v1.1.1/Civil-Hydration-NX-Setup-1.1.1-x64.exe)**
+**[Unduh langsung installer v1.1.1 — pembaruan material (.exe)](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/download/v1.1.1-materials/Civil-Hydration-NX-Setup-1.1.1-x64.exe)**
 
 Berkas versi 1.1.1: `Civil-Hydration-NX-Setup-1.1.1-x64.exe`.
 Paket ini ditujukan untuk Windows 10/11 64-bit dengan prosesor x64. Aplikasi
@@ -18,6 +18,8 @@ instalasi Node.js, Python, browser tambahan, atau koneksi internet.
 4. Atur geometri, mix design, material termal, konveksi, sumber panas dan tahapan.
    Pada **Thermal & heat**, specific heat dan heat conduction dapat memakai
    input manual atau metode perhitungan yang tersedia.
+   Pada **Time Dependent Material**, pilih kode C&S dan perkembangan kuat
+   tekan, isi parameter atau tabel custom jobmix, lalu periksa link material.
 5. Klik **Save** untuk menyimpan proyek JSON yang dapat diedit kembali. Untuk
    proyek baru, pilih nama dan folder tujuan pada dialog penyimpanan.
 6. Klik **Unduh .MCT** atau gunakan **File → Ekspor model .MCT…**. Pilih nama
@@ -36,7 +38,8 @@ Aplikasi ini menyusun input; analisis suhu dan tegangan dilakukan di MIDAS Civil
 File proyek berupa JSON dan menyimpan seluruh parameter: geometri, mesh, mix
 design, material mekanis, specific heat dan heat conduction beserta metode
 perhitungan dan properti fasenya, material beton lama, temperatur, konveksi,
-sumber panas, kondisi batas dan staging. Membuka JSON mengisi kembali parameter
+sumber panas, kondisi batas, staging, C&S, perkembangan kuat tekan dan link
+material bergantung waktu. Membuka JSON mengisi kembali parameter
 tersebut agar dapat diedit dan diekspor menjadi MCT baru.
 
 Rilis v1.1.1 menambahkan **SW · Dead Load (D) · LG_SW** dengan faktor global
@@ -45,6 +48,18 @@ JSON, pratinjau, laporan TXT serta ekspor MCT. Proyek JSON v1 lama memperoleh
 parameter SW default saat dibuka. Grup aktif mulai H0 dan dipertahankan pada
 tahap berikutnya; berat sendiri otomatis hidrasi tetap nonaktif agar beban
 tidak dihitung ganda. Lihat [rincian SW](../web/README.md#berat-sendiri-sw).
+
+Pembaruan material tetap memakai versi aplikasi **1.1.1**. C&S menyediakan
+ACI native MIDAS, CEB-FIP 1990, AASHTO LRFD 2006 dan fungsi user; perkembangan
+kuat tekan menyediakan ACI, CEB-FIP, konvensi AASHTO/WSDOT melalui ACI, serta
+tabel custom `umur, fc, ft, E`. Definisi dan link material ikut masuk ke MCT,
+pratinjau, laporan, dan JSON. Default menghubungkan beton baru saja. Proyek
+JSON lama yang belum memiliki parameter ini membukanya dalam keadaan
+nonaktif untuk mempertahankan perilaku mekanis sebelumnya.
+[Rumus, satuan dan batas material bergantung waktu](../web/TIME_DEPENDENT_METHODS.md).
+Aset pembaruan berada pada revisi rilis `v1.1.1-materials`, termasuk
+[contoh MCT](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/download/v1.1.1-materials/PILAR_TIME_DEPENDENT_EXAMPLE.MCT)
+dan [parameter JSON contoh](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/download/v1.1.1-materials/PARAMETER_TIME_DEPENDENT_EXAMPLE.json).
 
 - **Open / Buka (`Ctrl+O`)** memilih proyek melalui dialog Windows. JSON yang
   dibuka menjadi file proyek aktif.
@@ -104,7 +119,9 @@ atau tombol **Input report**. Dialog penyimpanan menentukan lokasi berkas ekspor
 Fitur perhitungan material, konversi satuan, mesh HEX8 dan staging memakai mesin
 yang sama dengan aplikasi HTML. Parameter contoh tetap memerlukan kalibrasi
 terhadap campuran dan kondisi proyek. Baca [rumus dan batas metode termal](../web/THERMAL_METHODS.md)
-serta [petunjuk input](../web/README.md).
+serta [material bergantung waktu](../web/TIME_DEPENDENT_METHODS.md) dan
+[petunjuk input](../web/README.md). Tabel foto campuran tidak otomatis
+menghasilkan kurva creep, shrinkage, kuat tarik, atau modulus terukur.
 
 Paket ini merupakan aplikasi independen. File keluaran berbentuk `.MCT`;
 setelah impor, model native disimpan melalui MIDAS Civil. Keberhasilan build

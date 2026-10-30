@@ -2,7 +2,7 @@
 
 ## Aplikasi Windows (.exe)
 
-**[Unduh installer Windows 64-bit v1.1.1 (.exe)](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/download/v1.1.1/Civil-Hydration-NX-Setup-1.1.1-x64.exe)**
+**[Unduh installer Windows 64-bit v1.1.1 — pembaruan material (.exe)](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/download/v1.1.1-materials/Civil-Hydration-NX-Setup-1.1.1-x64.exe)**
 
 **[Unduh installer Civil Hydration NX dari GitHub Releases](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/latest)**
 
@@ -21,6 +21,20 @@ default **(0, 0, −1)** pada aplikasi, JSON, pratinjau, laporan TXT, dan ekspor
 MCT. Grup beban diaktifkan mulai H0; JSON v1 lama dimigrasikan otomatis.
 [Rincian parameter dan aktivasi SW](web/README.md#berat-sendiri-sw).
 
+Pembaruan material pada versi aplikasi **1.1.1** menambahkan **Creep &
+Shrinkage**, **Compression Strength**, dan **Time Dependent Material Link**.
+Pilihan kode ACI, CEB-FIP 1990, AASHTO serta tabel user/custom jobmix ikut
+tersimpan pada JSON, pratinjau, laporan, dan MCT. AASHTO untuk perkembangan
+kuat tekan menggunakan konvensi ACI 209R-92 yang dijelaskan WSDOT.
+[Metode, parameter, satuan, dan cakupan ekspor](web/TIME_DEPENDENT_METHODS.md).
+Versi aplikasi tetap 1.1.1; aset pembaruan berada pada revisi rilis
+`v1.1.1-materials`.
+
+**[Unduh contoh MCT dengan C&S, kekuatan dan link](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/download/v1.1.1-materials/PILAR_TIME_DEPENDENT_EXAMPLE.MCT)**
+dan [JSON yang dapat dibuka di aplikasi](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/download/v1.1.1-materials/PARAMETER_TIME_DEPENDENT_EXAMPLE.json).
+Contoh CEB-FIP 1990 menghubungkan beton baru saja; parameter merupakan asumsi
+yang perlu disesuaikan dan bukan jobmix terkalibrasi.
+
 ## Aplikasi HTML untuk menyusun input hidrasi
 
 **[Unduh CIVIL_HEAT_HYDRATION_NX.html](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/raw/refs/heads/main/downloads/CIVIL_HEAT_HYDRATION_NX.html)**
@@ -36,6 +50,12 @@ Buka file HTML di browser. Edit campuran dari foto, geometri, mesh, sifat
 termal, konveksi, sumber panas dan empat tahap, lalu klik **Unduh .MCT**.
 Tidak perlu instalasi atau koneksi internet. Tersedia pratinjau mesh/kurva,
 koreksi batch, konversi satuan, simpan/buka JSON dan ringkasan input.
+
+Pada tab **Time Dependent Material**, pilih model C&S dan kuat tekan,
+periksa parameter curing/kelembapan/ukuran, isi tabel custom bila diperlukan,
+dan tentukan link ke material beton lama/baru. Proyek baru menghubungkan
+beton baru; JSON lama membuka fitur ini dalam keadaan nonaktif agar perilaku
+material mekanis sebelumnya tetap dipertahankan.
 
 **Material Data**: specific heat dan heat conduction dapat diinput manual atau
 dihitung dari sifat fase campuran; tersedia pula acuan EN1992-1-2 pada suhu

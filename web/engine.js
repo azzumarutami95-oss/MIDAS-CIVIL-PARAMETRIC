@@ -2,6 +2,7 @@
 (function (root) {
   'use strict';
   const Thermal=typeof module!=='undefined'&&module.exports?require('./thermal.js'):root.HydrationThermal;
+  const TimeDependent=typeof module!=='undefined'&&module.exports?require('./time-dependent.js'):root.HydrationTimeDependent;
   const DEFAULTS = {
     geometry: {diameter:7.5, heightOld:4, heightNew:4},
     material: {fc:30, density:2400, cp:0.9, conductivity:2.4, poisson:0.2, expansion:0.00001},
@@ -14,7 +15,8 @@
           batchVolume:0.035, sandMoisture:4, gravelMoisture:0.15},
     boundary: {baseMode:'fixed'},
     selfWeight: {caseName:'SW', caseType:'D', groupName:'LG_SW', factorX:0, factorY:0, factorZ:-1},
-    ...Thermal.defaults()
+    ...Thermal.defaults(),
+    ...TimeDependent.defaults()
   };
   const clone = obj => JSON.parse(JSON.stringify(obj));
   const number = x => Number.isFinite(x);
@@ -29,6 +31,8 @@
       if(legacyThermal&&(group==='thermal'||group==='thermalComponents'))continue;
       // Projects saved before SW was introduced inherit the requested load.
       if(group==='selfWeight'&&source[group]===undefined)continue;
+      // Older projects retain their original constant mechanical material behavior.
+      if(group==='timeDependent'&&source[group]===undefined){result.timeDependent.enabled='no';continue;}
       if (!source[group] || typeof source[group] !== 'object') throw Error('Kelompok parameter tidak lengkap: '+group);
       for (const key of Object.keys(DEFAULTS[group])) {
         const x = source[group][key];
@@ -105,6 +109,8 @@
         err('selfWeight.'+key,'Beban berat sendiri harus memakai SW, tipe Dead Load (D), dan grup LG_SW.');
     for(const key of ['factorX','factorY','factorZ'])
       if(!number(c.selfWeight?.[key]))err('selfWeight.'+key,'Faktor berat sendiri harus berupa angka berhingga.');
+    const dependentValidation=TimeDependent.validate(c);
+    errors.push(...dependentValidation.errors);warnings.push(...dependentValidation.warnings);
     const stats=estimate(c);
     if (stats.elements>100000 || stats.nodes>125000) err('mesh.sideDiv','Mesh terlalu besar untuk ekspor lokal: batas 100.000 elemen / 125.000 node.');
     if (number(c.schedule.end/c.schedule.dtEarly) && c.schedule.end/Math.min(c.schedule.dtEarly,c.schedule.dtMiddle,c.schedule.dtStrip,c.schedule.dtLate)>20000)
@@ -124,6 +130,9 @@
     return {errors,warnings};
   }
   function resolvedThermal(c){return Thermal.evaluate(c);}
+  function timeDependent(c){return TimeDependent.evaluate(c);}
+  function timeDependentCards(c){return TimeDependent.cards(c);}
+  function hydrationControl(c){return TimeDependent.control(c);}
   function crossSection(c) {
     const n=c.mesh.sideDiv, nr=c.mesh.radialDiv, R=c.geometry.diameter/2, a=.45*R;
     const xy=[],quads=[],lookup=new Map();
@@ -284,7 +293,7 @@
         convectionFaces:assigned.size,activeBoundaries:[...activeB],activeLoadGroups:[...activeL],temperatureOverride:stage.temp,steps:stage.steps.length});
       elapsed+=end;
     }
-    const E=4700*Math.sqrt(c.material.fc)*1e6,m=c.material,T=c.temperature,thermal=resolvedThermal(c);
+    const E=4700*Math.sqrt(c.material.fc)*1e6,m=c.material,T=c.temperature,thermal=resolvedThermal(c),dependent=timeDependent(c);
     const lines=['; CIVIL HEAT STUDIO - ILLUSTRATIVE HEAT OF HYDRATION MODEL',
       '; Offline HTML generator. NOT project calibrated. Native MIDAS import/solver not tested.',
       '; Units N,m,kJ,degC; hydration time HOURS; mass kg.',
@@ -293,7 +302,9 @@
       '; Mix information is provenance; it does NOT calibrate heat curve or strength development.',
       `; MIX kg/m3: cement=${c.mix.cement}, flyash=${c.mix.flyash}, water=${c.mix.water}, sand=${c.mix.sand}, gravel=${c.mix.gravel}`,
       `; MIX kg/m3 admixtures=${c.mix.admixture1}+${c.mix.admixture2}; w/b=${mixMetrics(c).wb.toFixed(8)}`,
-      `; fc=${m.fc}MPa basis for E; no nonlinear strength/age law. Creep/equivalent age disabled.`,
+      `; fc=${m.fc}MPa basis for initial E. Time-dependent material enabled=${c.timeDependent.enabled}.`,
+      '; Time-dependent material ages use DAYS; hydration stage/time-step values use HOURS.',
+      '; Old concrete is mature static unless explicitly linked; no pre-existing stress history reconstructed.',
       '; Explicit SW (Dead Load) in LG_SW is activated once at H0 local time 0 and retained.',
       `; Thermal methods: cp=${thermal.cpMode}, k=${thermal.kMode}, old=${thermal.oldMode}, Tref=${thermal.referenceTemperature}degC.`,
       '; Effective properties are CONSTANT MCT inputs; not temperature/age dependent functions.',
@@ -304,6 +315,7 @@
       '*UNIT','N, M, KJ, C','','*STRUCTYPE',`0, 1, 3, NO, NO, 9.80665, ${T.old}, NO, NO, NO`,'','*MATERIAL',
       '; iMAT,TYPE,MNAME,SPHEAT,HEATCO,PLAST,TUNIT,bMASS,DAMP,2,E,nu,alpha,DEN,MASS'];
     for(const [id,name,cp,k] of [[1,'FC_OLD',thermal.oldCp,thermal.oldK],[2,'FC_NEW',thermal.cp,thermal.k]])lines.push(`${id}, CONC, ${name}, ${cp.toFixed(9)}, ${(k*3.6).toFixed(9)}, , C, NO, 0.05, 2, ${E.toFixed(6)}, ${m.poisson}, ${m.expansion}, ${(m.density*9.80665).toFixed(6)}, 0`);
+    lines.push('',...timeDependentCards(c));
     lines.push('','*MATL-COLOR','1, 90, 100, 110, 180, 186, 193, 48, 60, 72, NO, 0.5','2, 160, 90, 35, 220, 139, 61, 48, 60, 72, NO, 0.5','','*NODE');
     nodes.forEach((p,i)=>lines.push(`${i+1}, ${p.map(x=>x.toFixed(10)).join(', ')}`));
     lines.push('','*ELEMENT');cells.forEach((cell,i)=>lines.push(`${i+1}, SOLID, ${i<oldElements?1:2}, 0, ${cell.map(x=>x+1).join(', ')}`));
@@ -332,9 +344,9 @@
       for(const [field,key] of [['AELEM','ae'],['ABNDR','ab'],['DBNDR','db']])if(stage[key].length)lines.push(field+'='+stage[key].join(', '));
       for(const name of stage.al)lines.push(`ALOAD=${name}, 0`);
     }
-    lines.push('','*HYD-CTRL','; TYPE=BOTH is disabled creep/shrinkage selection, not thermal/stress mode.',
+    lines.push('','*HYD-CTRL','; Creep/shrinkage uses the selected linked time-dependent material and general code method.',
       '; bINCSW=NO avoids adding automatic selfweight on top of explicit SW / LG_SW.',
-      `YES, , 1, ${T.old}, GAUSS, NO, NO, -1, NO, BOTH, 0, 5, 0.001`,'','*HYD-NODE');
+      hydrationControl(c),'','*HYD-NODE');
     const monitors=[];
     for(const [name,target] of [['OLD_CORE',[0,0,c.geometry.heightOld/2]],['JOINT_CORE',[0,0,c.geometry.heightOld]],
       ['NEW_CORE',[0,0,c.geometry.heightOld+c.geometry.heightNew/2]],['NEW_SIDE',[c.geometry.diameter/2,0,c.geometry.heightOld+c.geometry.heightNew/2]],
@@ -343,11 +355,11 @@
       monitors.push({name,id:idx+1,coordinates:nodes[idx],target});lines.push(`${name}, ${idx+1}, 3, 0`);
     }
     lines.push('','*ENDDATA','');
-    if(lines.some(x=>x.length>1024))throw Error('Terlalu banyak timestep dalam satu tahap. Perbesar timestep agar baris MCT tetap ringkas.');
+    if(lines.some(x=>x.length>1024))throw Error('Baris MCT melebihi 1.024 karakter. Kurangi data per baris atau perbesar timestep.');
     return {text:lines.join('\r\n'),filename:'PILAR_HEAT_HYDRATION.MCT',mesh:data,
       stats:estimate(c),stages:auditStages,monitors,units:units(c),checks:data.audit,
-      config:clone(c),thermal,nativeMidasTested:false,journalValidated:false};
+      config:clone(c),thermal,timeDependent:dependent,nativeMidasTested:false,journalValidated:false};
   }
-  root.MidasEngine={defaults:()=>clone(DEFAULTS),cleanConfig,resolvedThermal,mixMetrics,estimate,validate,crossSection,auditCross,mesh,ranges,stages,units,heatRise,selfWeightCards,build};
+  root.MidasEngine={defaults:()=>clone(DEFAULTS),cleanConfig,resolvedThermal,timeDependent,timeDependentCards,hydrationControl,mixMetrics,estimate,validate,crossSection,auditCross,mesh,ranges,stages,units,heatRise,selfWeightCards,build};
   if(typeof module!=='undefined' && module.exports)module.exports=root.MidasEngine;
 })(typeof window!=='undefined'?window:globalThis);

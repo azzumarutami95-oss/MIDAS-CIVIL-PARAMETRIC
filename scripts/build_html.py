@@ -8,7 +8,7 @@ html = (web / 'index.html').read_text(encoding='utf-8')
 css = (web / 'styles.css').read_text(encoding='utf-8')
 assert '@import' not in css and '</style' not in css.lower()
 html = html.replace('<link rel="stylesheet" href="./styles.css">', '<style>\n'+css+'\n</style>')
-for name in ['thermal.js', 'engine.js', 'viewport.js', 'app.js', 'nx-ui.js']:
+for name in ['thermal.js', 'time-dependent.js', 'engine.js', 'viewport.js', 'app.js', 'nx-ui.js']:
     source = (web / name).read_text(encoding='utf-8')
     assert '</script' not in source.lower(), 'Escape a closing script tag before bundling'
     token = f'<script src="./{name}"></script>'

@@ -11,7 +11,7 @@
     temperatureLab:[{minutes:15,C:31.1},{minutes:60,C:32.3}],reportedSA:49,reportedRatio:28,
     note:'Basis S/A, persentase kekuatan, kondisi SSD dan absorpsi perlu konfirmasi. Tidak mengganti fc atau mengkalibrasi K/a.'};
   function fill(c){fields.forEach(el=>{const [g,k]=el.dataset.key.split('.');el.value=c[g][k];});}
-  function read(){const c=E.defaults();fields.forEach(el=>{const [g,k]=el.dataset.key.split('.');c[g][k]=el.tagName==='SELECT'?el.value:el.valueAsNumber;});return c;}
+  function read(){const c=E.defaults();fields.forEach(el=>{const [g,k]=el.dataset.key.split('.');c[g][k]=el.type==='number'?el.valueAsNumber:el.value;});return c;}
   function persist(c){
     try{localStorage.setItem(storageKey,JSON.stringify({schema:'civil-heat-studio/v1',config:c}));$('save-status').textContent='Tersimpan di browser';}
     catch(_){saveAvailable=false;$('save-status').textContent='Gunakan JSON untuk menyimpan';}
@@ -102,6 +102,7 @@
       `; Metode cp=${th.cpMode}; k=${th.kMode}; old=${th.oldMode}; Tref=${th.referenceTemperature} degC`,
       '*MATERIAL',`1, CONC, FC_OLD, ${th.oldCpMct.toFixed(9)}, ${th.oldKMct.toFixed(9)}, , C, NO, 0.05, 2, ${(4700*Math.sqrt(m.fc)*1e6).toFixed(3)}, ${m.poisson}, ${m.expansion}, ${(m.density*9.80665).toFixed(3)}, 0`,
       `2, CONC, FC_NEW, ${th.cpMct.toFixed(9)}, ${th.kMct.toFixed(9)}, , C, NO, 0.05, 2, ${(4700*Math.sqrt(m.fc)*1e6).toFixed(3)}, ${m.poisson}, ${m.expansion}, ${(m.density*9.80665).toFixed(3)}, 0`,
+      ...E.timeDependentCards(c),
       ...E.selfWeightCards(c),
       `*HYD-HEATSRCF`,`FUNC=NEW_ADIABATIC, USER, 1, YES`,
       '0, 0',`24, ${E.heatRise(c,24).toFixed(6)}`,`${c.schedule.end}, ${E.heatRise(c,c.schedule.end).toFixed(6)}`,
@@ -111,7 +112,7 @@
       lines.push('; '+t.steps.length+' waktu lokal, akhir '+t.steps[t.steps.length-1]+' jam');
       for(const [field,key]of [['AELEM','ae'],['ABNDR','ab'],['DBNDR','db']])if(t[key].length)lines.push(field+'='+t[key].join(', '));
       for(const group of t.al)lines.push('ALOAD='+group+', 0');}
-    lines.push('*HYD-CTRL',`YES, , 1, ${c.temperature.old}, GAUSS, NO, NO, -1, NO, BOTH, 0, 5, 0.001`);
+    lines.push('*HYD-CTRL',E.hydrationControl(c));
     $('mct-preview').value=lines.join('\n');
   }
   function renderThermal(){
@@ -141,6 +142,74 @@
       for(const [phase]of window.HydrationThermal.phases){$('thermal-mass-'+phase).textContent=format(config.mix[phase],3);$('thermal-volume-'+phase).textContent='—';}
     }
   }
+  function renderTimeDependent(){
+    const t=config.timeDependent,on=t.enabled==='yes';
+    const input=key=>fields.find(f=>f.dataset.key==='timeDependent.'+key);
+    fields.filter(f=>f.dataset.key.startsWith('timeDependent.')).forEach(f=>{f.disabled=!on&&f!==input('enabled');});
+    function panel(id,show){
+      $(id).hidden=!show;
+      $(id).querySelectorAll('[data-key]').forEach(f=>{f.disabled=!on||!show;});
+    }
+    const aci=t.creepModel==='ACI',ceb=t.creepModel==='CEB1990',aashto=t.creepModel==='AASHTO2006',user=t.creepModel==='USER';
+    panel('td-cs-common',!user);panel('td-cs-ceb',ceb);panel('td-cs-volume',aci||aashto);
+    panel('td-cs-aci',aci);panel('td-aci-ultimate',aci&&t.aciUltimate==='USER');panel('td-cs-user',user);
+    panel('td-strength-aci',aci||t.strengthModel==='ACI'||t.strengthModel==='AASHTO');
+    panel('td-strength-user',t.strengthModel==='USER');$('td-aashto-note').hidden=t.strengthModel!=='AASHTO';
+    input('aashtoExposed').disabled=!on||!aashto;
+    input('cementType').disabled=!on||!(ceb||t.strengthModel==='CEB1990');
+    for(const key of ['aciCuring','aciMixSource','aciSlump','aciFineAggregate','aciAir'])input(key).disabled=!on||!aci||t.aciUltimate!=='CODE';
+    input('aciCementContent').disabled=!on||!aci||t.aciUltimate!=='CODE'||t.aciMixSource!=='manual';
+    input('strengthScale').disabled=!on||t.strengthModel!=='USER';
+    input('cebMeanOffset').disabled=!on||t.strengthModel!=='CEB1990';
+    input('creepReferenceModulus').disabled=!on||!user||t.creepModulusSource!=='user';
+    $('td-use-geometry').disabled=!on||user;
+    $('td-status').textContent=on?'Aktif':'Nonaktif';
+    $('td-fc28').textContent=format(config.material.fc,2)+' MPa';
+    const table=$('td-strength-table');table.replaceChildren();
+    try{
+      const r=E.timeDependent(config);
+      $('td-cs-label').textContent=r.creepLabel;
+      $('td-strength-label').textContent=r.strengthLabel;
+      $('td-cement-active').textContent=format(r.aciCement,2)+' kg/m³';
+      for(const link of r.links){
+        const names=[link.creep?link.creepName:'',link.strength?link.strengthName:''].filter(Boolean);
+        $(link.material===1?'td-link-old':'td-link-new').textContent=on&&names.length?names.join(' / '):'Tidak ada';
+      }
+      const curve=on?r.strengthCurve:[];
+      const shown=curve.length>14?curve.filter((_,i)=>i===0||i===curve.length-1||i%Math.ceil(curve.length/12)===0):curve;
+      for(const point of shown){
+        const row=document.createElement('tr');
+        for(const value of [point.day,point.fc,point.tensile,point.elastic]){const cell=document.createElement('td');cell.textContent=value===null?'—':format(value,3);row.append(cell);}
+        table.append(row);
+      }
+      const basis=r.strengthBasis==='user'?'Tabel USER: fc, ft dan E mengikuti data masukan; skala hanya berlaku pada E. ':r.strengthBasis==='mean'?'Kurva fcm (rata-rata); acuan 28 hari '+format(r.strength28,2)+' MPa. ':'Acuan kuat tekan 28 hari '+format(r.strength28??r.fc28,2)+' MPa. ';
+      $('td-strength-note').textContent=on?basis+'Kurva ini input material, bukan hasil analisis suhu atau tegangan.':'Material bergantung waktu nonaktif; definisi dan link tidak diekspor.';
+      const count=r.creepCurves.reduce((sum,item)=>sum+item.points.length,0);
+      $('td-creep-note').textContent=user?`${r.creepCurves.length} umur pembebanan, ${count} titik creep, dan ${r.shrinkageCurve.length} titik shrinkage USER. Data akan dikonversi ke satuan MCT.`:'Kurva C&S kode dihitung oleh MIDAS dari parameter yang diekspor; aplikasi tidak menggambar pendekatan yang berbeda dari solver.';
+      const referenceE=r.creepE??(t.creepModulusSource==='user'?t.creepReferenceModulus:4700*Math.sqrt(config.material.fc));
+      $('td-creep-reference').textContent='Modulus acuan creep USER = '+format(referenceE,3)+' MPa. Nilai ini mengubah koefisien φ menjadi specific creep pada fungsi MCT; samakan dengan basis pengujian jobmix.';
+      const active=r.links.filter(l=>l.creep||l.strength).length;
+      $('td-export-note').textContent=on?`${active} dari 2 material memiliki link terpilih. Definisi fungsi dan link ditulis bersama di MCT; periksa hasil impor pada versi MIDAS Anda.`:'Definisi dan link material bergantung waktu tidak disertakan dalam ekspor ini.';
+      renderStrengthCurve(curve);
+    }catch(error){
+      $('td-strength-note').textContent=error.message;$('td-cs-label').textContent='Periksa parameter';$('td-strength-label').textContent='Periksa parameter';
+      $('td-link-old').textContent='Periksa masukan';$('td-link-new').textContent='Periksa masukan';renderStrengthCurve([]);
+    }
+  }
+  function renderStrengthCurve(points){
+    const svg=$('td-strength-chart'),W=620,H=250,L=58,R=20,T=22,B=42;
+    const data=points.filter(p=>Number.isFinite(p.day)&&Number.isFinite(p.fc)&&p.day>=0);
+    if(!data.length){svg.innerHTML=svgText(W/2,H/2,'Kurva belum tersedia','text-anchor="middle" fill="#7a8d9c" font-size="13"');return;}
+    const last=Math.max(1,...data.map(p=>p.day)),top=Math.max(1,...data.map(p=>p.fc))*1.1;
+    const x=day=>L+Math.log1p(day)/Math.log1p(last)*(W-L-R),y=fc=>H-B-fc/top*(H-T-B);
+    let markup='';
+    for(let i=0;i<=4;i++){const v=top*i/4;markup+=`<path d="M${L} ${y(v)}H${W-R}" stroke="#e2eaf0"/>`+svgText(L-9,y(v)+4,format(v,1),'text-anchor="end" fill="#74868f" font-size="11"');}
+    for(const day of [0,1,7,28,90,365,3650,36500].filter(d=>d<=last))markup+=svgText(x(day),H-19,format(day,0),'text-anchor="middle" fill="#74868f" font-size="10"');
+    const line=data.map((p,i)=>`${i?'L':'M'}${x(p.day).toFixed(2)},${y(p.fc).toFixed(2)}`).join('');
+    markup+=`<path d="${line}" fill="none" stroke="#407da2" stroke-width="2.6"/>`;
+    markup+=svgText(L,13,'fc (MPa)','fill="#6f818c" font-size="11"')+svgText(W-R,H-3,'Umur (hari) · skala log(1+t)','text-anchor="end" fill="#6f818c" font-size="11"');
+    svg.innerHTML=markup;
+  }
   function messages(validation,checks){
     const list=$('validation-list');list.replaceChildren();
     const add=(text,kind)=>{const li=document.createElement('li');li.className=kind;const badge=document.createElement('span');badge.textContent=kind==='valid'?'✓':kind==='invalid'?'!':'i';const content=document.createElement('span');content.textContent=text;li.append(badge,content);list.append(li);};
@@ -163,7 +232,7 @@
     fields.forEach(el=>{const bad=result.errors.some(e=>e.field===el.dataset.key);el.setAttribute('aria-invalid',String(bad));});
     $('export-mct').disabled=!!result.errors.length;$('export-json').disabled=!!result.errors.length;$('download-report').disabled=!!result.errors.length;
     const fixed=config.boundary.baseMode==='fixed';document.querySelector('[data-key="temperature.base"]').disabled=!fixed;
-    renderThermal();
+    renderThermal();renderTimeDependent();
     const mix=E.mixMetrics(config),stats=E.estimate(config);
     for(const [id,value,digits]of [['metrics-nodes',stats.nodes,0],['metrics-elements',stats.elements,0],['metrics-volume',stats.volume,2],['metrics-wb',mix.wb,3],
       ['mix-wc',mix.wc,3],['mix-wb',mix.wb,3],['mix-binder',mix.binder,1],['mix-total',mix.total,2],['mix-flyash',mix.flyash,1]])$(id).textContent=format(value,digits);
@@ -181,12 +250,18 @@
   function download(name,text,type='application/octet-stream'){
     const url=URL.createObjectURL(new Blob([text],{type})),a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);
   }
-  function snapshot(){return {schema:'civil-heat-studio/v1',created_at:new Date().toISOString(),config:structuredClone(config),reference,thermal_calculation:E.resolvedThermal(config),
+  function snapshot(){return {schema:'civil-heat-studio/v1',created_at:new Date().toISOString(),config:structuredClone(config),reference,thermal_calculation:E.resolvedThermal(config),time_dependent_calculation:E.timeDependent(config),
     status:{assumptions:true,native_midas_tested:false,journal_validated:false}};}
   fields.forEach(el=>el.addEventListener('input',()=>{projectStatus();clearTimeout(timer);timer=setTimeout(render,160);}));
   fields.filter(el=>el.tagName==='SELECT').forEach(el=>el.addEventListener('change',()=>{clearTimeout(timer);render();}));
   $('use-mix-density').addEventListener('click',()=>{config=read();const sum=E.mixMetrics(config).total;if(!Number.isFinite(sum))return;
     document.querySelector('[data-key="material.density"]').value=sum.toFixed(2);clearTimeout(timer);render();notify('Massa jenis diisi dari jumlah massa campuran. Ini perkiraan, bukan hasil pengukuran massa jenis.');});
+  $('td-use-geometry').addEventListener('click',()=>{
+    const c=read(),D=c.geometry.diameter;if(!Number.isFinite(D)||D<=0)return;
+    document.querySelector('[data-key="timeDependent.notionalSize"]').value=D/2;
+    document.querySelector('[data-key="timeDependent.volumeSurface"]').value=D/4;
+    clearTimeout(timer);render();notify('Ukuran C&S diisi dari diameter: h = D/2 dan V/S = D/4. Asumsi paparan sisi silinder saja; muka ujung diabaikan.');
+  });
   $('export-mct').addEventListener('click',async()=>{
     clearTimeout(timer);render();if($('export-mct').disabled){notify('Masukan belum valid. Periksa daftar pemeriksaan.');return;}
     const captured=structuredClone(config);$('export-mct').disabled=true;notify('Menyusun mesh solid dan memeriksa batas aktif…');
@@ -272,6 +347,39 @@
         `DASAR TERMAL: ${config.boundary.baseMode}; tumpuan translasi dasar tetap (idealisasi mekanis).`,
         '','TAHAP:'];
       model.stages.forEach(t=>rows.push(`${t.name}: global ${t.globalStart}-${t.globalEnd}jam; umur baru ${t.newAgeStart}-${t.newAgeEnd}jam; elemen aktif ${t.activeElements}; muka konveksi ${t.convectionFaces}; grup beban aktif ${t.activeLoadGroups.join(', ')}.`));
+      const td=E.timeDependent(config),p=config.timeDependent;
+      rows.push('','MATERIAL BERGANTUNG WAKTU / TIME DEPENDENT MATERIAL:',
+        `Status=${td.enabled?'aktif':'nonaktif'}; C&S=${td.creepLabel}; compression strength=${td.strengthLabel}.`,
+        `fck,28 material dasar=${config.material.fc} MPa; acuan ini bukan hasil uji jobmix terukur.`,
+        td.strengthBasis==='user'?'Compression strength USER: fc dan ft mengikuti tabel; faktor skala hanya mengalikan E.':`Basis kurva kekuatan=${td.strengthBasis}; acuan 28 hari=${td.strength28} MPa.`,
+        'Umur fungsi C&S/kekuatan dalam hari; waktu tahap hidrasi dalam jam.');
+      if(td.enabled){
+        const activeKeys=['creepModel','strengthModel','csMode','iterations','tolerance'];
+        if(p.creepModel!=='USER')activeKeys.push('humidity','shrinkageAge');
+        if(p.creepModel==='CEB1990')activeKeys.push('notionalSize','cementType');
+        if(p.creepModel==='ACI'||p.creepModel==='AASHTO2006')activeKeys.push('volumeSurface');
+        if(p.creepModel==='ACI')activeKeys.push('aciUltimate',...(p.aciUltimate==='CODE'?['aciCuring','aciMixSource','aciSlump','aciFineAggregate','aciAir']:['ultimateCreep','ultimateShrinkage']));
+        if(p.creepModel==='AASHTO2006')activeKeys.push('aashtoExposed');
+        if(p.strengthModel==='CEB1990')activeKeys.push('cementType','cebMeanOffset');
+        if(p.creepModel==='ACI'||['ACI','AASHTO'].includes(p.strengthModel))activeKeys.push('aciA','aciB');
+        if(p.strengthModel==='USER')activeKeys.push('strengthScale');
+        for(const key of new Set(activeKeys)){
+          const field=fields.find(f=>f.dataset.key==='timeDependent.'+key),label=field?.closest('label')?.querySelector('span')?.textContent||key;
+          rows.push(`${label} [${key}] = ${p[key]}`);
+        }
+        if(p.creepModel==='ACI'&&p.aciUltimate==='CODE')rows.push(`Kandungan semen ACI aktif=${td.aciCement} kg/m3; sumber=${p.aciMixSource}.`);
+        if(p.creepModel==='USER')rows.push(`Modulus acuan creep USER=${td.creepE} MPa; sumber=${p.creepModulusSource}; specific creep dikonversi dengan modulus acuan ini.`,
+          'CREEP USER CSV: umur pembebanan(hari), waktu sejak beban(hari), phi',p.customCreep,
+          'SHRINKAGE USER CSV: umur(hari), shrinkage positif(microstrain)',p.customShrinkage);
+        if(p.strengthModel==='USER')rows.push('COMPRESSION STRENGTH USER CSV: umur(hari), fc(MPa), ft(MPa), E(MPa)',p.customStrength);
+        if(p.strengthModel==='AASHTO')rows.push('AASHTO tidak mendefinisikan kurva kuat tekan terhadap umur; pilihan ini memakai ACI209R-92 mengikuti konvensi WSDOT.');
+      }
+      rows.push('','TIME DEPENDENT MATERIAL LINK:');
+      td.links.forEach(link=>rows.push(`Material ${link.material} ${link.name}: C&S=${td.enabled&&link.creep?link.creepName:'tidak dihubungkan'}; compression strength=${td.enabled&&link.strength?link.strengthName:'tidak dihubungkan'}.`));
+      rows.push('Link beton lama tidak merekonstruksi umur matang atau riwayat tegangan sebelum analisis.');
+      if(td.enabled)rows.push('','KARTU MATERIAL BERGANTUNG WAKTU MCT:',...E.timeDependentCards(config));
+      rows.push('','RUJUKAN MATERIAL BERGANTUNG WAKTU:');
+      td.references.forEach(source=>rows.push(`${source.id}: ${source.title}\n${source.url}`));
       rows.push('','PERHITUNGAN MATERIAL TERMAL:',
         `Metode cp=${thermal.cpMode}; k=${thermal.kMode}; Tref=${thermal.referenceTemperature}degC; material lama=${thermal.oldMode}.`,
         `Beton baru: cp=${thermal.cp}kJ/kgC; k=${thermal.k}W/mC; SPHEAT=${thermal.cpMct}; HEATCO=${thermal.kMct}.`,
