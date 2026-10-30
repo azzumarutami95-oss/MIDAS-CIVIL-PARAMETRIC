@@ -169,7 +169,28 @@
           </div>
         </div>
         <div class="card convection-card"><div class="card-heading"><div><h3>Konveksi permukaan</h3><p class="card-subtitle">Koefisien efektif awal. Bekisting dan penutup curing tidak dimodelkan sebagai elemen tersendiri.</p></div><span class="section-badge">W/m²·°C</span></div>
-          <div class="form-grid convection-grid"><label class="field"><span>Sisi beton lama</span><input type="number" data-key="convection.oldSide" value="10" min="0" step="0.5"></label><label class="field"><span>Atas lama sebelum cor</span><input type="number" data-key="convection.oldTop" value="10" min="0" step="0.5"></label><label class="field"><span>Sisi dengan bekisting</span><input type="number" data-key="convection.form" value="3" min="0" step="0.5"></label><label class="field"><span>Sisi setelah bongkar</span><input type="number" data-key="convection.air" value="10" min="0" step="0.5"></label><label class="field"><span>Atas selama curing</span><input type="number" data-key="convection.curing" value="5" min="0" step="0.5"></label><label class="field"><span>Atas setelah curing</span><input type="number" data-key="convection.topAir" value="10" min="0" step="0.5"></label></div>
+          <div class="form-grid convection-grid">
+            <label class="field"><span>Sisi beton lama</span><input type="number" data-key="convection.oldSide" value="10" min="0" step="0.5" aria-describedby="convection-help-oldSide"><small class="convection-field-help" id="convection-help-oldSide">Panduan kondisi udara ditampilkan di bawah.</small></label>
+            <label class="field"><span>Atas lama sebelum cor</span><input type="number" data-key="convection.oldTop" value="10" min="0" step="0.5" aria-describedby="convection-help-oldTop"><small class="convection-field-help" id="convection-help-oldTop">Periksa kondisi permukaan sebelum menjadi sambungan.</small></label>
+            <label class="field"><span>Sisi dengan bekisting</span><input type="number" data-key="convection.form" value="3" min="0" step="0.5" aria-describedby="convection-help-form"><small class="convection-field-help" id="convection-help-form">Gunakan koefisien efektif sistem bekisting.</small></label>
+            <label class="field"><span>Sisi setelah bongkar</span><input type="number" data-key="convection.air" value="10" min="0" step="0.5" aria-describedby="convection-help-air"><small class="convection-field-help" id="convection-help-air">Sesuaikan dengan udara dan angin setelah bongkar.</small></label>
+            <label class="field"><span>Atas selama curing</span><input type="number" data-key="convection.curing" value="5" min="0" step="0.5" aria-describedby="convection-help-curing"><small class="convection-field-help" id="convection-help-curing">Sesuaikan dengan jenis penutup dan metode curing.</small></label>
+            <label class="field"><span>Atas setelah curing</span><input type="number" data-key="convection.topAir" value="10" min="0" step="0.5" aria-describedby="convection-help-topAir"><small class="convection-field-help" id="convection-help-topAir">Periksa paparan udara pada permukaan atas.</small></label>
+          </div>
+          <p class="convection-summary" id="convection-range-note" role="status">Rentang acuan membantu memilih nilai menurut kondisi lapangan. Batas masukan aplikasi adalah 0–200 W/(m²·°C).</p>
+          <details class="details-panel convection-guide" id="convection-guide" open><summary>Kriteria range & petunjuk pemilihan h <span aria-hidden="true">+</span></summary><div class="details-content">
+            <p class="field-help">Nilai h memakai W/(m²·°C), setara W/(m²·K). Batas masukan aplikasi dan rentang acuan fisik memiliki tujuan berbeda; nilai yang dipilih tetap perlu dasar kondisi lapangan.</p>
+            <div class="table-scroll"><table class="convection-guide-table"><thead><tr><th>Permukaan</th><th>h dipilih<br><small>W/(m²·°C)</small></th><th>Nilai MCT<br><small>kJ/(m²·jam·°C)</small></th><th>Rentang / kriteria acuan</th><th>Penilaian & petunjuk</th></tr></thead><tbody id="convection-guide-table"></tbody></table></div>
+            <ol class="convection-instructions">
+              <li>Identifikasi permukaan yang terpapar pada setiap tahap: sebelum cor, dalam bekisting, setelah bongkar, saat curing, dan setelah curing.</li>
+              <li>Untuk permukaan terbuka, pilih h berdasarkan kondisi aliran udara, orientasi permukaan, geometri, dan beda temperatur. Catat data angin serta sumber korelasinya.</li>
+              <li>Untuk bekisting atau penutup, gunakan h<sub>ef</sub> = 1 / (1/h<sub>udara</sub> + Σ δ/k), dengan δ dalam m dan k dalam W/(m·°C). Tambahkan tahanan kontak bila relevan; masukkan data tebal, konduktivitas, dan kondisi lapisan yang digunakan.</li>
+              <li>Curing dengan penutup, penyiraman, dan kontak air memerlukan dasar perpindahan panas yang sesuai masing-masing metode. Penutup basah juga dapat melibatkan penguapan.</li>
+              <li>Gunakan h = 0 hanya untuk idealisasi tanpa aliran konveksi. Untuk nilai nonnol, periksa sensitivitas nilai rendah/tengah/tinggi dan bandingkan dengan data temperatur bila tersedia.</li>
+            </ol>
+            <p class="field-help">Ekspor mengonversi h ke kJ/(m²·jam·°C) dengan faktor 3,6. Radiasi, penguapan, dan elemen bekisting terpisah belum dihitung otomatis oleh input konveksi ini.</p>
+            <p class="field-help"><a href="https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/blob/main/web/CONVECTION_GUIDE.md" target="_blank" rel="noopener noreferrer">Baca dasar rentang, contoh perhitungan, dan rujukan teknis</a>.</p>
+          </div></details>
           <div class="inline-note"><span class="note-symbol" aria-hidden="true">↳</span><p>Konveksi atas beton lama dihentikan saat beton baru aktif. Sisi dan atas beton baru berganti kondisi melalui grup staging, tanpa konveksi ganda.</p></div>
         </div>
       </section>

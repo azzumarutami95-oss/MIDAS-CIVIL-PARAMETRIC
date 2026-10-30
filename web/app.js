@@ -227,12 +227,33 @@
     $('validation-summary').textContent=validation.errors.length?validation.errors.length+' perlu diperbaiki':'Input dapat diekspor';
     $('validation-summary').classList.toggle('has-error',!!validation.errors.length);
   }
+  const convectionStatus={reference:'Dalam acuan',review:'Tinjau kondisi',adiabatic:'Adiabatik ideal',invalid:'Perbaiki nilai',custom:'Dasar proyek'};
+  function renderConvectionGuidance(){
+    const table=$('convection-guide-table');table.replaceChildren();
+    try{
+      const guide=E.convectionGuidance(config);
+      $('convection-range-note').textContent=`Batas masukan aplikasi: ${guide.limit.min}–${guide.limit.max} W/(m²·°C). ${guide.note}`;
+      for(const item of guide.items){
+        const status=Object.hasOwn(convectionStatus,item.status)?item.status:'custom';
+        const help=$('convection-help-'+item.key),row=document.createElement('tr');
+        help.textContent=(item.rangeLabel||'Bergantung kondisi konstruksi')+' · '+convectionStatus[status];help.dataset.status=status;
+        row.dataset.key=item.key;row.dataset.status=status;
+        const cells=[item.label,format(item.value,2),format(item.mctValue,2),item.rangeLabel||'Bergantung kondisi konstruksi'];
+        const captions=['Permukaan','h · W/(m²·°C)','MCT · kJ/(m²·jam·°C)','Rentang / kriteria acuan'];
+        for(const [i,text] of cells.entries()){const cell=document.createElement('td');cell.textContent=text;cell.dataset.label=captions[i];row.append(cell);}
+        const detail=document.createElement('td'),badge=document.createElement('strong'),message=document.createElement('span'),instruction=document.createElement('p'),basis=document.createElement('small');
+        badge.className='convection-status';badge.textContent=convectionStatus[status];
+        message.textContent=item.message||'';instruction.textContent=item.instruction||'';basis.textContent='Dasar: '+(item.basis||'Data kondisi proyek diperlukan.');
+        detail.append(badge,message,instruction,basis);row.append(detail);table.append(row);
+      }
+    }catch(error){$('convection-range-note').textContent='Panduan konveksi belum tersedia: '+error.message;}
+  }
   function render(){
     config=read();lastModel=null;const result=E.validate(config);
     fields.forEach(el=>{const bad=result.errors.some(e=>e.field===el.dataset.key);el.setAttribute('aria-invalid',String(bad));});
     $('export-mct').disabled=!!result.errors.length;$('export-json').disabled=!!result.errors.length;$('download-report').disabled=!!result.errors.length;
     const fixed=config.boundary.baseMode==='fixed';document.querySelector('[data-key="temperature.base"]').disabled=!fixed;
-    renderThermal();renderTimeDependent();
+    renderThermal();renderTimeDependent();renderConvectionGuidance();
     const mix=E.mixMetrics(config),stats=E.estimate(config);
     for(const [id,value,digits]of [['metrics-nodes',stats.nodes,0],['metrics-elements',stats.elements,0],['metrics-volume',stats.volume,2],['metrics-wb',mix.wb,3],
       ['mix-wc',mix.wc,3],['mix-wb',mix.wb,3],['mix-binder',mix.binder,1],['mix-total',mix.total,2],['mix-flyash',mix.flyash,1]])$(id).textContent=format(value,digits);
@@ -250,7 +271,7 @@
   function download(name,text,type='application/octet-stream'){
     const url=URL.createObjectURL(new Blob([text],{type})),a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);
   }
-  function snapshot(){return {schema:'civil-heat-studio/v1',created_at:new Date().toISOString(),config:structuredClone(config),reference,thermal_calculation:E.resolvedThermal(config),time_dependent_calculation:E.timeDependent(config),
+  function snapshot(){return {schema:'civil-heat-studio/v1',created_at:new Date().toISOString(),config:structuredClone(config),reference,thermal_calculation:E.resolvedThermal(config),time_dependent_calculation:E.timeDependent(config),convection_guidance:E.convectionGuidance(config),
     status:{assumptions:true,native_midas_tested:false,journal_validated:false}};}
   fields.forEach(el=>el.addEventListener('input',()=>{projectStatus();clearTimeout(timer);timer=setTimeout(render,160);}));
   fields.filter(el=>el.tagName==='SELECT').forEach(el=>el.addEventListener('change',()=>{clearTimeout(timer);render();}));
@@ -347,6 +368,14 @@
         `DASAR TERMAL: ${config.boundary.baseMode}; tumpuan translasi dasar tetap (idealisasi mekanis).`,
         '','TAHAP:'];
       model.stages.forEach(t=>rows.push(`${t.name}: global ${t.globalStart}-${t.globalEnd}jam; umur baru ${t.newAgeStart}-${t.newAgeEnd}jam; elemen aktif ${t.activeElements}; muka konveksi ${t.convectionFaces}; grup beban aktif ${t.activeLoadGroups.join(', ')}.`));
+      const convection=E.convectionGuidance(config);
+      rows.push('','CONVECTION BOUNDARIES / KRITERIA RANGE DAN PETUNJUK:',
+        `Batas masukan aplikasi ${convection.limit.min}–${convection.limit.max} W/(m2·degC); batas ini berbeda dari rentang acuan fisik.`,convection.note);
+      for(const item of convection.items)rows.push(
+        `${item.label}: h=${item.value} W/(m2·degC) -> ${item.value*3.6} kJ/(m2·jam·degC); acuan=${item.rangeLabel||'bergantung kondisi konstruksi'}; status=${convectionStatus[item.status]||item.status}.`,
+        item.message||'',`Petunjuk: ${item.instruction||''}`,`Dasar: ${item.basis||''}`);
+      rows.push('Radiasi, penguapan, dan elemen bekisting terpisah belum dihitung otomatis. Kalibrasi atau uji sensitivitas sesuai kondisi lapangan.','RUJUKAN KONVEKSI:');
+      convection.sources.forEach(source=>rows.push(`${source.title}\n${source.url}`));
       const td=E.timeDependent(config),p=config.timeDependent;
       rows.push('','MATERIAL BERGANTUNG WAKTU / TIME DEPENDENT MATERIAL:',
         `Status=${td.enabled?'aktif':'nonaktif'}; C&S=${td.creepLabel}; compression strength=${td.strengthLabel}.`,

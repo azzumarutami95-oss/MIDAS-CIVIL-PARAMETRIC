@@ -181,3 +181,58 @@ test('JSON schema is strict and does not accept coercions or unknown schema vers
   config.geometry.diameter='7.5';assert.throws(()=>E.cleanConfig({schema:'civil-heat-studio/v1',config}));
   assert.throws(()=>E.cleanConfig({}));
 });
+
+test('convection guidance distinguishes air references, construction-dependent covers and the software guard',()=>{
+  const c=E.defaults(),before=JSON.stringify(c),guide=E.convectionGuidance(c);
+  assert.deepEqual(guide.limit,{min:0,max:200});
+  assert.deepEqual(guide.items.map(item=>item.key),Object.keys(c.convection));
+  assert.ok(guide.sources.length>=3);
+  assert.ok(guide.sources.every(source=>source.title&&source.url.startsWith('https://')));
+  assert.ok(guide.note);
+  for(const key of ['oldSide','oldTop','air','topAir']){
+    const item=guide.items.find(item=>item.key===key);
+    assert.equal(item.min,2);assert.equal(item.max,25);assert.equal(item.status,'reference');
+    assert.ok(item.instruction&&item.basis&&item.message);
+    close(item.mctValue,item.value*3.6);
+  }
+  for(const key of ['form','curing']){
+    const item=guide.items.find(item=>item.key===key);
+    assert.equal(item.min,null);assert.equal(item.max,null);assert.equal(item.status,'custom');
+    assert.ok(item.rangeLabel&&item.instruction&&item.basis);
+  }
+  assert.equal(JSON.stringify(c),before,'Guidance must not replace user coefficients.');
+});
+
+test('convection reference warnings are advisory while numerical export limits remain enforced',()=>{
+  const c=E.defaults();
+  for(const [value,status,valid] of [[1,'review',true],[2,'reference',true],[10,'reference',true],
+    [25,'reference',true],[30,'review',true],[200,'review',true],[201,'invalid',false],[-1,'invalid',false],[NaN,'invalid',false]]){
+    c.convection.air=value;
+    const item=E.convectionGuidance(c).items.find(item=>item.key==='air');
+    assert.equal(item.status,status,String(value));
+    assert.equal(E.validate(c).errors.some(error=>error.field==='convection.air'),!valid,String(value));
+    assert.ok(Object.is(c.convection.air,value),'Guidance must not clamp a selected coefficient.');
+  }
+  for(const key of Object.keys(c.convection)){
+    const zero=E.defaults();zero.convection[key]=0;
+    assert.equal(E.convectionGuidance(zero).items.find(item=>item.key===key).status,'adiabatic');
+    assert.equal(E.validate(zero).errors.length,0);
+  }
+});
+
+test('actual convection exports and JSON roundtrip retain advisory and zero coefficients with hour conversion',()=>{
+  const c=E.defaults();Object.assign(c.mesh,{sideDiv:4,radialDiv:2,layersOld:1,layersNew:1});
+  Object.assign(c.convection,{oldSide:0,oldTop:1,form:3.2,air:30,curing:5.4,topAir:200});
+  const before=JSON.stringify(c),guidance=E.convectionGuidance(c),s=parseMCT(E.build(c).text);
+  const expected={H_OLD_SIDE:0,H_OLD_TOP:3.6,H_FORM:11.52,H_AIR:108,H_CURING:19.44,H_TOP_AIR:720};
+  const actual={};
+  for(const line of s['*HYD-CONVCOEF']){
+    const [name,method,value]=line.split(',').map(value=>value.trim());
+    assert.equal(method,'CONST');actual[name.replace('FUNC=','')]=+value;
+  }
+  assert.deepEqual(Object.keys(actual),Object.keys(expected));
+  for(const [name,value] of Object.entries(expected))close(actual[name],value);
+  const restored=E.cleanConfig(JSON.parse(JSON.stringify({schema:'civil-heat-studio/v1',config:c,convection_guidance:guidance})));
+  assert.deepEqual(restored.convection,c.convection);
+  assert.equal(JSON.stringify(c),before);
+});

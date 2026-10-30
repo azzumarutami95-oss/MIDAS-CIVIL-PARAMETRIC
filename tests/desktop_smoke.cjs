@@ -153,6 +153,9 @@ const {setTimeout: delay} = require('node:timers/promises');
     assert.equal(await page.evaluate(() => typeof process), 'undefined');
     assert.equal(await page.locator('#metrics-elements').innerText(), '24.576');
     assert.equal(await page.locator('[data-key="timeDependent.enabled"]').inputValue(), 'yes');
+    assert.equal(await page.locator('#convection-guide-table tr').count(), 6);
+    assert.equal(await page.locator('#convection-help-air').getAttribute('data-status'), 'reference');
+    assert.equal(await page.locator('#convection-help-form').getAttribute('data-status'), 'custom');
     const security = await application.evaluate(({BrowserWindow}) => {
       const preferences = BrowserWindow.getAllWindows()[0].webContents.getLastWebPreferences();
       return {sandbox: preferences.sandbox, nodeIntegration: preferences.nodeIntegration,

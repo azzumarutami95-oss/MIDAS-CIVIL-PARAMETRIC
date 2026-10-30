@@ -76,6 +76,8 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           $notes = @'
+          Pembaruan panduan Convection Boundaries untuk aplikasi v1.1.1: rentang referensi udara alami 2–25 dan udara terpaksa 25–250 W/(m²·°C), contoh koefisien efektif bekisting/penutup curing dari tabel MIDAS, serta petunjuk tahanan lapisan dan tahap penerapannya. Batas input aplikasi 0–200 ditandai terpisah; nilai tidak diubah otomatis. Pratinjau, JSON, dan laporan memuat panduan aktual; MCT tetap memakai koefisien pilihan pengguna dengan konversi satuan yang sama.
+
           Pembaruan material untuk aplikasi v1.1.1: creep/shrinkage ACI 209, CEB-FIP 1990, AASHTO 2006, dan USER; perkembangan kuat tekan ACI 209R-92, CEB-FIP 1990, serta tabel jobmix USER. Pilihan kuat tekan AASHTO memakai ACI 209R-92 sesuai konvensi WSDOT karena AASHTO tidak menetapkan model perkembangan kuat tekan sendiri.
 
           Parameter kode, tabel custom, modulus acuan creep, dan link independen untuk FC_OLD/FC_NEW tersimpan di JSON serta ikut dalam pratinjau, laporan TXT, dan MCT (TDM-FUNC, TDM-TYPE, TDM-ELAST, TDM-LINK). Default baru menghubungkan beton baru; JSON lama mempertahankan material konstan sampai fitur diaktifkan. SW Dead Load / LG_SW dengan faktor (0, 0, -1) tetap tersedia.
@@ -86,4 +88,4 @@ jobs:
           '@
           $notes | Set-Content dist/RELEASE_NOTES.md -Encoding utf8
           $packageVersion = (Get-Content package.json -Raw | ConvertFrom-Json).version
-          gh release create $env:GITHUB_REF_NAME dist/Civil-Hydration-NX-Setup-*-x64.exe dist/SHA256SUMS.txt downloads/CIVIL_HEAT_HYDRATION_NX.html downloads/CIVIL_HEAT_HYDRATION.html dist/PILAR_TIME_DEPENDENT_EXAMPLE.MCT dist/PARAMETER_TIME_DEPENDENT_EXAMPLE.json --verify-tag --latest --title "Civil Hydration NX v$packageVersion — Time Dependent Material / Windows x64" --notes-file dist/RELEASE_NOTES.md
+          gh release create $env:GITHUB_REF_NAME dist/Civil-Hydration-NX-Setup-*-x64.exe dist/SHA256SUMS.txt downloads/CIVIL_HEAT_HYDRATION_NX.html downloads/CIVIL_HEAT_HYDRATION.html dist/PILAR_TIME_DEPENDENT_EXAMPLE.MCT dist/PARAMETER_TIME_DEPENDENT_EXAMPLE.json --verify-tag --latest --title "Civil Hydration NX v$packageVersion — Convection Boundaries Guide / Windows x64" --notes-file dist/RELEASE_NOTES.md

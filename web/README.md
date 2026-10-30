@@ -55,6 +55,22 @@ lama generator Python memakai format berbeda dan bukan format impor aplikasi.
 **Unduh ringkasan input** menyimpan `.txt` berisi parameter, unit, jadwal,
 node pemantauan dan batas interpretasi. Tombol reset meminta konfirmasi.
 
+## Kriteria convection boundaries
+
+Pada **Heat of Hydration → Konveksi permukaan**, panduan pemilihan h
+menjelaskan rentang acuan udara, koefisien efektif bekisting/curing, serta
+permukaan dan tahap yang digunakan. Acuan umum udara adalah **2–25** untuk
+konveksi alami dan **25–250 W/(m²·°C)** untuk konveksi paksa; batas masukan
+aplikasi tetap **0–200**, sehingga kedua rentang tersebut tidak boleh dianggap
+sebagai batas validasi yang sama.
+
+Bekisting dan penutup tidak memiliki satu rentang universal. Bandingkan
+bahan/ketebalan aktual dengan acuan historis MIDAS atau gunakan tahanan seri
+`h_eff = 1 / (1/h_udara + Σd/k)`. Nilai h=0 berarti fluks konveksi nol pada
+muka terkait; kondisi dasar termal tetap diatur terpisah. Nilai awal aplikasi
+adalah asumsi, dan angka dalam rentang acuan bukan tanda model telah aman
+atau terkalibrasi. [Petunjuk empat langkah, tabel acuan dan sumber](CONVECTION_GUIDE.md).
+
 ## Berat sendiri SW
 
 Panel **Model → Berat sendiri / self weight** menampilkan kasus **SW**, tipe

@@ -2,7 +2,7 @@
 
 **[Buka halaman unduh installer di GitHub Releases](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/latest)**
 
-**[Unduh langsung installer v1.1.1 — pembaruan material (.exe)](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/download/v1.1.1-materials/Civil-Hydration-NX-Setup-1.1.1-x64.exe)**
+**[Unduh langsung installer v1.1.1 — panduan konveksi (.exe)](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/download/v1.1.1-convection/Civil-Hydration-NX-Setup-1.1.1-x64.exe)**
 
 Berkas versi 1.1.1: `Civil-Hydration-NX-Setup-1.1.1-x64.exe`.
 Paket ini ditujukan untuk Windows 10/11 64-bit dengan prosesor x64. Aplikasi
@@ -57,9 +57,16 @@ pratinjau, laporan, dan JSON. Default menghubungkan beton baru saja. Proyek
 JSON lama yang belum memiliki parameter ini membukanya dalam keadaan
 nonaktif untuk mempertahankan perilaku mekanis sebelumnya.
 [Rumus, satuan dan batas material bergantung waktu](../web/TIME_DEPENDENT_METHODS.md).
-Aset pembaruan berada pada revisi rilis `v1.1.1-materials`, termasuk
-[contoh MCT](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/download/v1.1.1-materials/PILAR_TIME_DEPENDENT_EXAMPLE.MCT)
-dan [parameter JSON contoh](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/download/v1.1.1-materials/PARAMETER_TIME_DEPENDENT_EXAMPLE.json).
+Aset terbaru berada pada revisi rilis `v1.1.1-convection`, termasuk
+[contoh MCT](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/download/v1.1.1-convection/PILAR_TIME_DEPENDENT_EXAMPLE.MCT)
+dan [parameter JSON contoh](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/download/v1.1.1-convection/PARAMETER_TIME_DEPENDENT_EXAMPLE.json).
+
+Pembaruan konveksi juga tetap memakai nomor aplikasi **1.1.1**. Panel
+**Konveksi permukaan** menambahkan kriteria rentang h dan petunjuk pemilihan
+untuk udara, bekisting dan curing. Rentang literatur berbeda dari batas
+masukan aplikasi 0–200 W/(m²·°C); h=0 berarti fluks konveksi nol pada muka
+tersebut. Periksa satuan, bahan penutup dan tahapan paparan sebelum memilih
+nilai. [Panduan konveksi lengkap](../web/CONVECTION_GUIDE.md).
 
 - **Open / Buka (`Ctrl+O`)** memilih proyek melalui dialog Windows. JSON yang
   dibuka menjadi file proyek aktif.

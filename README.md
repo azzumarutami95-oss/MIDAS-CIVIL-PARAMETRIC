@@ -2,7 +2,7 @@
 
 ## Aplikasi Windows (.exe)
 
-**[Unduh installer Windows 64-bit v1.1.1 — pembaruan material (.exe)](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/download/v1.1.1-materials/Civil-Hydration-NX-Setup-1.1.1-x64.exe)**
+**[Unduh installer Windows 64-bit v1.1.1 — panduan konveksi (.exe)](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/download/v1.1.1-convection/Civil-Hydration-NX-Setup-1.1.1-x64.exe)**
 
 **[Unduh installer Civil Hydration NX dari GitHub Releases](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/latest)**
 
@@ -27,11 +27,13 @@ Pilihan kode ACI, CEB-FIP 1990, AASHTO serta tabel user/custom jobmix ikut
 tersimpan pada JSON, pratinjau, laporan, dan MCT. AASHTO untuk perkembangan
 kuat tekan menggunakan konvensi ACI 209R-92 yang dijelaskan WSDOT.
 [Metode, parameter, satuan, dan cakupan ekspor](web/TIME_DEPENDENT_METHODS.md).
-Versi aplikasi tetap 1.1.1; aset pembaruan berada pada revisi rilis
-`v1.1.1-materials`.
+Versi aplikasi tetap 1.1.1. Revisi terbaru `v1.1.1-convection` menambahkan
+**kriteria rentang dan petunjuk convection boundaries**, dengan acuan udara,
+bekisting/curing, satuan, asumsi dan cara memilih nilai.
+[Panduan konveksi dan rujukan](web/CONVECTION_GUIDE.md).
 
-**[Unduh contoh MCT dengan C&S, kekuatan dan link](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/download/v1.1.1-materials/PILAR_TIME_DEPENDENT_EXAMPLE.MCT)**
-dan [JSON yang dapat dibuka di aplikasi](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/download/v1.1.1-materials/PARAMETER_TIME_DEPENDENT_EXAMPLE.json).
+**[Unduh contoh MCT dengan C&S, kekuatan dan link](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/download/v1.1.1-convection/PILAR_TIME_DEPENDENT_EXAMPLE.MCT)**
+dan [JSON yang dapat dibuka di aplikasi](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/download/v1.1.1-convection/PARAMETER_TIME_DEPENDENT_EXAMPLE.json).
 Contoh CEB-FIP 1990 menghubungkan beton baru saja; parameter merupakan asumsi
 yang perlu disesuaikan dan bukan jobmix terkalibrasi.
 

@@ -35,6 +35,12 @@
 @media(max-width:1100px){.td-columns{grid-template-columns:1fr}.td-chart-wrap{max-width:740px}}
 @media(max-width:600px){#material-waktu .three-fields,#material-waktu .two-fields{grid-template-columns:1fr}.td-chart-wrap{height:220px}#material-waktu .section-heading{align-items:flex-start;flex-wrap:wrap}.td-csv-field textarea{font-size:10px}}
 
+/* Convection criteria remain readable alongside the actual editable coefficients. */
+.convection-grid{grid-template-columns:repeat(3,minmax(0,1fr));align-items:start}.convection-grid .field>span:first-child{min-height:0}.convection-field-help{font-size:9px;line-height:1.7;color:#718b9e;min-height:31px;overflow-wrap:anywhere}.convection-field-help[data-status="review"],.convection-field-help[data-status="adiabatic"]{color:#9d773d}.convection-field-help[data-status="invalid"]{color:#b26750}.convection-summary{margin-top:14px;padding:11px 13px;border-left:3px solid #7da8c6;background:#f1f6fa;color:#5c7c94;font-size:10px;line-height:1.8}.convection-guide-table{width:100%;min-width:760px}.convection-guide-table th,.convection-guide-table td{font-size:10px;vertical-align:top;line-height:1.75}.convection-guide-table th:nth-child(2),.convection-guide-table th:nth-child(3){min-width:110px}.convection-guide-table td:nth-child(2),.convection-guide-table td:nth-child(3){font-variant-numeric:tabular-nums;white-space:nowrap}.convection-guide-table td:first-child{min-width:125px;color:#54758d;font-weight:600}.convection-guide-table td:nth-child(4){min-width:145px}.convection-guide-table td:last-child{min-width:260px}.convection-status{display:block;color:#4e7d91;font-size:10px;margin-bottom:4px}.convection-guide-table [data-status="review"] .convection-status,.convection-guide-table [data-status="adiabatic"] .convection-status{color:#9c783d}.convection-guide-table [data-status="invalid"] .convection-status{color:#b26750}.convection-guide-table td p{margin-top:6px}.convection-guide-table td>small{display:block;margin-top:7px;color:#8297a6;font-size:9px}.convection-instructions{padding-left:21px;margin:17px 0 0;color:#6a8598;font-size:10px;line-height:1.9}.convection-instructions li+li{margin-top:7px}.convection-guide .field-help{margin-top:10px}.convection-guide .field-help a{text-decoration:underline;text-underline-offset:2px}
+@media(max-width:850px){.convection-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:500px){.convection-grid{grid-template-columns:1fr}.convection-field-help{min-height:0}.convection-summary,.convection-instructions{font-size:10px}}
+@media(max-width:650px){.convection-guide-table{display:block;min-width:0}.convection-guide-table thead{display:none}.convection-guide-table tbody{display:block}.convection-guide-table tr{display:grid;grid-template-columns:1fr 1fr;margin:10px 0;border:1px solid #d7e3eb;border-radius:3px;overflow:hidden}.convection-guide-table td{display:block;min-width:0!important;padding:10px 12px;white-space:normal!important;border:0}.convection-guide-table td:first-child{grid-column:1/-1;background:#edf4f9;border-bottom:1px solid #d7e3eb}.convection-guide-table td:nth-child(4),.convection-guide-table td:last-child{grid-column:1/-1}.convection-guide-table td:nth-child(2)::before,.convection-guide-table td:nth-child(3)::before,.convection-guide-table td:nth-child(4)::before{content:attr(data-label);display:block;font-size:9px;color:#7e96a7;margin-bottom:4px;white-space:normal}.convection-guide-table td:last-child{border-top:1px solid #e4edf3}.convection-guide-table td:last-child small{line-height:1.7}}
+
 </style></head>
 <body class="nx-app">
 <header class="nx-titlebar" id="overview"><a class="nx-appmark" href="#model" data-workspace="model" aria-label="Civil Hydration model"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 9 5v10l-9 5-9-5V7zM3 7l9 5 9-5M12 12v10"/></svg><span>CIVIL <b>HYDRATION</b><small>NX WORKSPACE</small></span></a><div class="nx-project-title"><span class="project-indicator"></span><span id="project-file-name">Pilar dua tahap</span><strong id="project-dirty" title="Perubahan belum disimpan" aria-label="Perubahan belum disimpan" hidden>*</strong><span class="nx-title-separator">—</span>Heat of Hydration</div><div class="nx-quick-actions"><button id="import-json" type="button" title="Buka parameter JSON">↥ <span>Buka</span></button><button id="export-json" type="button" title="Simpan parameter JSON">▣ <span>Simpan</span></button><button id="save-as" type="button" title="Save As — simpan proyek dengan nama atau lokasi baru (Ctrl+Shift+S)" hidden>▣ <span>Save As</span></button><button id="reset-defaults" type="button" title="Reset ke parameter contoh">↺ <span>Reset</span></button><input type="file" id="import-file" accept=".json,application/json" hidden></div></header>
@@ -204,7 +210,28 @@
           </div>
         </div>
         <div class="card convection-card"><div class="card-heading"><div><h3>Konveksi permukaan</h3><p class="card-subtitle">Koefisien efektif awal. Bekisting dan penutup curing tidak dimodelkan sebagai elemen tersendiri.</p></div><span class="section-badge">W/m²·°C</span></div>
-          <div class="form-grid convection-grid"><label class="field"><span>Sisi beton lama</span><input type="number" data-key="convection.oldSide" value="10" min="0" step="0.5"></label><label class="field"><span>Atas lama sebelum cor</span><input type="number" data-key="convection.oldTop" value="10" min="0" step="0.5"></label><label class="field"><span>Sisi dengan bekisting</span><input type="number" data-key="convection.form" value="3" min="0" step="0.5"></label><label class="field"><span>Sisi setelah bongkar</span><input type="number" data-key="convection.air" value="10" min="0" step="0.5"></label><label class="field"><span>Atas selama curing</span><input type="number" data-key="convection.curing" value="5" min="0" step="0.5"></label><label class="field"><span>Atas setelah curing</span><input type="number" data-key="convection.topAir" value="10" min="0" step="0.5"></label></div>
+          <div class="form-grid convection-grid">
+            <label class="field"><span>Sisi beton lama</span><input type="number" data-key="convection.oldSide" value="10" min="0" step="0.5" aria-describedby="convection-help-oldSide"><small class="convection-field-help" id="convection-help-oldSide">Panduan kondisi udara ditampilkan di bawah.</small></label>
+            <label class="field"><span>Atas lama sebelum cor</span><input type="number" data-key="convection.oldTop" value="10" min="0" step="0.5" aria-describedby="convection-help-oldTop"><small class="convection-field-help" id="convection-help-oldTop">Periksa kondisi permukaan sebelum menjadi sambungan.</small></label>
+            <label class="field"><span>Sisi dengan bekisting</span><input type="number" data-key="convection.form" value="3" min="0" step="0.5" aria-describedby="convection-help-form"><small class="convection-field-help" id="convection-help-form">Gunakan koefisien efektif sistem bekisting.</small></label>
+            <label class="field"><span>Sisi setelah bongkar</span><input type="number" data-key="convection.air" value="10" min="0" step="0.5" aria-describedby="convection-help-air"><small class="convection-field-help" id="convection-help-air">Sesuaikan dengan udara dan angin setelah bongkar.</small></label>
+            <label class="field"><span>Atas selama curing</span><input type="number" data-key="convection.curing" value="5" min="0" step="0.5" aria-describedby="convection-help-curing"><small class="convection-field-help" id="convection-help-curing">Sesuaikan dengan jenis penutup dan metode curing.</small></label>
+            <label class="field"><span>Atas setelah curing</span><input type="number" data-key="convection.topAir" value="10" min="0" step="0.5" aria-describedby="convection-help-topAir"><small class="convection-field-help" id="convection-help-topAir">Periksa paparan udara pada permukaan atas.</small></label>
+          </div>
+          <p class="convection-summary" id="convection-range-note" role="status">Rentang acuan membantu memilih nilai menurut kondisi lapangan. Batas masukan aplikasi adalah 0–200 W/(m²·°C).</p>
+          <details class="details-panel convection-guide" id="convection-guide" open><summary>Kriteria range & petunjuk pemilihan h <span aria-hidden="true">+</span></summary><div class="details-content">
+            <p class="field-help">Nilai h memakai W/(m²·°C), setara W/(m²·K). Batas masukan aplikasi dan rentang acuan fisik memiliki tujuan berbeda; nilai yang dipilih tetap perlu dasar kondisi lapangan.</p>
+            <div class="table-scroll"><table class="convection-guide-table"><thead><tr><th>Permukaan</th><th>h dipilih<br><small>W/(m²·°C)</small></th><th>Nilai MCT<br><small>kJ/(m²·jam·°C)</small></th><th>Rentang / kriteria acuan</th><th>Penilaian & petunjuk</th></tr></thead><tbody id="convection-guide-table"></tbody></table></div>
+            <ol class="convection-instructions">
+              <li>Identifikasi permukaan yang terpapar pada setiap tahap: sebelum cor, dalam bekisting, setelah bongkar, saat curing, dan setelah curing.</li>
+              <li>Untuk permukaan terbuka, pilih h berdasarkan kondisi aliran udara, orientasi permukaan, geometri, dan beda temperatur. Catat data angin serta sumber korelasinya.</li>
+              <li>Untuk bekisting atau penutup, gunakan h<sub>ef</sub> = 1 / (1/h<sub>udara</sub> + Σ δ/k), dengan δ dalam m dan k dalam W/(m·°C). Tambahkan tahanan kontak bila relevan; masukkan data tebal, konduktivitas, dan kondisi lapisan yang digunakan.</li>
+              <li>Curing dengan penutup, penyiraman, dan kontak air memerlukan dasar perpindahan panas yang sesuai masing-masing metode. Penutup basah juga dapat melibatkan penguapan.</li>
+              <li>Gunakan h = 0 hanya untuk idealisasi tanpa aliran konveksi. Untuk nilai nonnol, periksa sensitivitas nilai rendah/tengah/tinggi dan bandingkan dengan data temperatur bila tersedia.</li>
+            </ol>
+            <p class="field-help">Ekspor mengonversi h ke kJ/(m²·jam·°C) dengan faktor 3,6. Radiasi, penguapan, dan elemen bekisting terpisah belum dihitung otomatis oleh input konveksi ini.</p>
+            <p class="field-help"><a href="https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/blob/main/web/CONVECTION_GUIDE.md" target="_blank" rel="noopener noreferrer">Baca dasar rentang, contoh perhitungan, dan rujukan teknis</a>.</p>
+          </div></details>
           <div class="inline-note"><span class="note-symbol" aria-hidden="true">↳</span><p>Konveksi atas beton lama dihentikan saat beton baru aktif. Sisi dan atas beton baru berganti kondisi melalui grup staging, tanpa konveksi ganda.</p></div>
         </div>
       </section>
@@ -572,6 +599,49 @@
   const clone = obj => JSON.parse(JSON.stringify(obj));
   const number = x => Number.isFinite(x);
   const faceNodes = [[0,1,2,3],[4,5,6,7],[0,1,5,4],[1,2,6,5],[2,3,7,6],[3,0,4,7]];
+  function convectionGuidance(c) {
+    const conversion=4184/3600;
+    const referenceValues={steel:12*conversion,plywood:7*conversion,sheet:5*conversion,mattress:4.5*conversion,epsSheet:1.5*conversion};
+    const airRange='Udara alami 2–25; udara terpaksa 25–250 W/(m²·°C)';
+    const airBasis='Rentang umum gas dari NPTEL; bukan rentang wajib beton atau hasil kalibrasi proyek.';
+    const coveredBasis='Rata-rata historis Korean Concrete Standard 1996 yang ditampilkan MIDAS; nilai contoh, bukan batas penerimaan.';
+    const definitions=[
+      ['oldSide','Sisi beton lama',false,
+        'H0–H3: pilih sesuai paparan sisi beton lama. Kriteria udara berlaku untuk sisi terbuka; tanah dan perendaman memerlukan model perpindahan panas yang sesuai.'],
+      ['oldTop','Atas lama sebelum cor',false,
+        'H0 saja: sesuaikan dengan paparan permukaan atas sebelum pengecoran baru. Kondisi ini dihentikan pada H1 saat permukaan menjadi sambungan internal.'],
+      ['form','Sisi dengan bekisting',true,
+        'H1 sampai bongkar bekisting: gunakan koefisien efektif berdasarkan bahan, ketebalan, kontak, dan lapisan. Untuk pendekatan 1D, h_eff = 1/(1/h_air + Σd/k); jangan memasukkan tahanan lapisan dua kali.'],
+      ['air','Sisi setelah bongkar',false,
+        'H2–H3: pilih sesuai kondisi angin setelah bekisting dilepas. Nilai di atas rentang udara alami dapat mewakili konveksi terpaksa bila ada dasar kecepatan angin atau kalibrasi.'],
+      ['curing','Atas selama curing',true,
+        'H1–H2 sampai akhir curing: identifikasi sheet, mattress, atau insulasi dan hitung tahanan lapisan bila relevan. Genangan, semprotan, dan evaporasi bukan kasus udara alami yang dapat ditetapkan dari tabel penutup saja.'],
+      ['topAir','Atas setelah curing',false,
+        'H3: gunakan kondisi permukaan atas sesudah penutup dilepas. Orientasi, angin, dan kelembapan aktual dapat berbeda dari sisi pilar.']
+    ];
+    const items=definitions.map(([key,label,covered,instruction])=>{
+      const value=c?.convection?.[key],valid=Number.isFinite(value)&&value>=0&&value<=200;
+      let status,message;
+      if(!valid){status='invalid';message='Nilai harus berupa angka berhingga dari 0 sampai 200 W/(m²·°C).';}
+      else if(value===0){status='adiabatic';message='h = 0 meniadakan fluks konveksi pada permukaan ini; konduksi, sumber panas, dan kondisi batas lain tetap bekerja.';}
+      else if(covered){status='custom';message='Nilai efektif memerlukan data lapisan/kondisi curing atau kalibrasi; tidak ada satu rentang universal untuk semua penutup.';}
+      else if(value<2||value>25){status='review';message=value<2?
+        'Di bawah acuan umum udara alami; periksa shielding, insulasi, atau dasar koefisien efektif yang digunakan.':
+        'Di atas acuan umum udara alami; periksa dasar konveksi terpaksa/angin. Rentang literatur terpaksa mencapai 250, sedangkan batas input aplikasi 200.';}
+      else{status='reference';message='Berada dalam rentang umum udara alami; kesesuaian untuk proyek tetap ditentukan oleh paparan dan data aktual.';}
+      const rangeLabel=key==='form'?'Contoh rata-rata: plywood ≈8,1; baja ≈13,9 W/(m²·°C)':
+        key==='curing'?'Contoh penutup ≈1,7–5,8: EPS 5 cm + sheet ≈1,7; mattress ≈5,2; sheet ≈5,8 W/(m²·°C)':airRange;
+      return {key,label,value:Number.isFinite(value)?value:null,min:covered?null:2,max:covered?null:25,rangeLabel,status,message,instruction,
+        basis:covered?coveredBasis:airBasis,mctValue:Number.isFinite(value)?value*3.6:null};
+    });
+    return {items,limit:{min:0,max:200},referenceValues,
+      note:'Rentang acuan fisik dan nilai contoh tidak menggantikan data proyek. Batas input 0–200 adalah pemeriksaan aplikasi; nilai tidak dipotong atau diubah otomatis. Koefisien diekspor konstan per fungsi; h MCT = 3,6 × h input.',
+      sources:[
+        {title:'NPTEL: kisaran umum koefisien konveksi gas alami dan terpaksa',url:'https://archive.nptel.ac.in/content/storage2/courses/112108149/pdf/M6/M6TeacherSlides.pdf'},
+        {title:'MIDAS: Convection Coefficient Functions, tabel rata-rata Korean Concrete Standard 1996',url:'https://support.midasuser.com/hc/en-us/articles/18297974301337-Convection-Coefficient-Functions'},
+        {title:'FHWA HIPERPAV II: koefisien efektif melalui lapisan, persamaan 26',url:'https://www.fhwa.dot.gov/publications/research/infrastructure/pavements/pccp/04127/alt.cfm'}
+      ]};
+  }
   function cleanConfig(value) {
     const source = value && value.schema ? value.config : value;
     if (!source || typeof source !== 'object' || Array.isArray(source)) throw Error('Format JSON parameter tidak sesuai.');
@@ -640,6 +710,8 @@
     for (const k of Object.keys(DEFAULTS.temperature)) range('temperature',k,-30,100);
     range('heat','K',0,150);range('heat','alpha',0,10,true);
     for (const k of Object.keys(DEFAULTS.convection)) range('convection',k,0,200);
+    for(const item of convectionGuidance(c).items)if(item.status==='review')
+      warnings.push({field:'convection.'+item.key,message:item.label+': '+item.message});
     range('schedule','init',0,24,true);
     for (const k of ['strip','cure','end']) range('schedule',k,0,8760,true);
     for (const k of ['dtEarly','dtMiddle','dtStrip','dtLate']) range('schedule',k,0.05,24);
@@ -882,7 +954,11 @@
     if(c.schedule.end>72)heatTimes.push(...steps(c.schedule.end,2,72));
     heatTimes.push(c.schedule.end+48);
     for(const time of heatTimes)lines.push(`${time.toFixed(6)}, ${heatRise(c,time).toFixed(9)}`);
-    lines.push('','*HYD-CONVCOEF');
+    lines.push('','*HYD-CONVCOEF',
+      '; CONVECTION GUIDE: natural convection (gas) 2-25 W/m2/C; forced convection (gas) 25-250; input guard 0-200.',
+      '; Covered/formwork values need layer resistance and curing data; reference averages are not code limits.');
+    for(const item of convectionGuidance(c).items)
+      lines.push(`; ${item.key}: h=${item.value} W/m2/C; MCT h=${item.mctValue} kJ/m2/hour/C; guidance=${item.status}.`);
     const hv={H_OLD_SIDE:c.convection.oldSide,H_OLD_TOP:c.convection.oldTop,H_FORM:c.convection.form,H_AIR:c.convection.air,H_CURING:c.convection.curing,H_TOP_AIR:c.convection.topAir};
     Object.entries(hv).forEach(([name,value])=>lines.push(`FUNC=${name}, CONST, ${(value*3.6).toFixed(9)}`));
     lines.push('','*HYD-AMBTEMPF',`FUNC=AMBIENT, CONST, ${T.ambient}`,'','*HYD-HEATSRC',`${ranges(oldIds)}, OLD_ZERO`,`${ranges(newIds)}, NEW_ADIABATIC`,'','*HYD-CONBNDR');
@@ -911,7 +987,7 @@
       stats:estimate(c),stages:auditStages,monitors,units:units(c),checks:data.audit,
       config:clone(c),thermal,timeDependent:dependent,nativeMidasTested:false,journalValidated:false};
   }
-  root.MidasEngine={defaults:()=>clone(DEFAULTS),cleanConfig,resolvedThermal,timeDependent,timeDependentCards,hydrationControl,mixMetrics,estimate,validate,crossSection,auditCross,mesh,ranges,stages,units,heatRise,selfWeightCards,build};
+  root.MidasEngine={defaults:()=>clone(DEFAULTS),cleanConfig,resolvedThermal,timeDependent,timeDependentCards,hydrationControl,convectionGuidance,mixMetrics,estimate,validate,crossSection,auditCross,mesh,ranges,stages,units,heatRise,selfWeightCards,build};
   if(typeof module!=='undefined' && module.exports)module.exports=root.MidasEngine;
 })(typeof window!=='undefined'?window:globalThis);
 
@@ -1233,12 +1309,33 @@
     $('validation-summary').textContent=validation.errors.length?validation.errors.length+' perlu diperbaiki':'Input dapat diekspor';
     $('validation-summary').classList.toggle('has-error',!!validation.errors.length);
   }
+  const convectionStatus={reference:'Dalam acuan',review:'Tinjau kondisi',adiabatic:'Adiabatik ideal',invalid:'Perbaiki nilai',custom:'Dasar proyek'};
+  function renderConvectionGuidance(){
+    const table=$('convection-guide-table');table.replaceChildren();
+    try{
+      const guide=E.convectionGuidance(config);
+      $('convection-range-note').textContent=`Batas masukan aplikasi: ${guide.limit.min}–${guide.limit.max} W/(m²·°C). ${guide.note}`;
+      for(const item of guide.items){
+        const status=Object.hasOwn(convectionStatus,item.status)?item.status:'custom';
+        const help=$('convection-help-'+item.key),row=document.createElement('tr');
+        help.textContent=(item.rangeLabel||'Bergantung kondisi konstruksi')+' · '+convectionStatus[status];help.dataset.status=status;
+        row.dataset.key=item.key;row.dataset.status=status;
+        const cells=[item.label,format(item.value,2),format(item.mctValue,2),item.rangeLabel||'Bergantung kondisi konstruksi'];
+        const captions=['Permukaan','h · W/(m²·°C)','MCT · kJ/(m²·jam·°C)','Rentang / kriteria acuan'];
+        for(const [i,text] of cells.entries()){const cell=document.createElement('td');cell.textContent=text;cell.dataset.label=captions[i];row.append(cell);}
+        const detail=document.createElement('td'),badge=document.createElement('strong'),message=document.createElement('span'),instruction=document.createElement('p'),basis=document.createElement('small');
+        badge.className='convection-status';badge.textContent=convectionStatus[status];
+        message.textContent=item.message||'';instruction.textContent=item.instruction||'';basis.textContent='Dasar: '+(item.basis||'Data kondisi proyek diperlukan.');
+        detail.append(badge,message,instruction,basis);row.append(detail);table.append(row);
+      }
+    }catch(error){$('convection-range-note').textContent='Panduan konveksi belum tersedia: '+error.message;}
+  }
   function render(){
     config=read();lastModel=null;const result=E.validate(config);
     fields.forEach(el=>{const bad=result.errors.some(e=>e.field===el.dataset.key);el.setAttribute('aria-invalid',String(bad));});
     $('export-mct').disabled=!!result.errors.length;$('export-json').disabled=!!result.errors.length;$('download-report').disabled=!!result.errors.length;
     const fixed=config.boundary.baseMode==='fixed';document.querySelector('[data-key="temperature.base"]').disabled=!fixed;
-    renderThermal();renderTimeDependent();
+    renderThermal();renderTimeDependent();renderConvectionGuidance();
     const mix=E.mixMetrics(config),stats=E.estimate(config);
     for(const [id,value,digits]of [['metrics-nodes',stats.nodes,0],['metrics-elements',stats.elements,0],['metrics-volume',stats.volume,2],['metrics-wb',mix.wb,3],
       ['mix-wc',mix.wc,3],['mix-wb',mix.wb,3],['mix-binder',mix.binder,1],['mix-total',mix.total,2],['mix-flyash',mix.flyash,1]])$(id).textContent=format(value,digits);
@@ -1256,7 +1353,7 @@
   function download(name,text,type='application/octet-stream'){
     const url=URL.createObjectURL(new Blob([text],{type})),a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);
   }
-  function snapshot(){return {schema:'civil-heat-studio/v1',created_at:new Date().toISOString(),config:structuredClone(config),reference,thermal_calculation:E.resolvedThermal(config),time_dependent_calculation:E.timeDependent(config),
+  function snapshot(){return {schema:'civil-heat-studio/v1',created_at:new Date().toISOString(),config:structuredClone(config),reference,thermal_calculation:E.resolvedThermal(config),time_dependent_calculation:E.timeDependent(config),convection_guidance:E.convectionGuidance(config),
     status:{assumptions:true,native_midas_tested:false,journal_validated:false}};}
   fields.forEach(el=>el.addEventListener('input',()=>{projectStatus();clearTimeout(timer);timer=setTimeout(render,160);}));
   fields.filter(el=>el.tagName==='SELECT').forEach(el=>el.addEventListener('change',()=>{clearTimeout(timer);render();}));
@@ -1353,6 +1450,14 @@
         `DASAR TERMAL: ${config.boundary.baseMode}; tumpuan translasi dasar tetap (idealisasi mekanis).`,
         '','TAHAP:'];
       model.stages.forEach(t=>rows.push(`${t.name}: global ${t.globalStart}-${t.globalEnd}jam; umur baru ${t.newAgeStart}-${t.newAgeEnd}jam; elemen aktif ${t.activeElements}; muka konveksi ${t.convectionFaces}; grup beban aktif ${t.activeLoadGroups.join(', ')}.`));
+      const convection=E.convectionGuidance(config);
+      rows.push('','CONVECTION BOUNDARIES / KRITERIA RANGE DAN PETUNJUK:',
+        `Batas masukan aplikasi ${convection.limit.min}–${convection.limit.max} W/(m2·degC); batas ini berbeda dari rentang acuan fisik.`,convection.note);
+      for(const item of convection.items)rows.push(
+        `${item.label}: h=${item.value} W/(m2·degC) -> ${item.value*3.6} kJ/(m2·jam·degC); acuan=${item.rangeLabel||'bergantung kondisi konstruksi'}; status=${convectionStatus[item.status]||item.status}.`,
+        item.message||'',`Petunjuk: ${item.instruction||''}`,`Dasar: ${item.basis||''}`);
+      rows.push('Radiasi, penguapan, dan elemen bekisting terpisah belum dihitung otomatis. Kalibrasi atau uji sensitivitas sesuai kondisi lapangan.','RUJUKAN KONVEKSI:');
+      convection.sources.forEach(source=>rows.push(`${source.title}\n${source.url}`));
       const td=E.timeDependent(config),p=config.timeDependent;
       rows.push('','MATERIAL BERGANTUNG WAKTU / TIME DEPENDENT MATERIAL:',
         `Status=${td.enabled?'aktif':'nonaktif'}; C&S=${td.creepLabel}; compression strength=${td.strengthLabel}.`,

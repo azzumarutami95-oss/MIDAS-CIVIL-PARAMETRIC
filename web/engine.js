@@ -21,6 +21,49 @@
   const clone = obj => JSON.parse(JSON.stringify(obj));
   const number = x => Number.isFinite(x);
   const faceNodes = [[0,1,2,3],[4,5,6,7],[0,1,5,4],[1,2,6,5],[2,3,7,6],[3,0,4,7]];
+  function convectionGuidance(c) {
+    const conversion=4184/3600;
+    const referenceValues={steel:12*conversion,plywood:7*conversion,sheet:5*conversion,mattress:4.5*conversion,epsSheet:1.5*conversion};
+    const airRange='Udara alami 2–25; udara terpaksa 25–250 W/(m²·°C)';
+    const airBasis='Rentang umum gas dari NPTEL; bukan rentang wajib beton atau hasil kalibrasi proyek.';
+    const coveredBasis='Rata-rata historis Korean Concrete Standard 1996 yang ditampilkan MIDAS; nilai contoh, bukan batas penerimaan.';
+    const definitions=[
+      ['oldSide','Sisi beton lama',false,
+        'H0–H3: pilih sesuai paparan sisi beton lama. Kriteria udara berlaku untuk sisi terbuka; tanah dan perendaman memerlukan model perpindahan panas yang sesuai.'],
+      ['oldTop','Atas lama sebelum cor',false,
+        'H0 saja: sesuaikan dengan paparan permukaan atas sebelum pengecoran baru. Kondisi ini dihentikan pada H1 saat permukaan menjadi sambungan internal.'],
+      ['form','Sisi dengan bekisting',true,
+        'H1 sampai bongkar bekisting: gunakan koefisien efektif berdasarkan bahan, ketebalan, kontak, dan lapisan. Untuk pendekatan 1D, h_eff = 1/(1/h_air + Σd/k); jangan memasukkan tahanan lapisan dua kali.'],
+      ['air','Sisi setelah bongkar',false,
+        'H2–H3: pilih sesuai kondisi angin setelah bekisting dilepas. Nilai di atas rentang udara alami dapat mewakili konveksi terpaksa bila ada dasar kecepatan angin atau kalibrasi.'],
+      ['curing','Atas selama curing',true,
+        'H1–H2 sampai akhir curing: identifikasi sheet, mattress, atau insulasi dan hitung tahanan lapisan bila relevan. Genangan, semprotan, dan evaporasi bukan kasus udara alami yang dapat ditetapkan dari tabel penutup saja.'],
+      ['topAir','Atas setelah curing',false,
+        'H3: gunakan kondisi permukaan atas sesudah penutup dilepas. Orientasi, angin, dan kelembapan aktual dapat berbeda dari sisi pilar.']
+    ];
+    const items=definitions.map(([key,label,covered,instruction])=>{
+      const value=c?.convection?.[key],valid=Number.isFinite(value)&&value>=0&&value<=200;
+      let status,message;
+      if(!valid){status='invalid';message='Nilai harus berupa angka berhingga dari 0 sampai 200 W/(m²·°C).';}
+      else if(value===0){status='adiabatic';message='h = 0 meniadakan fluks konveksi pada permukaan ini; konduksi, sumber panas, dan kondisi batas lain tetap bekerja.';}
+      else if(covered){status='custom';message='Nilai efektif memerlukan data lapisan/kondisi curing atau kalibrasi; tidak ada satu rentang universal untuk semua penutup.';}
+      else if(value<2||value>25){status='review';message=value<2?
+        'Di bawah acuan umum udara alami; periksa shielding, insulasi, atau dasar koefisien efektif yang digunakan.':
+        'Di atas acuan umum udara alami; periksa dasar konveksi terpaksa/angin. Rentang literatur terpaksa mencapai 250, sedangkan batas input aplikasi 200.';}
+      else{status='reference';message='Berada dalam rentang umum udara alami; kesesuaian untuk proyek tetap ditentukan oleh paparan dan data aktual.';}
+      const rangeLabel=key==='form'?'Contoh rata-rata: plywood ≈8,1; baja ≈13,9 W/(m²·°C)':
+        key==='curing'?'Contoh penutup ≈1,7–5,8: EPS 5 cm + sheet ≈1,7; mattress ≈5,2; sheet ≈5,8 W/(m²·°C)':airRange;
+      return {key,label,value:Number.isFinite(value)?value:null,min:covered?null:2,max:covered?null:25,rangeLabel,status,message,instruction,
+        basis:covered?coveredBasis:airBasis,mctValue:Number.isFinite(value)?value*3.6:null};
+    });
+    return {items,limit:{min:0,max:200},referenceValues,
+      note:'Rentang acuan fisik dan nilai contoh tidak menggantikan data proyek. Batas input 0–200 adalah pemeriksaan aplikasi; nilai tidak dipotong atau diubah otomatis. Koefisien diekspor konstan per fungsi; h MCT = 3,6 × h input.',
+      sources:[
+        {title:'NPTEL: kisaran umum koefisien konveksi gas alami dan terpaksa',url:'https://archive.nptel.ac.in/content/storage2/courses/112108149/pdf/M6/M6TeacherSlides.pdf'},
+        {title:'MIDAS: Convection Coefficient Functions, tabel rata-rata Korean Concrete Standard 1996',url:'https://support.midasuser.com/hc/en-us/articles/18297974301337-Convection-Coefficient-Functions'},
+        {title:'FHWA HIPERPAV II: koefisien efektif melalui lapisan, persamaan 26',url:'https://www.fhwa.dot.gov/publications/research/infrastructure/pavements/pccp/04127/alt.cfm'}
+      ]};
+  }
   function cleanConfig(value) {
     const source = value && value.schema ? value.config : value;
     if (!source || typeof source !== 'object' || Array.isArray(source)) throw Error('Format JSON parameter tidak sesuai.');
@@ -89,6 +132,8 @@
     for (const k of Object.keys(DEFAULTS.temperature)) range('temperature',k,-30,100);
     range('heat','K',0,150);range('heat','alpha',0,10,true);
     for (const k of Object.keys(DEFAULTS.convection)) range('convection',k,0,200);
+    for(const item of convectionGuidance(c).items)if(item.status==='review')
+      warnings.push({field:'convection.'+item.key,message:item.label+': '+item.message});
     range('schedule','init',0,24,true);
     for (const k of ['strip','cure','end']) range('schedule',k,0,8760,true);
     for (const k of ['dtEarly','dtMiddle','dtStrip','dtLate']) range('schedule',k,0.05,24);
@@ -331,7 +376,11 @@
     if(c.schedule.end>72)heatTimes.push(...steps(c.schedule.end,2,72));
     heatTimes.push(c.schedule.end+48);
     for(const time of heatTimes)lines.push(`${time.toFixed(6)}, ${heatRise(c,time).toFixed(9)}`);
-    lines.push('','*HYD-CONVCOEF');
+    lines.push('','*HYD-CONVCOEF',
+      '; CONVECTION GUIDE: natural convection (gas) 2-25 W/m2/C; forced convection (gas) 25-250; input guard 0-200.',
+      '; Covered/formwork values need layer resistance and curing data; reference averages are not code limits.');
+    for(const item of convectionGuidance(c).items)
+      lines.push(`; ${item.key}: h=${item.value} W/m2/C; MCT h=${item.mctValue} kJ/m2/hour/C; guidance=${item.status}.`);
     const hv={H_OLD_SIDE:c.convection.oldSide,H_OLD_TOP:c.convection.oldTop,H_FORM:c.convection.form,H_AIR:c.convection.air,H_CURING:c.convection.curing,H_TOP_AIR:c.convection.topAir};
     Object.entries(hv).forEach(([name,value])=>lines.push(`FUNC=${name}, CONST, ${(value*3.6).toFixed(9)}`));
     lines.push('','*HYD-AMBTEMPF',`FUNC=AMBIENT, CONST, ${T.ambient}`,'','*HYD-HEATSRC',`${ranges(oldIds)}, OLD_ZERO`,`${ranges(newIds)}, NEW_ADIABATIC`,'','*HYD-CONBNDR');
@@ -360,6 +409,6 @@
       stats:estimate(c),stages:auditStages,monitors,units:units(c),checks:data.audit,
       config:clone(c),thermal,timeDependent:dependent,nativeMidasTested:false,journalValidated:false};
   }
-  root.MidasEngine={defaults:()=>clone(DEFAULTS),cleanConfig,resolvedThermal,timeDependent,timeDependentCards,hydrationControl,mixMetrics,estimate,validate,crossSection,auditCross,mesh,ranges,stages,units,heatRise,selfWeightCards,build};
+  root.MidasEngine={defaults:()=>clone(DEFAULTS),cleanConfig,resolvedThermal,timeDependent,timeDependentCards,hydrationControl,convectionGuidance,mixMetrics,estimate,validate,crossSection,auditCross,mesh,ranges,stages,units,heatRise,selfWeightCards,build};
   if(typeof module!=='undefined' && module.exports)module.exports=root.MidasEngine;
 })(typeof window!=='undefined'?window:globalThis);
