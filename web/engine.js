@@ -4,13 +4,13 @@
   const Thermal=typeof module!=='undefined'&&module.exports?require('./thermal.js'):root.HydrationThermal;
   const TimeDependent=typeof module!=='undefined'&&module.exports?require('./time-dependent.js'):root.HydrationTimeDependent;
   const DEFAULTS = {
-    geometry: {diameter:7.5, heightOld:4, heightNew:4},
+    geometry: {shape:'circular',diameter:7.5,width:6,depth:4,heightOld:4,heightNew:4},
     material: {fc:30, density:2400, cp:0.9, conductivity:2.4, poisson:0.2, expansion:0.00001},
     temperature: {old:28, pour:30, ambient:28, base:28},
     heat: {K:45, alpha:0.5},
     convection: {oldSide:10, oldTop:10, form:3, air:10, curing:5, topAir:10},
     schedule: {init:1, strip:72, cure:168, end:720, dtEarly:0.5, dtMiddle:1, dtStrip:2, dtLate:6},
-    mesh: {sideDiv:16, radialDiv:8, layersOld:16, layersNew:16},
+    mesh: {sideDiv:16,radialDiv:8,divX:16,divY:16,layersOld:16,layersNew:16},
     mix: {cement:432, flyash:108, water:151, admixture1:2.16, admixture2:8.1, sand:749, gravel:976,
           batchVolume:0.035, sandMoisture:4, gravelMoisture:0.15},
     boundary: {baseMode:'fixed'},
@@ -70,6 +70,8 @@
     if (value.schema && value.schema !== 'civil-heat-studio/v1') throw Error('Versi JSON parameter belum didukung.');
     const result = clone(DEFAULTS);
     const legacyThermal=source.thermal===undefined&&source.thermalComponents===undefined;
+    const legacyGeometry=['shape','width','depth'].every(k=>source.geometry?.[k]===undefined);
+    const legacyRectMesh=source.mesh?.divX===undefined&&source.mesh?.divY===undefined&&(legacyGeometry||source.geometry?.shape==='circular');
     for (const group of Object.keys(DEFAULTS)) {
       if(legacyThermal&&(group==='thermal'||group==='thermalComponents'))continue;
       // Projects saved before SW was introduced inherit the requested load.
@@ -78,6 +80,8 @@
       if(group==='timeDependent'&&source[group]===undefined){result.timeDependent.enabled='no';continue;}
       if (!source[group] || typeof source[group] !== 'object') throw Error('Kelompok parameter tidak lengkap: '+group);
       for (const key of Object.keys(DEFAULTS[group])) {
+        if(group==='geometry'&&legacyGeometry&&['shape','width','depth'].includes(key))continue;
+        if(group==='mesh'&&legacyRectMesh&&['divX','divY'].includes(key))continue;
         const x = source[group][key];
         if (typeof DEFAULTS[group][key] === 'number' ? !number(x) : typeof x !== 'string')
           throw Error('Nilai parameter tidak valid: '+group+'.'+key);
@@ -96,11 +100,18 @@
       sandWater,gravelWater,batchWater:m.water*m.batchVolume-sandWater-gravelWater,
       batchSand:m.sand*m.batchVolume+sandWater,batchGravel:m.gravel*m.batchVolume+gravelWater};
   }
+  function geometryInfo(c) {
+    const g=c.geometry,rect=g.shape==='rectangular',width=rect?g.width:g.diameter,depth=rect?g.depth:g.diameter;
+    const area=rect?width*depth:Math.PI*width*width/4,perimeter=rect?2*(width+depth):Math.PI*width;
+    return {shape:rect?'rectangular':'circular',label:rect?'Rectangular':'Lingkaran',width,depth,halfX:width/2,halfY:depth/2,
+      area,perimeter,notionalSize:2*area/perimeter,volumeSurface:area/perimeter};
+  }
   function estimate(c) {
     const n=c.mesh.sideDiv, r=c.mesh.radialDiv, layers=c.mesh.layersOld+c.mesh.layersNew;
-    const quads=n*n+4*n*r, planeNodes=quads+2*n+1;
+    const rect=c.geometry.shape==='rectangular',quads=rect?c.mesh.divX*c.mesh.divY:n*n+4*n*r,
+      planeNodes=rect?(c.mesh.divX+1)*(c.mesh.divY+1):quads+2*n+1;
     return {quads,planeNodes,layers,elements:quads*layers,nodes:planeNodes*(layers+1),
-      volume:Math.PI*c.geometry.diameter**2/4*(c.geometry.heightOld+c.geometry.heightNew)};
+      volume:geometryInfo(c).area*(c.geometry.heightOld+c.geometry.heightNew)};
   }
   function validate(c) {
     const errors=[],warnings=[];
@@ -110,7 +121,9 @@
       if (!number(v) || (strictMin ? v<=min : v<min) || v>max)
         err(group+'.'+key,`${group}.${key}: nilai harus ${strictMin?'>':'≥'} ${min} dan ≤ ${max}.`);
     }
-    for (const k of ['diameter','heightOld','heightNew']) range('geometry',k,0.1,100);
+    if(!['circular','rectangular'].includes(c.geometry.shape))err('geometry.shape','Bentuk penampang harus circular atau rectangular.');
+    for(const k of ['diameter','width','depth'])if(!number(c.geometry[k]))err('geometry.'+k,'Dimensi geometri harus berupa angka berhingga.');
+    for(const k of ['heightOld','heightNew',...(c.geometry.shape==='rectangular'?['width','depth']:['diameter'])])range('geometry',k,0.1,100);
     range('material','fc',1,120);range('material','density',1000,4000);
     if(!number(c.material.cp))err('material.cp','Nilai manual panas jenis harus berupa angka berhingga.');
     else if(c.thermal.cpMode==='manual')range('material','cp',0.1,3);
@@ -139,11 +152,13 @@
     for (const k of ['dtEarly','dtMiddle','dtStrip','dtLate']) range('schedule',k,0.05,24);
     if (!(c.schedule.strip<c.schedule.cure && c.schedule.cure<c.schedule.end))
       err('schedule.strip','Jadwal harus: bongkar bekisting < akhir curing < akhir analisis.');
-    for (const [key,lo,hi] of [['sideDiv',4,32],['radialDiv',2,24],['layersOld',1,64],['layersNew',1,64]]) {
+    for(const key of Object.keys(DEFAULTS.mesh))if(!number(c.mesh[key]))err('mesh.'+key,'Pembagian mesh harus berupa angka berhingga.');
+    const activeMesh=c.geometry.shape==='rectangular'?[['divX',1,128],['divY',1,128]]:[['sideDiv',4,32],['radialDiv',2,24]];
+    for (const [key,lo,hi] of [...activeMesh,['layersOld',1,64],['layersNew',1,64]]) {
       range('mesh',key,lo,hi);
       if (!Number.isInteger(c.mesh[key])) err('mesh.'+key,'Pembagian mesh harus bilangan bulat.');
     }
-    if (c.mesh.sideDiv%2!==0) err('mesh.sideDiv','Pembagian sisi tengah harus genap agar ada node sumbu.');
+    if (c.geometry.shape==='circular'&&c.mesh.sideDiv%2!==0) err('mesh.sideDiv','Pembagian sisi tengah harus genap agar ada node sumbu.');
     for (const k of ['cement','water','sand','gravel']) range('mix',k,0,3000,true);
     for (const k of ['flyash','admixture1','admixture2']) range('mix',k,0,1500);
     range('mix','batchVolume',0,20,true);
@@ -157,7 +172,7 @@
     const dependentValidation=TimeDependent.validate(c);
     errors.push(...dependentValidation.errors);warnings.push(...dependentValidation.warnings);
     const stats=estimate(c);
-    if (stats.elements>100000 || stats.nodes>125000) err('mesh.sideDiv','Mesh terlalu besar untuk ekspor lokal: batas 100.000 elemen / 125.000 node.');
+    if (stats.elements>100000 || stats.nodes>125000) err(c.geometry.shape==='rectangular'?'mesh.divX':'mesh.sideDiv','Mesh terlalu besar untuk ekspor lokal: batas 100.000 elemen / 125.000 node.');
     if (number(c.schedule.end/c.schedule.dtEarly) && c.schedule.end/Math.min(c.schedule.dtEarly,c.schedule.dtMiddle,c.schedule.dtStrip,c.schedule.dtLate)>20000)
       err('schedule.end','Jadwal terlalu besar; batasi hingga 20.000 langkah perkiraan.');
     const mix=mixMetrics(c);
@@ -179,6 +194,19 @@
   function timeDependentCards(c){return TimeDependent.cards(c);}
   function hydrationControl(c){return TimeDependent.control(c);}
   function crossSection(c) {
+    if(c.geometry.shape==='rectangular'){
+      const {divX:nx,divY:ny}=c.mesh,{width,depth}=c.geometry,xy=[],quads=[],boundary=[];
+      const id=(i,j)=>j*(nx+1)+i;
+      for(let j=0;j<=ny;j++)for(let i=0;i<=nx;i++)xy.push([+(-width/2+width*i/nx).toFixed(10),+(-depth/2+depth*j/ny).toFixed(10)]);
+      for(let j=0;j<ny;j++)for(let i=0;i<nx;i++)quads.push([id(i,j),id(i+1,j),id(i+1,j+1),id(i,j+1)]);
+      for(let i=0;i<=nx;i++)boundary.push(id(i,0));
+      for(let j=1;j<=ny;j++)boundary.push(id(nx,j));
+      for(let i=nx-1;i>=0;i--)boundary.push(id(i,ny));
+      for(let j=ny-1;j>0;j--)boundary.push(id(0,j));
+      const exterior=new Set(boundary),order=boundary.concat(xy.map((_,i)=>i).filter(i=>!exterior.has(i))),inv=[];
+      order.forEach((old,i)=>inv[old]=i);
+      return {xy:order.map(i=>xy[i]),quads:quads.map(q=>q.map(i=>inv[i])),boundaryCount:boundary.length};
+    }
     const n=c.mesh.sideDiv, nr=c.mesh.radialDiv, R=c.geometry.diameter/2, a=.45*R;
     const xy=[],quads=[],lookup=new Map();
     function add(x,y) {
@@ -248,7 +276,8 @@
       else throw Error('Sisi mesh non-manifold.');
     });
     const seen=new Set([0]),stack=[0];while(stack.length){const v=stack.pop();for(const n of adj[v])if(!seen.has(n)){seen.add(n);stack.push(n);}}
-    if(seen.size!==section.quads.length || exterior!==4*c.mesh.sideDiv || used.size!==section.xy.length)throw Error('Mesh terpisah atau memiliki sisi/node tak terhubung.');
+    const expectedExterior=c.geometry.shape==='rectangular'?2*(c.mesh.divX+c.mesh.divY):4*c.mesh.sideDiv;
+    if(seen.size!==section.quads.length || exterior!==expectedExterior || used.size!==section.xy.length)throw Error('Mesh terpisah atau memiliki sisi/node tak terhubung.');
     const volume=area*(c.geometry.heightOld+c.geometry.heightNew);
     return {area,volume,minScaled,minDet,minEdge,maxEdge,maxRatio,sharedInterfaceNodes:section.xy.length,
       volumeDeficitPercent:100*(estimate(c).volume-volume)/estimate(c).volume};
@@ -261,6 +290,15 @@
     const nn=section.xy.length,nq=section.quads.length;
     for(let k=0;k<zlevels.length-1;k++)for(const q of section.quads)cells.push(q.map(i=>i+k*nn).concat(q.map(i=>i+(k+1)*nn)));
     return {nodes,cells,section,audit,zlevels,nn,nq,oldElements:nq*c.mesh.layersOld};
+  }
+  function exteriorEdges(section){
+    const owners=new Map();
+    section.quads.forEach((q,quad)=>q.forEach((a,edge)=>{
+      const b=q[(edge+1)%4],key=Math.min(a,b)+':'+Math.max(a,b);
+      if(!owners.has(key))owners.set(key,[]);
+      owners.get(key).push({quad,face:edge+3});
+    }));
+    return [...owners.values()].filter(x=>x.length===1).map(x=>x[0]).sort((a,b)=>a.quad-b.quad||a.face-b.face);
   }
   function ranges(values) {
     if(!values.length)return '';
@@ -309,13 +347,13 @@
     const allIds=Array.from({length:cells.length},(_,i)=>i+1),oldIds=allIds.slice(0,oldElements),newIds=allIds.slice(oldElements);
     const groups={STAGE1_OLD:{start:1,end:(c.mesh.layersOld+1)*nn,elements:oldIds},STAGE2_NEW:{start:c.mesh.layersOld*nn+1,end:nodes.length,elements:newIds}};
     const surfaces={OLD_SIDE:[],NEW_SIDE:[],OLD_TOP:[],NEW_TOP:[]};
-    const outer=[];
-    data.section.quads.forEach((q,i)=>{if(q[1]<data.section.boundaryCount && q[2]<data.section.boundaryCount)outer.push(i);});
-    if(outer.length!==4*c.mesh.sideDiv)throw Error('Jumlah muka luar tidak sesuai.');
-    for(let k=0;k<data.zlevels.length-1;k++)for(const qi of outer)surfaces[k<c.mesh.layersOld?'OLD_SIDE':'NEW_SIDE'].push(k*nq+qi+1);
-    surfaces.OLD_TOP=Array.from({length:nq},(_,i)=>oldElements-nq+i+1);
-    surfaces.NEW_TOP=Array.from({length:nq},(_,i)=>cells.length-nq+i+1);
-    const bc={OLD_SIDE:['OLD_SIDE','H_OLD_SIDE',4],OLD_TOP:['OLD_TOP','H_OLD_TOP',2],NEW_FORM:['NEW_SIDE','H_FORM',4],NEW_AIR:['NEW_SIDE','H_AIR',4],TOP_CURE:['NEW_TOP','H_CURING',2],TOP_AIR:['NEW_TOP','H_TOP_AIR',2]};
+    const outer=exteriorEdges(data.section);
+    if(outer.length!==data.section.boundaryCount)throw Error('Jumlah muka luar tidak sesuai.');
+    for(let k=0;k<data.zlevels.length-1;k++)for(const edge of outer)
+      surfaces[k<c.mesh.layersOld?'OLD_SIDE':'NEW_SIDE'].push({id:k*nq+edge.quad+1,face:edge.face});
+    surfaces.OLD_TOP=Array.from({length:nq},(_,i)=>({id:oldElements-nq+i+1,face:2}));
+    surfaces.NEW_TOP=Array.from({length:nq},(_,i)=>({id:cells.length-nq+i+1,face:2}));
+    const bc={OLD_SIDE:['OLD_SIDE','H_OLD_SIDE'],OLD_TOP:['OLD_TOP','H_OLD_TOP'],NEW_FORM:['NEW_SIDE','H_FORM'],NEW_AIR:['NEW_SIDE','H_AIR'],TOP_CURE:['NEW_TOP','H_CURING'],TOP_AIR:['NEW_TOP','H_TOP_AIR']};
     // Audit boundary changes using actual element faces at each stage.
     const activeE=new Set(),activeB=new Set(),activeL=new Set(),auditStages=[];let elapsed=0;
     const faceKey=(e,f)=>faceNodes[f-1].map(i=>cells[e-1][i]).sort((a,b)=>a-b).join(':');
@@ -325,9 +363,9 @@
       for(const name of stage.ab){if(activeB.has(name))throw Error('Grup batas aktif dua kali.');activeB.add(name);}
       for(const name of stage.al){if(activeL.has(name))throw Error('Grup beban aktif dua kali.');activeL.add(name);}
       const assigned=new Set();
-      for(const name of activeB){if(!bc[name])continue;const [surface,,face]=bc[name];
+      for(const name of activeB){if(!bc[name])continue;const [surface]=bc[name];
         if(name==='OLD_TOP' && activeE.size>oldElements)throw Error('Konveksi pada sambungan internal.');
-        for(const id of surfaces[surface]){
+        for(const {id,face} of surfaces[surface]){
           if(!activeE.has(id))throw Error('Konveksi pada elemen belum aktif.');
           const key=faceKey(id,face);if(assigned.has(key))throw Error('Konveksi rangkap.');assigned.add(key);
         }
@@ -342,6 +380,7 @@
     const lines=['; CIVIL HEAT STUDIO - ILLUSTRATIVE HEAT OF HYDRATION MODEL',
       '; Offline HTML generator. NOT project calibrated. Native MIDAS import/solver not tested.',
       '; Units N,m,kJ,degC; hydration time HOURS; mass kg.',
+      `; Geometry shape=${c.geometry.shape}; X=${geometryInfo(c).width}m; Y=${geometryInfo(c).depth}m; height=${c.geometry.heightOld+c.geometry.heightNew}m.`,
       '; Old concrete starts mature with ASSUMED initial temperature and zero residual heat.',
       '; No reconstructed pre-existing temperature/stress history. Shared joint: perfect contact.',
       '; Mix information is provenance; it does NOT calibrate heat curve or strength development.',
@@ -384,7 +423,12 @@
     const hv={H_OLD_SIDE:c.convection.oldSide,H_OLD_TOP:c.convection.oldTop,H_FORM:c.convection.form,H_AIR:c.convection.air,H_CURING:c.convection.curing,H_TOP_AIR:c.convection.topAir};
     Object.entries(hv).forEach(([name,value])=>lines.push(`FUNC=${name}, CONST, ${(value*3.6).toFixed(9)}`));
     lines.push('','*HYD-AMBTEMPF',`FUNC=AMBIENT, CONST, ${T.ambient}`,'','*HYD-HEATSRC',`${ranges(oldIds)}, OLD_ZERO`,`${ranges(newIds)}, NEW_ADIABATIC`,'','*HYD-CONBNDR');
-    for(const [name,[surface,func,face]] of Object.entries(bc))for(const chunk of chunks(surfaces[surface]))lines.push(`${chunk}, ${func}, AMBIENT, ${face}, ${name}`);
+    for(const [name,[surface,func]] of Object.entries(bc)){
+      const byFace=new Map();
+      for(const {id,face} of surfaces[surface]){if(!byFace.has(face))byFace.set(face,[]);byFace.get(face).push(id);}
+      for(const [face,ids] of [...byFace].sort((a,b)=>a[0]-b[0]))
+        for(const chunk of chunks(ids))lines.push(`${chunk}, ${func}, AMBIENT, ${face}, ${name}`);
+    }
     lines.push('','*HYD-STAGE','; STEP = cumulative LOCAL stage times in HOURS; no invented AGE field.');
     for(const stage of stageData){
       lines.push(`NAME=${stage.name}, ${stage.temp===null?'NO, 0':`YES, ${stage.temp}`}`);
@@ -398,8 +442,9 @@
       hydrationControl(c),'','*HYD-NODE');
     const monitors=[];
     for(const [name,target] of [['OLD_CORE',[0,0,c.geometry.heightOld/2]],['JOINT_CORE',[0,0,c.geometry.heightOld]],
-      ['NEW_CORE',[0,0,c.geometry.heightOld+c.geometry.heightNew/2]],['NEW_SIDE',[c.geometry.diameter/2,0,c.geometry.heightOld+c.geometry.heightNew/2]],
-      ['NEW_TOP',[0,0,c.geometry.heightOld+c.geometry.heightNew]]]){
+      ['NEW_CORE',[0,0,c.geometry.heightOld+c.geometry.heightNew/2]],['NEW_SIDE',[geometryInfo(c).halfX,0,c.geometry.heightOld+c.geometry.heightNew/2]],
+      ['NEW_TOP',[0,0,c.geometry.heightOld+c.geometry.heightNew]],
+      ...(c.geometry.shape==='rectangular'?[['NEW_SIDE_Y',[0,geometryInfo(c).halfY,c.geometry.heightOld+c.geometry.heightNew/2]]]:[])]){
       let idx=0,dist=Infinity;nodes.forEach((p,i)=>{const d=p.reduce((v,x,k)=>v+(x-target[k])**2,0);if(d<dist){dist=d;idx=i;}});
       monitors.push({name,id:idx+1,coordinates:nodes[idx],target});lines.push(`${name}, ${idx+1}, 3, 0`);
     }
@@ -409,6 +454,6 @@
       stats:estimate(c),stages:auditStages,monitors,units:units(c),checks:data.audit,
       config:clone(c),thermal,timeDependent:dependent,nativeMidasTested:false,journalValidated:false};
   }
-  root.MidasEngine={defaults:()=>clone(DEFAULTS),cleanConfig,resolvedThermal,timeDependent,timeDependentCards,hydrationControl,convectionGuidance,mixMetrics,estimate,validate,crossSection,auditCross,mesh,ranges,stages,units,heatRise,selfWeightCards,build};
+  root.MidasEngine={defaults:()=>clone(DEFAULTS),cleanConfig,geometryInfo,resolvedThermal,timeDependent,timeDependentCards,hydrationControl,convectionGuidance,mixMetrics,estimate,validate,crossSection,auditCross,mesh,ranges,stages,units,heatRise,selfWeightCards,build};
   if(typeof module!=='undefined' && module.exports)module.exports=root.MidasEngine;
 })(typeof window!=='undefined'?window:globalThis);

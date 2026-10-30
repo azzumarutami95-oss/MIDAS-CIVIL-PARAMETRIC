@@ -41,6 +41,10 @@
 @media(max-width:500px){.convection-grid{grid-template-columns:1fr}.convection-field-help{min-height:0}.convection-summary,.convection-instructions{font-size:10px}}
 @media(max-width:650px){.convection-guide-table{display:block;min-width:0}.convection-guide-table thead{display:none}.convection-guide-table tbody{display:block}.convection-guide-table tr{display:grid;grid-template-columns:1fr 1fr;margin:10px 0;border:1px solid #d7e3eb;border-radius:3px;overflow:hidden}.convection-guide-table td{display:block;min-width:0!important;padding:10px 12px;white-space:normal!important;border:0}.convection-guide-table td:first-child{grid-column:1/-1;background:#edf4f9;border-bottom:1px solid #d7e3eb}.convection-guide-table td:nth-child(4),.convection-guide-table td:last-child{grid-column:1/-1}.convection-guide-table td:nth-child(2)::before,.convection-guide-table td:nth-child(3)::before,.convection-guide-table td:nth-child(4)::before{content:attr(data-label);display:block;font-size:9px;color:#7e96a7;margin-bottom:4px;white-space:normal}.convection-guide-table td:last-child{border-top:1px solid #e4edf3}.convection-guide-table td:last-child small{line-height:1.7}}
 
+/* Shape controls retain both sets of dimensions while switching sections. */
+.geometry-shape-field,.geometry-dimensions{margin-bottom:14px}
+[data-geometry-shape][hidden]{display:none!important}
+
 </style></head>
 <body class="nx-app">
 <header class="nx-titlebar" id="overview"><a class="nx-appmark" href="#model" data-workspace="model" aria-label="Civil Hydration model"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 9 5v10l-9 5-9-5V7zM3 7l9 5 9-5M12 12v10"/></svg><span>CIVIL <b>HYDRATION</b><small>NX WORKSPACE</small></span></a><div class="nx-project-title"><span class="project-indicator"></span><span id="project-file-name">Pilar dua tahap</span><strong id="project-dirty" title="Perubahan belum disimpan" aria-label="Perubahan belum disimpan" hidden>*</strong><span class="nx-title-separator">—</span>Heat of Hydration</div><div class="nx-quick-actions"><button id="import-json" type="button" title="Buka parameter JSON">↥ <span>Buka</span></button><button id="export-json" type="button" title="Simpan parameter JSON">▣ <span>Simpan</span></button><button id="save-as" type="button" title="Save As — simpan proyek dengan nama atau lokasi baru (Ctrl+Shift+S)" hidden>▣ <span>Save As</span></button><button id="reset-defaults" type="button" title="Reset ke parameter contoh">↺ <span>Reset</span></button><input type="file" id="import-file" accept=".json,application/json" hidden></div></header>
@@ -48,14 +52,19 @@
 <div class="nx-ribbon-tools"><div class="ribbon-group"><button class="ribbon-command" type="button" data-workspace="model"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 9 5v10l-9 5-9-5V7zM3 7l9 5 9-5M12 12v10"/></svg><span>Solid model</span></button><button class="ribbon-command" type="button" data-workspace="campuran"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M7 5v5l-4 9a2 2 0 0 0 2 3h14a2 2 0 0 0 2-3l-4-9V5M7 15h10M8 2h8"/></svg><span>Mix design</span></button><span class="ribbon-group-label">MODEL INPUT</span></div><div class="ribbon-group"><button class="ribbon-command" type="button" data-workspace="termal"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14V5a3 3 0 0 1 6 0v9a5 5 0 1 1-6 0zM13 7v10"/></svg><span>Thermal & heat</span></button><button class="ribbon-command" type="button" data-workspace="tahapan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h6v4H3zM9 10h6v4H9zM15 15h6v4h-6zM9 7h11M3 12h6M3 17h12"/></svg><span>Stages</span></button><span class="ribbon-group-label">ANALYSIS INPUT</span></div><div class="ribbon-group"><button class="ribbon-command" type="button" data-workspace="ekspor"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 2h9l5 5v15H5zM14 2v6h5M8 12h8M8 16h8"/></svg><span>Check input</span></button><button class="ribbon-command" type="button" id="download-report"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 2h9l5 5v15H5zM14 2v6h5M8 12h8M8 16h8"/></svg><span>Input report</span></button><span class="ribbon-group-label">VALIDATION</span></div><div class="nx-export-group"><span id="save-status" class="save-status" role="status">Tersimpan di browser</span><button class="button button-primary" id="export-mct" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M4 16v5h16v-5"/></svg><span>Unduh .MCT</span></button><small>Periksa impor pada versi NX Anda</small></div></div></div>
 <div class="nx-workbench">
 <aside class="nx-model-tree"><div class="nx-dock-heading"><strong>Model Tree</strong><span>▤</span></div><div class="tree-file"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 2h9l5 5v15H5zM14 2v6h5M8 12h8M8 16h8"/></svg><strong>Pilar_Heat_Hydration</strong></div><nav class="section-nav" aria-label="Pohon model"><details open class="tree-folder"><summary>Model</summary><div class="tree-children"><a href="#model" data-workspace="model" class="is-active"><i class="tree-icon blue">•</i>Nodes<span id="nx-model-node-count">26.433</span></a><a href="#model" data-workspace="model"><i class="tree-icon blue">▦</i>Solid elements<span id="nx-model-element-count">24.576</span></a><a href="#model" data-workspace="model"><i class="tree-icon cyan">◈</i>Geometry & mesh</a></div></details><details open class="tree-folder"><summary>Properties</summary><div class="tree-children"><a href="#campuran" data-workspace="campuran"><i class="tree-icon purple">▤</i>Mix design</a><a href="#material-waktu" data-workspace="material-waktu"><i class="tree-icon purple">◷</i>Creep / shrinkage</a><a href="#material-waktu" data-workspace="material-waktu"><i class="tree-icon blue">↗</i>Comp. strength & link</a><a href="#termal" data-workspace="termal"><i class="tree-icon red">♨</i>Thermal materials</a><a href="#termal" data-workspace="termal"><i class="tree-icon cyan">↗</i>Convection boundaries</a></div></details><details open class="tree-folder"><summary>Loads</summary><div class="tree-children"><a href="#model" data-workspace="model"><i class="tree-icon blue">↓</i>SW · Dead Load</a><a href="#model" data-workspace="model"><i class="tree-icon gray">▤</i>LG_SW</a></div></details><details open class="tree-folder"><summary>Hydration stages</summary><div class="tree-children"><a href="#tahapan" data-workspace="tahapan"><i class="tree-icon gray">■</i>H0 · Old concrete</a><a href="#tahapan" data-workspace="tahapan"><i class="tree-icon orange">■</i>H1 · New placement</a><a href="#tahapan" data-workspace="tahapan"><i class="tree-icon cyan">■</i>H2 · Formwork removal</a><a href="#tahapan" data-workspace="tahapan"><i class="tree-icon blue">■</i>H3 · Cooling</a></div></details><a class="tree-export" href="#ekspor" data-workspace="ekspor"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M4 16v5h16v-5"/></svg>Check & export .MCT</a></nav><div class="nx-tree-note"><span class="tiny-label">INPUT PRESET</span><strong>Data campuran dari foto</strong><p>Beton lama dipertahankan. Beton baru diaktifkan sekali.</p><span class="tree-offline"><i></i>Offline workspace</span></div></aside>
-<main class="nx-workspace"><div class="nx-documentbar"><span><i class="document-square"></i><strong id="nx-active-tab">Model</strong></span><span class="document-subtitle">Pilar dua tahap / hydration input</span><span class="nx-document-state">PARAMETER CONTOH</span></div><div class="metric-grid" aria-label="Ringkasan model"><div class="metric"><span>Nodes</span><strong id="metrics-nodes">26.433</strong></div><div class="metric"><span>Solid HEX8</span><strong id="metrics-elements">24.576</strong></div><div class="metric"><span>Volume ideal</span><strong><span id="metrics-volume">353,43</span><em>m³</em></strong></div><div class="metric"><span>Water / binder</span><strong id="metrics-wb">0,280</strong></div><span class="metric-info">Shared nodes · joint bonded</span></div><div class="nx-content">
+<main class="nx-workspace"><div class="nx-documentbar"><span><i class="document-square"></i><strong id="nx-active-tab">Model</strong></span><span class="document-subtitle" id="geometry-document-subtitle">Pilar lingkaran dua tahap / hydration input</span><span class="nx-document-state">PARAMETER CONTOH</span></div><div class="metric-grid" aria-label="Ringkasan model"><div class="metric"><span>Nodes</span><strong id="metrics-nodes">26.433</strong></div><div class="metric"><span>Solid HEX8</span><strong id="metrics-elements">24.576</strong></div><div class="metric"><span>Volume ideal</span><strong><span id="metrics-volume">353,43</span><em>m³</em></strong></div><div class="metric"><span>Water / binder</span><strong id="metrics-wb">0,280</strong></div><span class="metric-info">Shared nodes · joint bonded</span></div><div class="nx-content">
 <section class="app-section nx-pane" id="model" aria-labelledby="model-title">
         <div class="section-heading"><div><div class="eyebrow">MODEL WORKSPACE</div><h2 id="model-title">Model & properti</h2></div><span class="section-badge">Satuan geometri: meter</span></div>
         <div class="two-column nx-model-split">
           <div class="card nx-properties">
-            <div class="card-heading"><h3>Geometri pilar</h3><span class="quiet-label">Penampang lingkaran solid</span></div>
-            <div class="form-grid three-fields">
-              <label class="field"><span>Diameter pilar</span><span class="input-unit"><input type="number" data-key="geometry.diameter" value="7.5" min="0.1" step="0.1"><span>m</span></span></label>
+            <div class="card-heading"><h3>Geometri pilar</h3><span class="quiet-label" id="geometry-shape-label">Penampang lingkaran solid</span></div>
+            <label class="field geometry-shape-field"><span>Bentuk penampang</span><select data-key="geometry.shape" aria-label="Bentuk penampang"><option value="circular">Lingkaran / circular</option><option value="rectangular">Persegi panjang / rectangular</option></select></label>
+            <div class="form-grid two-fields geometry-dimensions">
+              <label class="field" data-geometry-shape="circular"><span>Diameter pilar</span><span class="input-unit"><input type="number" data-key="geometry.diameter" value="7.5" min="0.1" max="100" step="0.1"><span>m</span></span></label>
+              <label class="field" data-geometry-shape="rectangular" hidden><span>Lebar B · arah X</span><span class="input-unit"><input type="number" data-key="geometry.width" value="6" min="0.1" max="100" step="0.1" aria-label="Lebar rectangular arah X"><span>m</span></span></label>
+              <label class="field" data-geometry-shape="rectangular" hidden><span>Panjang L · arah Y</span><span class="input-unit"><input type="number" data-key="geometry.depth" value="4" min="0.1" max="100" step="0.1" aria-label="Panjang rectangular arah Y"><span>m</span></span></label>
+            </div>
+            <div class="form-grid two-fields">
               <label class="field"><span>Tinggi beton lama</span><span class="input-unit"><input type="number" data-key="geometry.heightOld" value="4" min="0.1" step="0.1"><span>m</span></span></label>
               <label class="field"><span>Tinggi beton baru</span><span class="input-unit"><input type="number" data-key="geometry.heightNew" value="4" min="0.1" step="0.1"><span>m</span></span></label>
             </div>
@@ -77,15 +86,17 @@
             <p class="field-help">SW aktif sejak awal H0 dan tetap aktif saat beton baru diaktifkan pada H1. Berat sendiri otomatis analisis hidrasi dinonaktifkan agar tidak dihitung ganda.</p>
             <div class="subsection-heading">Kerapatan mesh</div>
             <div class="form-grid two-fields">
-              <label class="field"><span>Pembagian per sisi blok pusat</span><input type="number" data-key="mesh.sideDiv" value="16" min="4" max="32" step="2"></label>
-              <label class="field"><span>Pembagian radial luar</span><input type="number" data-key="mesh.radialDiv" value="8" min="2" max="24" step="1"></label>
+              <label class="field" data-geometry-shape="circular"><span>Pembagian per sisi blok pusat</span><input type="number" data-key="mesh.sideDiv" value="16" min="4" max="32" step="2"></label>
+              <label class="field" data-geometry-shape="circular"><span>Pembagian radial luar</span><input type="number" data-key="mesh.radialDiv" value="8" min="2" max="24" step="1"></label>
+              <label class="field" data-geometry-shape="rectangular" hidden><span>Pembagian mesh arah X</span><input type="number" data-key="mesh.divX" value="16" min="1" max="128" step="1" aria-label="Pembagian mesh rectangular arah X"></label>
+              <label class="field" data-geometry-shape="rectangular" hidden><span>Pembagian mesh arah Y</span><input type="number" data-key="mesh.divY" value="16" min="1" max="128" step="1" aria-label="Pembagian mesh rectangular arah Y"></label>
               <label class="field"><span>Lapis vertikal beton lama</span><input type="number" data-key="mesh.layersOld" value="16" min="1" max="64" step="1"></label>
               <label class="field"><span>Lapis vertikal beton baru</span><input type="number" data-key="mesh.layersNew" value="16" min="1" max="64" step="1"></label>
             </div>
-            <div class="inline-note"><span class="note-symbol" aria-hidden="true">↳</span><p>Mesh 5 blok menjaga elemen di pusat tetap berbentuk hexahedral. Kedua segmen berbagi node pada sambungan.</p></div>
+            <div class="inline-note"><span class="note-symbol" aria-hidden="true">↳</span><p id="geometry-mesh-note">Mesh lingkaran memakai 5 blok HEX8. Kedua segmen berbagi node pada sambungan.</p></div>
           </div>
           <div class="card preview-card nx-viewport">
-  <div class="nx-viewport-top"><div><span class="viewport-dot"></span><strong>Pilar dua tahap</strong><span class="viewport-file">/ solid model</span></div><span id="nx-view-caption">Isometric · seluruh model</span></div>
+  <div class="nx-viewport-top"><div><span class="viewport-dot"></span><strong id="geometry-view-title">Pilar lingkaran dua tahap</strong><span class="viewport-file">/ solid model</span></div><span id="nx-view-caption">Isometric · seluruh model</span></div>
   <div class="viewport-toolbar" aria-label="Kontrol tampilan model">
     <div class="segmented-control"><button type="button" data-nx-view="iso" class="is-active" aria-pressed="true">ISO</button><button type="button" data-nx-view="front" aria-pressed="false">Depan</button><button type="button" data-nx-view="top" aria-pressed="false">Atas</button></div>
     <button class="viewport-tool" id="nx-fit-view" type="button" title="Sesuaikan model ke viewport">⛶ <span>Fit view</span></button>
@@ -93,7 +104,7 @@
     <label class="viewport-stage"><span>Tampilkan</span><select id="nx-stage-select" aria-label="Segmen model yang ditampilkan"><option value="all">Seluruh model</option><option value="old">Beton lama</option><option value="new">Beton baru</option></select></label>
   </div>
   <div class="mesh-side-wrap nx-model-canvas"><svg id="mesh-side" viewBox="0 0 900 600" role="img" aria-label="Viewport model solid pilar dengan navigasi tiga dimensi"></svg></div>
-  <div class="nx-plan-inset"><span>PENAMPANG</span><div class="mesh-plan-wrap"><svg id="mesh-plan" viewBox="0 0 360 360" role="img" aria-label="Mesh penampang lingkaran lima blok"></svg></div></div>
+  <div class="nx-plan-inset"><span>PENAMPANG</span><div class="mesh-plan-wrap"><svg id="mesh-plan" viewBox="0 0 360 360" role="img" aria-label="Mesh penampang pilar"></svg></div></div>
 
   <div class="nx-canvas-help"><span>Drag: orbit</span><span>Scroll: zoom</span><span>Shift + drag: pan</span></div>
   <div class="preview-legend"><span><i class="dot dot-gray"></i> Beton lama · umur &gt;2 bulan</span><span><i class="dot dot-orange"></i> Beton baru</span></div>
@@ -132,7 +143,7 @@
   <div class="two-column td-columns">
     <div class="card"><div class="card-heading"><div><h3>Creep & shrinkage · C&S</h3><p class="card-subtitle" id="td-cs-label">CEB-FIP 1990</p></div><span class="code-badge">TDM-TYPE</span></div>
       <div class="form-grid two-fields"><label class="field"><span>Model C&S</span><select data-key="timeDependent.creepModel"><option value="ACI">ACI 209(1982)</option><option value="CEB1990">CEB-FIP 1990</option><option value="AASHTO2006">AASHTO LRFD 2006</option><option value="USER">User / custom jobmix</option></select></label><label class="field"><span>Jenis semen CEB-FIP</span><select data-key="timeDependent.cementType"><option value="RS">RS · pengerasan cepat, kuat awal tinggi</option><option value="NR">NR · semen normal / cepat</option><option value="SL">SL · pengerasan lambat</option></select></label></div>
-      <p class="field-help"><button id="td-use-geometry" class="button button-secondary td-inline-button" type="button">Isi ukuran dari diameter pilar</button> h = D/2 dan V/S = D/4 untuk silinder prismatis dengan paparan sisi saja; muka ujung diabaikan. Periksa paparan efektif.</p><div class="form-grid two-fields" id="td-cs-common"><label class="field"><span>Kelembapan relatif</span><span class="input-unit"><input type="number" data-key="timeDependent.humidity" step="1"><span>%</span></span></label><label class="field"><span>Umur mulai shrinkage</span><span class="input-unit"><input type="number" data-key="timeDependent.shrinkageAge" step="0.5"><span>hari</span></span></label></div>
+      <p class="field-help"><button id="td-use-geometry" class="button button-secondary td-inline-button" type="button">Isi ukuran dari penampang aktif</button> <span id="td-geometry-formula">h = D/2 dan V/S = D/4 untuk silinder prismatis dengan paparan sisi saja; muka ujung diabaikan.</span> Periksa paparan efektif.</p><div class="form-grid two-fields" id="td-cs-common"><label class="field"><span>Kelembapan relatif</span><span class="input-unit"><input type="number" data-key="timeDependent.humidity" step="1"><span>%</span></span></label><label class="field"><span>Umur mulai shrinkage</span><span class="input-unit"><input type="number" data-key="timeDependent.shrinkageAge" step="0.5"><span>hari</span></span></label></div>
       <div class="form-grid two-fields" id="td-cs-ceb"><label class="field"><span>Ukuran nosional h = 2V/S</span><span class="input-unit"><input type="number" data-key="timeDependent.notionalSize" step="0.01"><span>m</span></span></label><p class="field-help">Ukuran penampang harus sesuai permukaan yang benar-benar terpapar. Ukuran contoh mengabaikan kedua muka ujung; nilai tidak otomatis mengikuti perubahan geometri.</p></div>
       <div class="form-grid two-fields" id="td-cs-volume"><label class="field"><span>Rasio volume / permukaan V/S</span><span class="input-unit"><input type="number" data-key="timeDependent.volumeSurface" step="0.01"><span>m</span></span></label><label class="field"><span>Kondisi paparan AASHTO</span><select data-key="timeDependent.aashtoExposed"><option value="no">Kondisi umum</option><option value="yes">Terpapar sesuai opsi kode</option></select></label></div>
       <div id="td-cs-aci"><div class="subsection-heading">Parameter ACI</div><div class="form-grid two-fields"><label class="field"><span>Metode curing</span><select data-key="timeDependent.aciCuring"><option value="MOIST">Moist cure</option><option value="STEAM">Steam cure</option></select></label><label class="field"><span>Nilai ultimit C&S</span><select data-key="timeDependent.aciUltimate"><option value="CODE">Hitung dari parameter ACI</option><option value="USER">User · masukkan nilai ultimit</option></select></label><label class="field"><span>Sumber kandungan semen</span><select data-key="timeDependent.aciMixSource"><option value="jobmix">Dari Mix Design aktif</option><option value="manual">Input manual</option></select></label><label class="field"><span>Kandungan semen manual</span><span class="input-unit"><input type="number" data-key="timeDependent.aciCementContent" step="1"><span>kg/m³</span></span></label><label class="field"><span>Slump</span><span class="input-unit"><input type="number" data-key="timeDependent.aciSlump" step="5"><span>mm</span></span></label><label class="field"><span>Agregat halus / agregat total</span><span class="input-unit"><input type="number" data-key="timeDependent.aciFineAggregate" step="0.1"><span>%</span></span></label><label class="field"><span>Kadar udara</span><span class="input-unit"><input type="number" data-key="timeDependent.aciAir" step="0.1"><span>%</span></span></label><p class="field-help">Semen yang dipakai: <strong id="td-cement-active">432 kg/m³</strong>. Mengganti jobmix tidak mengkalibrasi fungsi creep atau shrinkage secara otomatis.</p></div>
@@ -582,13 +593,13 @@
   const Thermal=typeof module!=='undefined'&&module.exports?require('./thermal.js'):root.HydrationThermal;
   const TimeDependent=typeof module!=='undefined'&&module.exports?require('./time-dependent.js'):root.HydrationTimeDependent;
   const DEFAULTS = {
-    geometry: {diameter:7.5, heightOld:4, heightNew:4},
+    geometry: {shape:'circular',diameter:7.5,width:6,depth:4,heightOld:4,heightNew:4},
     material: {fc:30, density:2400, cp:0.9, conductivity:2.4, poisson:0.2, expansion:0.00001},
     temperature: {old:28, pour:30, ambient:28, base:28},
     heat: {K:45, alpha:0.5},
     convection: {oldSide:10, oldTop:10, form:3, air:10, curing:5, topAir:10},
     schedule: {init:1, strip:72, cure:168, end:720, dtEarly:0.5, dtMiddle:1, dtStrip:2, dtLate:6},
-    mesh: {sideDiv:16, radialDiv:8, layersOld:16, layersNew:16},
+    mesh: {sideDiv:16,radialDiv:8,divX:16,divY:16,layersOld:16,layersNew:16},
     mix: {cement:432, flyash:108, water:151, admixture1:2.16, admixture2:8.1, sand:749, gravel:976,
           batchVolume:0.035, sandMoisture:4, gravelMoisture:0.15},
     boundary: {baseMode:'fixed'},
@@ -648,6 +659,8 @@
     if (value.schema && value.schema !== 'civil-heat-studio/v1') throw Error('Versi JSON parameter belum didukung.');
     const result = clone(DEFAULTS);
     const legacyThermal=source.thermal===undefined&&source.thermalComponents===undefined;
+    const legacyGeometry=['shape','width','depth'].every(k=>source.geometry?.[k]===undefined);
+    const legacyRectMesh=source.mesh?.divX===undefined&&source.mesh?.divY===undefined&&(legacyGeometry||source.geometry?.shape==='circular');
     for (const group of Object.keys(DEFAULTS)) {
       if(legacyThermal&&(group==='thermal'||group==='thermalComponents'))continue;
       // Projects saved before SW was introduced inherit the requested load.
@@ -656,6 +669,8 @@
       if(group==='timeDependent'&&source[group]===undefined){result.timeDependent.enabled='no';continue;}
       if (!source[group] || typeof source[group] !== 'object') throw Error('Kelompok parameter tidak lengkap: '+group);
       for (const key of Object.keys(DEFAULTS[group])) {
+        if(group==='geometry'&&legacyGeometry&&['shape','width','depth'].includes(key))continue;
+        if(group==='mesh'&&legacyRectMesh&&['divX','divY'].includes(key))continue;
         const x = source[group][key];
         if (typeof DEFAULTS[group][key] === 'number' ? !number(x) : typeof x !== 'string')
           throw Error('Nilai parameter tidak valid: '+group+'.'+key);
@@ -674,11 +689,18 @@
       sandWater,gravelWater,batchWater:m.water*m.batchVolume-sandWater-gravelWater,
       batchSand:m.sand*m.batchVolume+sandWater,batchGravel:m.gravel*m.batchVolume+gravelWater};
   }
+  function geometryInfo(c) {
+    const g=c.geometry,rect=g.shape==='rectangular',width=rect?g.width:g.diameter,depth=rect?g.depth:g.diameter;
+    const area=rect?width*depth:Math.PI*width*width/4,perimeter=rect?2*(width+depth):Math.PI*width;
+    return {shape:rect?'rectangular':'circular',label:rect?'Rectangular':'Lingkaran',width,depth,halfX:width/2,halfY:depth/2,
+      area,perimeter,notionalSize:2*area/perimeter,volumeSurface:area/perimeter};
+  }
   function estimate(c) {
     const n=c.mesh.sideDiv, r=c.mesh.radialDiv, layers=c.mesh.layersOld+c.mesh.layersNew;
-    const quads=n*n+4*n*r, planeNodes=quads+2*n+1;
+    const rect=c.geometry.shape==='rectangular',quads=rect?c.mesh.divX*c.mesh.divY:n*n+4*n*r,
+      planeNodes=rect?(c.mesh.divX+1)*(c.mesh.divY+1):quads+2*n+1;
     return {quads,planeNodes,layers,elements:quads*layers,nodes:planeNodes*(layers+1),
-      volume:Math.PI*c.geometry.diameter**2/4*(c.geometry.heightOld+c.geometry.heightNew)};
+      volume:geometryInfo(c).area*(c.geometry.heightOld+c.geometry.heightNew)};
   }
   function validate(c) {
     const errors=[],warnings=[];
@@ -688,7 +710,9 @@
       if (!number(v) || (strictMin ? v<=min : v<min) || v>max)
         err(group+'.'+key,`${group}.${key}: nilai harus ${strictMin?'>':'≥'} ${min} dan ≤ ${max}.`);
     }
-    for (const k of ['diameter','heightOld','heightNew']) range('geometry',k,0.1,100);
+    if(!['circular','rectangular'].includes(c.geometry.shape))err('geometry.shape','Bentuk penampang harus circular atau rectangular.');
+    for(const k of ['diameter','width','depth'])if(!number(c.geometry[k]))err('geometry.'+k,'Dimensi geometri harus berupa angka berhingga.');
+    for(const k of ['heightOld','heightNew',...(c.geometry.shape==='rectangular'?['width','depth']:['diameter'])])range('geometry',k,0.1,100);
     range('material','fc',1,120);range('material','density',1000,4000);
     if(!number(c.material.cp))err('material.cp','Nilai manual panas jenis harus berupa angka berhingga.');
     else if(c.thermal.cpMode==='manual')range('material','cp',0.1,3);
@@ -717,11 +741,13 @@
     for (const k of ['dtEarly','dtMiddle','dtStrip','dtLate']) range('schedule',k,0.05,24);
     if (!(c.schedule.strip<c.schedule.cure && c.schedule.cure<c.schedule.end))
       err('schedule.strip','Jadwal harus: bongkar bekisting < akhir curing < akhir analisis.');
-    for (const [key,lo,hi] of [['sideDiv',4,32],['radialDiv',2,24],['layersOld',1,64],['layersNew',1,64]]) {
+    for(const key of Object.keys(DEFAULTS.mesh))if(!number(c.mesh[key]))err('mesh.'+key,'Pembagian mesh harus berupa angka berhingga.');
+    const activeMesh=c.geometry.shape==='rectangular'?[['divX',1,128],['divY',1,128]]:[['sideDiv',4,32],['radialDiv',2,24]];
+    for (const [key,lo,hi] of [...activeMesh,['layersOld',1,64],['layersNew',1,64]]) {
       range('mesh',key,lo,hi);
       if (!Number.isInteger(c.mesh[key])) err('mesh.'+key,'Pembagian mesh harus bilangan bulat.');
     }
-    if (c.mesh.sideDiv%2!==0) err('mesh.sideDiv','Pembagian sisi tengah harus genap agar ada node sumbu.');
+    if (c.geometry.shape==='circular'&&c.mesh.sideDiv%2!==0) err('mesh.sideDiv','Pembagian sisi tengah harus genap agar ada node sumbu.');
     for (const k of ['cement','water','sand','gravel']) range('mix',k,0,3000,true);
     for (const k of ['flyash','admixture1','admixture2']) range('mix',k,0,1500);
     range('mix','batchVolume',0,20,true);
@@ -735,7 +761,7 @@
     const dependentValidation=TimeDependent.validate(c);
     errors.push(...dependentValidation.errors);warnings.push(...dependentValidation.warnings);
     const stats=estimate(c);
-    if (stats.elements>100000 || stats.nodes>125000) err('mesh.sideDiv','Mesh terlalu besar untuk ekspor lokal: batas 100.000 elemen / 125.000 node.');
+    if (stats.elements>100000 || stats.nodes>125000) err(c.geometry.shape==='rectangular'?'mesh.divX':'mesh.sideDiv','Mesh terlalu besar untuk ekspor lokal: batas 100.000 elemen / 125.000 node.');
     if (number(c.schedule.end/c.schedule.dtEarly) && c.schedule.end/Math.min(c.schedule.dtEarly,c.schedule.dtMiddle,c.schedule.dtStrip,c.schedule.dtLate)>20000)
       err('schedule.end','Jadwal terlalu besar; batasi hingga 20.000 langkah perkiraan.');
     const mix=mixMetrics(c);
@@ -757,6 +783,19 @@
   function timeDependentCards(c){return TimeDependent.cards(c);}
   function hydrationControl(c){return TimeDependent.control(c);}
   function crossSection(c) {
+    if(c.geometry.shape==='rectangular'){
+      const {divX:nx,divY:ny}=c.mesh,{width,depth}=c.geometry,xy=[],quads=[],boundary=[];
+      const id=(i,j)=>j*(nx+1)+i;
+      for(let j=0;j<=ny;j++)for(let i=0;i<=nx;i++)xy.push([+(-width/2+width*i/nx).toFixed(10),+(-depth/2+depth*j/ny).toFixed(10)]);
+      for(let j=0;j<ny;j++)for(let i=0;i<nx;i++)quads.push([id(i,j),id(i+1,j),id(i+1,j+1),id(i,j+1)]);
+      for(let i=0;i<=nx;i++)boundary.push(id(i,0));
+      for(let j=1;j<=ny;j++)boundary.push(id(nx,j));
+      for(let i=nx-1;i>=0;i--)boundary.push(id(i,ny));
+      for(let j=ny-1;j>0;j--)boundary.push(id(0,j));
+      const exterior=new Set(boundary),order=boundary.concat(xy.map((_,i)=>i).filter(i=>!exterior.has(i))),inv=[];
+      order.forEach((old,i)=>inv[old]=i);
+      return {xy:order.map(i=>xy[i]),quads:quads.map(q=>q.map(i=>inv[i])),boundaryCount:boundary.length};
+    }
     const n=c.mesh.sideDiv, nr=c.mesh.radialDiv, R=c.geometry.diameter/2, a=.45*R;
     const xy=[],quads=[],lookup=new Map();
     function add(x,y) {
@@ -826,7 +865,8 @@
       else throw Error('Sisi mesh non-manifold.');
     });
     const seen=new Set([0]),stack=[0];while(stack.length){const v=stack.pop();for(const n of adj[v])if(!seen.has(n)){seen.add(n);stack.push(n);}}
-    if(seen.size!==section.quads.length || exterior!==4*c.mesh.sideDiv || used.size!==section.xy.length)throw Error('Mesh terpisah atau memiliki sisi/node tak terhubung.');
+    const expectedExterior=c.geometry.shape==='rectangular'?2*(c.mesh.divX+c.mesh.divY):4*c.mesh.sideDiv;
+    if(seen.size!==section.quads.length || exterior!==expectedExterior || used.size!==section.xy.length)throw Error('Mesh terpisah atau memiliki sisi/node tak terhubung.');
     const volume=area*(c.geometry.heightOld+c.geometry.heightNew);
     return {area,volume,minScaled,minDet,minEdge,maxEdge,maxRatio,sharedInterfaceNodes:section.xy.length,
       volumeDeficitPercent:100*(estimate(c).volume-volume)/estimate(c).volume};
@@ -839,6 +879,15 @@
     const nn=section.xy.length,nq=section.quads.length;
     for(let k=0;k<zlevels.length-1;k++)for(const q of section.quads)cells.push(q.map(i=>i+k*nn).concat(q.map(i=>i+(k+1)*nn)));
     return {nodes,cells,section,audit,zlevels,nn,nq,oldElements:nq*c.mesh.layersOld};
+  }
+  function exteriorEdges(section){
+    const owners=new Map();
+    section.quads.forEach((q,quad)=>q.forEach((a,edge)=>{
+      const b=q[(edge+1)%4],key=Math.min(a,b)+':'+Math.max(a,b);
+      if(!owners.has(key))owners.set(key,[]);
+      owners.get(key).push({quad,face:edge+3});
+    }));
+    return [...owners.values()].filter(x=>x.length===1).map(x=>x[0]).sort((a,b)=>a.quad-b.quad||a.face-b.face);
   }
   function ranges(values) {
     if(!values.length)return '';
@@ -887,13 +936,13 @@
     const allIds=Array.from({length:cells.length},(_,i)=>i+1),oldIds=allIds.slice(0,oldElements),newIds=allIds.slice(oldElements);
     const groups={STAGE1_OLD:{start:1,end:(c.mesh.layersOld+1)*nn,elements:oldIds},STAGE2_NEW:{start:c.mesh.layersOld*nn+1,end:nodes.length,elements:newIds}};
     const surfaces={OLD_SIDE:[],NEW_SIDE:[],OLD_TOP:[],NEW_TOP:[]};
-    const outer=[];
-    data.section.quads.forEach((q,i)=>{if(q[1]<data.section.boundaryCount && q[2]<data.section.boundaryCount)outer.push(i);});
-    if(outer.length!==4*c.mesh.sideDiv)throw Error('Jumlah muka luar tidak sesuai.');
-    for(let k=0;k<data.zlevels.length-1;k++)for(const qi of outer)surfaces[k<c.mesh.layersOld?'OLD_SIDE':'NEW_SIDE'].push(k*nq+qi+1);
-    surfaces.OLD_TOP=Array.from({length:nq},(_,i)=>oldElements-nq+i+1);
-    surfaces.NEW_TOP=Array.from({length:nq},(_,i)=>cells.length-nq+i+1);
-    const bc={OLD_SIDE:['OLD_SIDE','H_OLD_SIDE',4],OLD_TOP:['OLD_TOP','H_OLD_TOP',2],NEW_FORM:['NEW_SIDE','H_FORM',4],NEW_AIR:['NEW_SIDE','H_AIR',4],TOP_CURE:['NEW_TOP','H_CURING',2],TOP_AIR:['NEW_TOP','H_TOP_AIR',2]};
+    const outer=exteriorEdges(data.section);
+    if(outer.length!==data.section.boundaryCount)throw Error('Jumlah muka luar tidak sesuai.');
+    for(let k=0;k<data.zlevels.length-1;k++)for(const edge of outer)
+      surfaces[k<c.mesh.layersOld?'OLD_SIDE':'NEW_SIDE'].push({id:k*nq+edge.quad+1,face:edge.face});
+    surfaces.OLD_TOP=Array.from({length:nq},(_,i)=>({id:oldElements-nq+i+1,face:2}));
+    surfaces.NEW_TOP=Array.from({length:nq},(_,i)=>({id:cells.length-nq+i+1,face:2}));
+    const bc={OLD_SIDE:['OLD_SIDE','H_OLD_SIDE'],OLD_TOP:['OLD_TOP','H_OLD_TOP'],NEW_FORM:['NEW_SIDE','H_FORM'],NEW_AIR:['NEW_SIDE','H_AIR'],TOP_CURE:['NEW_TOP','H_CURING'],TOP_AIR:['NEW_TOP','H_TOP_AIR']};
     // Audit boundary changes using actual element faces at each stage.
     const activeE=new Set(),activeB=new Set(),activeL=new Set(),auditStages=[];let elapsed=0;
     const faceKey=(e,f)=>faceNodes[f-1].map(i=>cells[e-1][i]).sort((a,b)=>a-b).join(':');
@@ -903,9 +952,9 @@
       for(const name of stage.ab){if(activeB.has(name))throw Error('Grup batas aktif dua kali.');activeB.add(name);}
       for(const name of stage.al){if(activeL.has(name))throw Error('Grup beban aktif dua kali.');activeL.add(name);}
       const assigned=new Set();
-      for(const name of activeB){if(!bc[name])continue;const [surface,,face]=bc[name];
+      for(const name of activeB){if(!bc[name])continue;const [surface]=bc[name];
         if(name==='OLD_TOP' && activeE.size>oldElements)throw Error('Konveksi pada sambungan internal.');
-        for(const id of surfaces[surface]){
+        for(const {id,face} of surfaces[surface]){
           if(!activeE.has(id))throw Error('Konveksi pada elemen belum aktif.');
           const key=faceKey(id,face);if(assigned.has(key))throw Error('Konveksi rangkap.');assigned.add(key);
         }
@@ -920,6 +969,7 @@
     const lines=['; CIVIL HEAT STUDIO - ILLUSTRATIVE HEAT OF HYDRATION MODEL',
       '; Offline HTML generator. NOT project calibrated. Native MIDAS import/solver not tested.',
       '; Units N,m,kJ,degC; hydration time HOURS; mass kg.',
+      `; Geometry shape=${c.geometry.shape}; X=${geometryInfo(c).width}m; Y=${geometryInfo(c).depth}m; height=${c.geometry.heightOld+c.geometry.heightNew}m.`,
       '; Old concrete starts mature with ASSUMED initial temperature and zero residual heat.',
       '; No reconstructed pre-existing temperature/stress history. Shared joint: perfect contact.',
       '; Mix information is provenance; it does NOT calibrate heat curve or strength development.',
@@ -962,7 +1012,12 @@
     const hv={H_OLD_SIDE:c.convection.oldSide,H_OLD_TOP:c.convection.oldTop,H_FORM:c.convection.form,H_AIR:c.convection.air,H_CURING:c.convection.curing,H_TOP_AIR:c.convection.topAir};
     Object.entries(hv).forEach(([name,value])=>lines.push(`FUNC=${name}, CONST, ${(value*3.6).toFixed(9)}`));
     lines.push('','*HYD-AMBTEMPF',`FUNC=AMBIENT, CONST, ${T.ambient}`,'','*HYD-HEATSRC',`${ranges(oldIds)}, OLD_ZERO`,`${ranges(newIds)}, NEW_ADIABATIC`,'','*HYD-CONBNDR');
-    for(const [name,[surface,func,face]] of Object.entries(bc))for(const chunk of chunks(surfaces[surface]))lines.push(`${chunk}, ${func}, AMBIENT, ${face}, ${name}`);
+    for(const [name,[surface,func]] of Object.entries(bc)){
+      const byFace=new Map();
+      for(const {id,face} of surfaces[surface]){if(!byFace.has(face))byFace.set(face,[]);byFace.get(face).push(id);}
+      for(const [face,ids] of [...byFace].sort((a,b)=>a[0]-b[0]))
+        for(const chunk of chunks(ids))lines.push(`${chunk}, ${func}, AMBIENT, ${face}, ${name}`);
+    }
     lines.push('','*HYD-STAGE','; STEP = cumulative LOCAL stage times in HOURS; no invented AGE field.');
     for(const stage of stageData){
       lines.push(`NAME=${stage.name}, ${stage.temp===null?'NO, 0':`YES, ${stage.temp}`}`);
@@ -976,8 +1031,9 @@
       hydrationControl(c),'','*HYD-NODE');
     const monitors=[];
     for(const [name,target] of [['OLD_CORE',[0,0,c.geometry.heightOld/2]],['JOINT_CORE',[0,0,c.geometry.heightOld]],
-      ['NEW_CORE',[0,0,c.geometry.heightOld+c.geometry.heightNew/2]],['NEW_SIDE',[c.geometry.diameter/2,0,c.geometry.heightOld+c.geometry.heightNew/2]],
-      ['NEW_TOP',[0,0,c.geometry.heightOld+c.geometry.heightNew]]]){
+      ['NEW_CORE',[0,0,c.geometry.heightOld+c.geometry.heightNew/2]],['NEW_SIDE',[geometryInfo(c).halfX,0,c.geometry.heightOld+c.geometry.heightNew/2]],
+      ['NEW_TOP',[0,0,c.geometry.heightOld+c.geometry.heightNew]],
+      ...(c.geometry.shape==='rectangular'?[['NEW_SIDE_Y',[0,geometryInfo(c).halfY,c.geometry.heightOld+c.geometry.heightNew/2]]]:[])]){
       let idx=0,dist=Infinity;nodes.forEach((p,i)=>{const d=p.reduce((v,x,k)=>v+(x-target[k])**2,0);if(d<dist){dist=d;idx=i;}});
       monitors.push({name,id:idx+1,coordinates:nodes[idx],target});lines.push(`${name}, ${idx+1}, 3, 0`);
     }
@@ -987,7 +1043,7 @@
       stats:estimate(c),stages:auditStages,monitors,units:units(c),checks:data.audit,
       config:clone(c),thermal,timeDependent:dependent,nativeMidasTested:false,journalValidated:false};
   }
-  root.MidasEngine={defaults:()=>clone(DEFAULTS),cleanConfig,resolvedThermal,timeDependent,timeDependentCards,hydrationControl,convectionGuidance,mixMetrics,estimate,validate,crossSection,auditCross,mesh,ranges,stages,units,heatRise,selfWeightCards,build};
+  root.MidasEngine={defaults:()=>clone(DEFAULTS),cleanConfig,geometryInfo,resolvedThermal,timeDependent,timeDependentCards,hydrationControl,convectionGuidance,mixMetrics,estimate,validate,crossSection,auditCross,mesh,ranges,stages,units,heatRise,selfWeightCards,build};
   if(typeof module!=='undefined' && module.exports)module.exports=root.MidasEngine;
 })(typeof window!=='undefined'?window:globalThis);
 
@@ -1004,11 +1060,13 @@
     lastSection=section;lastConfig=c;
     const target=svg();if(!target)return;
     target.setAttribute('viewBox','0 0 900 600');
-    const R=c.geometry.diameter/2,hOld=c.geometry.heightOld,H=hOld+c.geometry.heightNew;
+    const geometry=window.MidasEngine.geometryInfo(c),hOld=c.geometry.heightOld,H=hOld+c.geometry.heightNew;
     const zmin=state.stage==='new'?hOld:0,zmax=state.stage==='old'?hOld:H;
-    const center=(zmin+zmax)/2,height=zmax-zmin;
+    const center=(zmin+zmax)/2;
     const C=Math.cos(state.yaw),S=Math.sin(state.yaw),P=Math.sin(state.pitch),Q=Math.cos(state.pitch);
-    const fit=Math.min(570/(2*R),400/Math.max(1e-9,height*Math.abs(Q)+2*R*Math.abs(P)));
+    const ring=section.xy.slice(0,section.boundaryCount),horizontal=ring.map(p=>p[0]*C-p[1]*S),vertical=[];
+    for(const p of ring)for(const z of [zmin,zmax])vertical.push((z-center)*Q-(p[0]*S+p[1]*C)*P);
+    const fit=Math.min(570/Math.max(1e-9,Math.max(...horizontal)-Math.min(...horizontal)),400/Math.max(1e-9,Math.max(...vertical)-Math.min(...vertical)));
     const scale=fit*state.zoom,cy=295+state.panY,cx=450+state.panX;
     const project=(p,z)=>[cx+scale*(p[0]*C-p[1]*S),cy-scale*((z-center)*Q-(p[0]*S+p[1]*C)*P)];
     const depth=(p,z)=>(p[0]*S+p[1]*C)*Q+(z-center)*P;
@@ -1019,7 +1077,7 @@
     if(state.stage!=='old')for(let k=1;k<=c.mesh.layersNew;k++)levels.push(hOld+c.geometry.heightNew*k/c.mesh.layersNew);
     for(let k=0;k<levels.length-1;k++)for(let i=0;i<section.boundaryCount;i++){
       const a=section.xy[i],b=section.xy[(i+1)%section.boundaryCount],mid=[(a[0]+b[0])/2,(a[1]+b[1])/2];
-      const normal=(mid[0]*S+mid[1]*C)/R;
+      const dx=b[0]-a[0],dy=b[1]-a[1],normal=(dy*S-dx*C)/Math.hypot(dx,dy);
       if(normal*Q<=1e-7)continue;
       const fresh=(levels[k]+levels[k+1])/2>hOld;
       const light=.75+.25*Math.max(0,normal);
@@ -1035,17 +1093,15 @@
     let markup='<defs><pattern id="nx-grid-minor" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0V24" fill="none" stroke="#d9e3ec" stroke-width=".5"/></pattern><pattern id="nx-grid-major" width="120" height="120" patternUnits="userSpaceOnUse"><rect width="120" height="120" fill="url(#nx-grid-minor)"/><path d="M120 0H0V120" fill="none" stroke="#c7d4df" stroke-width=".7"/></pattern></defs>';
     markup+='<rect width="900" height="600" fill="#f3f7fb"/><rect width="900" height="600" fill="url(#nx-grid-major)"/>';
     markup+='<path d="M0 300H900M450 0V600" stroke="#d1deea" stroke-width=".8" stroke-dasharray="4 5"/>';
-    const base=project([0,0],zmin);
-    markup+=`<ellipse cx="${base[0]}" cy="${base[1]+8}" rx="${R*scale*.9}" ry="${Math.max(3,R*scale*P*.38)}" fill="#6f8795" opacity=".12"/>`;
+    markup+=`<path d="${path(ring.map(p=>{const v=project(p,zmin);return [v[0],v[1]+8];}))}" fill="#6f8795" opacity=".12"/>`;
     const stroke=state.mesh?'#566b7a':'none',width=state.mesh?'.55':'0';
     markup+=faces.map(f=>`<path d="${f.p}" fill="${f.color}" stroke="${stroke}" stroke-width="${width}" stroke-linejoin="round"/>`).join('');
     if(state.stage==='all'){
-      const near=[];for(let i=0;i<=section.boundaryCount;i++){
-        const p=section.xy[i%section.boundaryCount];
-        if((p[0]*S+p[1]*C)*Q>=-1e-8)near.push(project(p,hOld));
-        else if(near.length>1){markup+='<polyline points="'+near.map(p=>p.join(',')).join(' ')+'" fill="none" stroke="#233e58" stroke-width="1.6"/>';near.length=0;}
+      for(let i=0;i<ring.length;i++){
+        const a=ring[i],b=ring[(i+1)%ring.length],dx=b[0]-a[0],dy=b[1]-a[1];
+        if((dy*S-dx*C)*Q/Math.hypot(dx,dy)>1e-7)
+          markup+=`<path d="M${project(a,hOld).join(',')}L${project(b,hOld).join(',')}" fill="none" stroke="#233e58" stroke-width="1.6"/>`;
       }
-      if(near.length>1)markup+='<polyline points="'+near.map(p=>p.join(',')).join(' ')+'" fill="none" stroke="#233e58" stroke-width="1.6"/>';
     }
     // Axes are the camera projection of world axes, not an analysis result.
     const axes=[['X',[C,S*P],'#c35253'],['Y',[-S,C*P],'#34865e'],['Z',[0,-Q],'#3377b8']];
@@ -1053,9 +1109,10 @@
     for(const [name,dir,color]of axes){const x=62+dir[0]*36,y=533+dir[1]*36;markup+=`<path d="M62 533L${x} ${y}" stroke="${color}" stroke-width="2.3"/><circle cx="${x}" cy="${y}" r="2.8" fill="${color}"/><text x="${x+5}" y="${y-3}" fill="${color}">${name}</text>`;}
     markup+='</g>';
     const label=state.stage==='old'?'BETON LAMA':state.stage==='new'?'BETON BARU':'DUA SEGMEN • KONTAK SEMPURNA';
-    markup+=`<g font-family="Segoe UI,Arial,sans-serif"><text x="24" y="29" fill="#48637b" font-size="11" letter-spacing="1">${label}</text><text x="24" y="49" fill="#7a8fa2" font-size="10">Ø ${fmt(c.geometry.diameter)} m · Z ${fmt(zmin)}–${fmt(zmax)} m · HEX8</text><text x="876" y="576" text-anchor="end" fill="#6d8296" font-size="10">${Math.round(state.zoom*100)}% · ${escape(state.view.toUpperCase())} · warna segmen</text></g>`;
+    const dimensions=geometry.shape==='rectangular'?`B ${fmt(geometry.width)} × L ${fmt(geometry.depth)} m`:`Ø ${fmt(geometry.width)} m`;
+    markup+=`<g font-family="Segoe UI,Arial,sans-serif"><text x="24" y="29" fill="#48637b" font-size="11" letter-spacing="1">${label}</text><text x="24" y="49" fill="#7a8fa2" font-size="10">${dimensions} · Z ${fmt(zmin)}–${fmt(zmax)} m · HEX8</text><text x="876" y="576" text-anchor="end" fill="#6d8296" font-size="10">${Math.round(state.zoom*100)}% · ${escape(state.view.toUpperCase())} · warna segmen</text></g>`;
     target.innerHTML=markup;
-    target.dataset.renderView=state.view;target.dataset.mesh=String(state.mesh);target.dataset.stage=state.stage;
+    target.dataset.renderView=state.view;target.dataset.mesh=String(state.mesh);target.dataset.stage=state.stage;target.dataset.shape=geometry.shape;
     const caption=document.getElementById('nx-view-caption');if(caption)caption.textContent=`${state.view==='iso'?'Isometrik':state.view==='front'?'Tampak depan':state.view==='top'?'Tampak atas':'Orbit bebas'} · ${Math.round(state.zoom*100)}%`;
   }
   function refresh(){if(lastSection&&lastConfig)render(lastSection,lastConfig);}
@@ -1122,15 +1179,16 @@
   fill(config);
   function svgText(x,y,text,extra=''){return `<text x="${x}" y="${y}" ${extra}>${text}</text>`;}
   function plan(section){
-    const R=config.geometry.diameter/2, scale=145/R, p=xy=>`${(180+xy[0]*scale).toFixed(2)},${(175-xy[1]*scale).toFixed(2)}`;
+    const g=E.geometryInfo(config),scale=290/Math.max(g.width,g.depth),p=xy=>`${(180+xy[0]*scale).toFixed(2)},${(175-xy[1]*scale).toFixed(2)}`;
     const paths=section.quads.map(q=>`M${q.map(i=>p(section.xy[i])).join('L')}Z`).join('');
     $('mesh-plan').innerHTML=`<rect width="360" height="360" fill="#f9faf9"/><path d="${paths}" fill="#e4edf1" stroke="#527184" stroke-width=".65"/>`+
-      '<path d="M35 338H325M35 333V343M325 333V343" stroke="#6c7e8a"/>'+svgText(180,332,`Ø ${format(config.geometry.diameter)} m`,'text-anchor="middle" fill="#536b7b" font-size="12"')+
+      '<path d="M35 338H325M35 333V343M325 333V343" stroke="#6c7e8a"/>'+svgText(180,332,g.shape==='rectangular'?`B ${format(g.width)} × L ${format(g.depth)} m`:`Ø ${format(g.width)} m`,'text-anchor="middle" fill="#536b7b" font-size="12"')+
       svgText(180,178,'+','text-anchor="middle" fill="#243e51" font-size="16"');
+    $('mesh-plan').setAttribute('aria-label',g.shape==='rectangular'?'Mesh penampang rectangular dengan pembagian X dan Y':'Mesh penampang lingkaran lima blok');
   }
   function side(section){
     if(window.HydrationViewport){window.HydrationViewport.render(section,config);return;}
-    const c=config,D=c.geometry.diameter,h1=c.geometry.heightOld,H=h1+c.geometry.heightNew;
+    const c=config,g=E.geometryInfo(c),D=(g.width+g.depth)/2,h1=c.geometry.heightOld,H=h1+c.geometry.heightNew;
     const scale=Math.min(220/(H+D*.3),220/(D*1.45)), p=([x,y],z)=>[220+(x-y)*.72*scale,263+(x+y)*.20*scale-z*scale];
     const coord=q=>q.map(x=>x.map(v=>v.toFixed(2)).join(',')).join(' ');
     let markup='<rect width="440" height="300" fill="#f9faf9"/>';
@@ -1138,7 +1196,7 @@
     for(let k=1;k<=c.mesh.layersNew;k++)levels.push(h1+c.geometry.heightNew*k/c.mesh.layersNew);
     for(let k=0;k<levels.length-1;k++)for(let i=0;i<section.boundaryCount;i++){
       const a=section.xy[i],b=section.xy[(i+1)%section.boundaryCount];
-      if(a[0]+a[1]+b[0]+b[1]<0)continue;
+      if((b[1]-a[1])-(b[0]-a[0])<=0)continue;
       const pts=[p(a,levels[k]),p(b,levels[k]),p(b,levels[k+1]),p(a,levels[k+1])];
       markup+=`<polygon points="${coord(pts)}" fill="${k<c.mesh.layersOld?'#c4cdd1':'#eab480'}" stroke="#6d7b7e" stroke-width=".4"/>`;
     }
@@ -1175,10 +1233,11 @@
     $('unit-table').innerHTML=E.units(config).map(r=>`<tr><td>${r[0]}</td><td>${format(r[1],3)}<small>${r[2]}</small></td><td><strong>${format(r[3],3)}</strong><small>${r[4]}</small></td></tr>`).join('');
   }
   function preview(c,checks){
-    const s=E.stages(c),m=c.material,th=E.resolvedThermal(c);
+    const s=E.stages(c),m=c.material,th=E.resolvedThermal(c),g=E.geometryInfo(c);
     const lines=['; RINGKASAN INPUT - unduhan MCT berisi seluruh node dan elemen.',
       '; Asumsi contoh, belum diuji dengan parser atau solver MIDAS Civil.',
       '*UNIT','N, M, KJ, C',
+      `; Geometry shape=${g.shape}; X=${g.width}m; Y=${g.depth}m; height=${c.geometry.heightOld+c.geometry.heightNew}m.`,
       `; NODE=${E.estimate(c).nodes}; SOLID HEX8=${E.estimate(c).elements}; interface nodes=${checks.sharedInterfaceNodes}`,
       `; fc=${m.fc} MPa; E=${(4700*Math.sqrt(m.fc)*1e6).toFixed(3)} N/m2`,
       `; Metode cp=${th.cpMode}; k=${th.kMode}; old=${th.oldMode}; Tref=${th.referenceTemperature} degC`,
@@ -1330,12 +1389,25 @@
       }
     }catch(error){$('convection-range-note').textContent='Panduan konveksi belum tersedia: '+error.message;}
   }
+  function renderGeometry(){
+    const rect=config.geometry.shape==='rectangular';
+    document.querySelectorAll('[data-geometry-shape]').forEach(group=>{
+      group.hidden=group.dataset.geometryShape!==(rect?'rectangular':'circular');
+      group.querySelectorAll('[data-key]').forEach(field=>{field.disabled=group.hidden;});
+    });
+    $('geometry-shape-label').textContent=rect?'Penampang rectangular solid':'Penampang lingkaran solid';
+    $('geometry-mesh-note').textContent=rect?'Mesh rectangular terstruktur X × Y dengan elemen HEX8. Kedua segmen berbagi node pada sambungan.':'Mesh lingkaran memakai 5 blok HEX8. Kedua segmen berbagi node pada sambungan.';
+    $('geometry-document-subtitle').textContent=rect?'Pilar rectangular dua tahap / hydration input':'Pilar lingkaran dua tahap / hydration input';
+    $('geometry-view-title').textContent=rect?'Pilar rectangular dua tahap':'Pilar lingkaran dua tahap';
+    $('td-use-geometry').textContent=rect?'Isi ukuran dari penampang rectangular':'Isi ukuran dari diameter pilar';
+    $('td-geometry-formula').textContent=rect?'h = B·L/(B+L) dan V/S = B·L/[2(B+L)] untuk penampang rectangular prismatis dengan paparan sisi saja; muka ujung diabaikan.':'h = D/2 dan V/S = D/4 untuk silinder prismatis dengan paparan sisi saja; muka ujung diabaikan.';
+  }
   function render(){
     config=read();lastModel=null;const result=E.validate(config);
     fields.forEach(el=>{const bad=result.errors.some(e=>e.field===el.dataset.key);el.setAttribute('aria-invalid',String(bad));});
     $('export-mct').disabled=!!result.errors.length;$('export-json').disabled=!!result.errors.length;$('download-report').disabled=!!result.errors.length;
     const fixed=config.boundary.baseMode==='fixed';document.querySelector('[data-key="temperature.base"]').disabled=!fixed;
-    renderThermal();renderTimeDependent();renderConvectionGuidance();
+    renderGeometry();renderThermal();renderTimeDependent();renderConvectionGuidance();
     const mix=E.mixMetrics(config),stats=E.estimate(config);
     for(const [id,value,digits]of [['metrics-nodes',stats.nodes,0],['metrics-elements',stats.elements,0],['metrics-volume',stats.volume,2],['metrics-wb',mix.wb,3],
       ['mix-wc',mix.wc,3],['mix-wb',mix.wb,3],['mix-binder',mix.binder,1],['mix-total',mix.total,2],['mix-flyash',mix.flyash,1]])$(id).textContent=format(value,digits);
@@ -1343,7 +1415,7 @@
     let checks;
     if(!result.errors.length){
       try{const section=E.crossSection(config);checks=E.auditCross(section,config);
-        if(checks.maxRatio>5)result.warnings.push({message:'Rasio rusuk maksimum '+format(checks.maxRatio,1)+' melebihi 5. Sesuaikan pembagian radial/vertikal untuk memperbaiki bentuk elemen.'});
+        if(checks.maxRatio>5)result.warnings.push({message:'Rasio rusuk maksimum '+format(checks.maxRatio,1)+' melebihi 5. Sesuaikan pembagian '+(config.geometry.shape==='rectangular'?'X/Y/vertikal':'radial/vertikal')+' untuk memperbaiki bentuk elemen.'});
         plan(section);side(section);heatChart();renderStages();preview(config,checks);persist(config);}
       catch(error){result.errors.push({message:error.message});$('export-mct').disabled=true;$('download-report').disabled=true;}
     }else{$('save-status').textContent='Perubahan belum disimpan';$('mct-preview').value='Perbaiki masukan yang ditandai sebelum mengekspor file .MCT.';}
@@ -1360,10 +1432,10 @@
   $('use-mix-density').addEventListener('click',()=>{config=read();const sum=E.mixMetrics(config).total;if(!Number.isFinite(sum))return;
     document.querySelector('[data-key="material.density"]').value=sum.toFixed(2);clearTimeout(timer);render();notify('Massa jenis diisi dari jumlah massa campuran. Ini perkiraan, bukan hasil pengukuran massa jenis.');});
   $('td-use-geometry').addEventListener('click',()=>{
-    const c=read(),D=c.geometry.diameter;if(!Number.isFinite(D)||D<=0)return;
-    document.querySelector('[data-key="timeDependent.notionalSize"]').value=D/2;
-    document.querySelector('[data-key="timeDependent.volumeSurface"]').value=D/4;
-    clearTimeout(timer);render();notify('Ukuran C&S diisi dari diameter: h = D/2 dan V/S = D/4. Asumsi paparan sisi silinder saja; muka ujung diabaikan.');
+    const g=E.geometryInfo(read());if(!Number.isFinite(g.area)||g.area<=0||!Number.isFinite(g.perimeter)||g.perimeter<=0)return;
+    document.querySelector('[data-key="timeDependent.notionalSize"]').value=g.notionalSize;
+    document.querySelector('[data-key="timeDependent.volumeSurface"]').value=g.volumeSurface;
+    clearTimeout(timer);render();notify(g.shape==='rectangular'?'Ukuran C&S diisi dari rectangular: h = B·L/(B+L), V/S = B·L/[2(B+L)]. Asumsi paparan sisi saja; muka ujung diabaikan.':'Ukuran C&S diisi dari diameter: h = D/2 dan V/S = D/4. Asumsi paparan sisi silinder saja; muka ujung diabaikan.');
   });
   $('export-mct').addEventListener('click',async()=>{
     clearTimeout(timer);render();if($('export-mct').disabled){notify('Masukan belum valid. Periksa daftar pemeriksaan.');return;}
@@ -1428,11 +1500,12 @@
     fill(E.defaults());render();notify('Parameter kembali ke contoh awal.');});
   $('download-report').addEventListener('click',()=>{
     clearTimeout(timer);render();if(E.validate(config).errors.length)return;
-    try{const model=lastModel||E.build(config),mix=E.mixMetrics(config),s=config.schedule,thermal=model.thermal;
+    try{const model=lastModel||E.build(config),mix=E.mixMetrics(config),s=config.schedule,thermal=model.thermal,g=E.geometryInfo(config);
       const rows=['RINGKASAN INPUT PANAS HIDRASI - CIVIL HYDRATION','Asumsi contoh; bukan hasil analisis suhu/tegangan.',
         'Waktu pembuatan: '+new Date().toLocaleString('id-ID',{timeZone:'Asia/Jakarta'})+' WIB','',
         'SATUAN MCT: N, m, kJ, degC; waktu jam, massa kg.',
-        `MODEL: diameter ${config.geometry.diameter} m; beton lama ${config.geometry.heightOld} m; baru ${config.geometry.heightNew} m.`,
+        `MODEL: ${g.shape==='rectangular'?`rectangular; lebar B(X)=${g.width} m; panjang L(Y)=${g.depth} m`:`lingkaran; diameter ${g.width} m`}; beton lama ${config.geometry.heightOld} m; baru ${config.geometry.heightNew} m.`,
+        `PENAMPANG: luas=${g.area}m2; keliling=${g.perimeter}m; mesh ${g.shape==='rectangular'?`X=${config.mesh.divX}, Y=${config.mesh.divY}`:`sisi=${config.mesh.sideDiv}, radial=${config.mesh.radialDiv}`}.`,
         `MESH: ${model.stats.nodes} node, ${model.stats.elements} HEX8; interface ${model.mesh.nn} node bersama.`,
         `Mesh volume=${model.checks.volume}m3, scaled Jacobian min=${model.checks.minScaled}.`,
         '',`BERAT SENDIRI: ${config.selfWeight.caseName}; tipe Dead Load (${config.selfWeight.caseType}); grup ${config.selfWeight.groupName}.`,

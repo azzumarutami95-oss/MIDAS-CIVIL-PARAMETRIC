@@ -54,7 +54,7 @@ jobs:
       - name: Create checksum
         shell: pwsh
         run: |
-          $files = @(Get-Item dist/Civil-Hydration-NX-Setup-*-x64.exe) + @(Get-Item downloads/CIVIL_HEAT_HYDRATION*.html) + @(Get-Item dist/PILAR_TIME_DEPENDENT_EXAMPLE.MCT,dist/PARAMETER_TIME_DEPENDENT_EXAMPLE.json)
+          $files = @(Get-Item dist/Civil-Hydration-NX-Setup-*-x64.exe) + @(Get-Item downloads/CIVIL_HEAT_HYDRATION*.html) + @(Get-Item dist/PILAR_*_EXAMPLE.MCT,dist/PARAMETER_*_EXAMPLE.json)
           $files | ForEach-Object {
             $hash = (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower()
             "$hash  $($_.Name)"
@@ -66,8 +66,8 @@ jobs:
             dist/Civil-Hydration-NX-Setup-*-x64.exe
             dist/SHA256SUMS.txt
             downloads/CIVIL_HEAT_HYDRATION*.html
-            dist/PILAR_TIME_DEPENDENT_EXAMPLE.MCT
-            dist/PARAMETER_TIME_DEPENDENT_EXAMPLE.json
+            dist/PILAR_*_EXAMPLE.MCT
+            dist/PARAMETER_*_EXAMPLE.json
           if-no-files-found: error
       - name: Publish installer for version tag
         if: startsWith(github.ref, 'refs/tags/v')
@@ -76,6 +76,10 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           $notes = @'
+          Tambahan geometri rectangular untuk aplikasi v1.1.1. Pilih lingkaran atau rectangular, edit lebar B(X), panjang L(Y), tinggi segmen, dan mesh X/Y. Orbit, zoom, pan, tampilan ISO/depan/atas, filter segmen, JSON, laporan dan MCT mengikuti bentuk aktif. Nilai kedua bentuk dipertahankan saat beralih; JSON lama dibuka sebagai lingkaran.
+
+          Mesh rectangular HEX8 memakai node sambungan bersama. Ekspor konveksi mencakup seluruh muka luar termasuk elemen sudut; bidang sambungan tetap dihentikan konveksinya setelah pengecoran. Contoh MCT/JSON rectangular tersedia terpisah. Helper ukuran C&S memakai 2A/u dan A/u dengan asumsi paparan sisi saja.
+
           Pembaruan panduan Convection Boundaries untuk aplikasi v1.1.1: rentang referensi udara alami 2–25 dan udara terpaksa 25–250 W/(m²·°C), contoh koefisien efektif bekisting/penutup curing dari tabel MIDAS, serta petunjuk tahanan lapisan dan tahap penerapannya. Batas input aplikasi 0–200 ditandai terpisah; nilai tidak diubah otomatis. Pratinjau, JSON, dan laporan memuat panduan aktual; MCT tetap memakai koefisien pilihan pengguna dengan konversi satuan yang sama.
 
           Pembaruan material untuk aplikasi v1.1.1: creep/shrinkage ACI 209, CEB-FIP 1990, AASHTO 2006, dan USER; perkembangan kuat tekan ACI 209R-92, CEB-FIP 1990, serta tabel jobmix USER. Pilihan kuat tekan AASHTO memakai ACI 209R-92 sesuai konvensi WSDOT karena AASHTO tidak menetapkan model perkembangan kuat tekan sendiri.
@@ -88,4 +92,4 @@ jobs:
           '@
           $notes | Set-Content dist/RELEASE_NOTES.md -Encoding utf8
           $packageVersion = (Get-Content package.json -Raw | ConvertFrom-Json).version
-          gh release create $env:GITHUB_REF_NAME dist/Civil-Hydration-NX-Setup-*-x64.exe dist/SHA256SUMS.txt downloads/CIVIL_HEAT_HYDRATION_NX.html downloads/CIVIL_HEAT_HYDRATION.html dist/PILAR_TIME_DEPENDENT_EXAMPLE.MCT dist/PARAMETER_TIME_DEPENDENT_EXAMPLE.json --verify-tag --latest --title "Civil Hydration NX v$packageVersion — Convection Boundaries Guide / Windows x64" --notes-file dist/RELEASE_NOTES.md
+          gh release create $env:GITHUB_REF_NAME dist/Civil-Hydration-NX-Setup-*-x64.exe dist/SHA256SUMS.txt downloads/CIVIL_HEAT_HYDRATION_NX.html downloads/CIVIL_HEAT_HYDRATION.html dist/PILAR_TIME_DEPENDENT_EXAMPLE.MCT dist/PARAMETER_TIME_DEPENDENT_EXAMPLE.json dist/PILAR_RECTANGULAR_EXAMPLE.MCT dist/PARAMETER_RECTANGULAR_EXAMPLE.json --verify-tag --latest --title "Civil Hydration NX v$packageVersion — Circular and Rectangular Geometry / Windows x64" --notes-file dist/RELEASE_NOTES.md

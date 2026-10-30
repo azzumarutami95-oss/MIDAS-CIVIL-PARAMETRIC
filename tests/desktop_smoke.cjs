@@ -296,15 +296,32 @@ const {setTimeout: delay} = require('node:timers/promises');
     assert.ok(customReport.includes('Modulus acuan creep USER=35000 MPa'));
     assert.ok(customReport.includes(customStrength));
 
+    // The installed application can change section shape and export actual rectangular connectivity.
+    await page.locator('.nx-ribbon-tabs [data-workspace="model"]').click();
+    await page.locator('[data-key="geometry.shape"]').selectOption('rectangular');
+    for (const [key,value] of [['geometry.width',8],['geometry.depth',3],['geometry.heightOld',2],['geometry.heightNew',3],['mesh.divX',4],['mesh.divY',3],['mesh.layersOld',2],['mesh.layersNew',3]]) {
+      await page.locator(`[data-key="${key}"]`).fill(String(value));
+    }
+    await page.waitForFunction(() => document.querySelector('#metrics-elements').textContent === '60');
+    assert.equal(await page.locator('#mesh-side').getAttribute('data-shape'), 'rectangular');
+    const rectangularMct = await download(page, 'export-mct', 'rectangular-model.MCT');
+    assert.match(rectangularMct, /Geometry shape=rectangular; X=8m; Y=3m; height=5m/);
+    const elementSection = rectangularMct.split('*ELEMENT')[1].split('*GROUP')[0];
+    assert.equal(elementSection.split(/\r?\n/).filter(line => /^\d+, SOLID,/.test(line)).length, 60);
+    const rectangularReport = await download(page, 'download-report', 'rectangular-report.txt');
+    assert.ok(rectangularReport.includes('rectangular; lebar B(X)=8 m; panjang L(Y)=3 m'));
+
     // Save on close persists the last edits. Discard leaves the saved file intact.
     await setCp(page, 1.17);
     await queue('message', 'save');
     await closeWindow();
     assert.equal(JSON.parse(await fs.readFile(projectB, 'utf8')).config.material.cp, 1.17);
     assert.equal(JSON.parse(await fs.readFile(projectB, 'utf8')).config.timeDependent.customStrength, customStrength);
+    assert.equal(JSON.parse(await fs.readFile(projectB, 'utf8')).config.geometry.shape, 'rectangular');
     page = await launch();
     await page.waitForFunction(() => document.querySelector('[data-key="material.cp"]').value === '1.17');
     assert.equal(await page.locator('[data-key="timeDependent.customStrength"]').inputValue(), customStrength);
+    assert.equal(await page.locator('[data-key="geometry.shape"]').inputValue(), 'rectangular');
     await queue('message', 'discard');
     await open(page, projectB);
     await waitSaved(page, path.basename(projectB));

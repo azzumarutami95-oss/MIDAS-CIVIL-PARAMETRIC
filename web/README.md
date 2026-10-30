@@ -30,7 +30,8 @@ Mengganti ekstensi MCT menjadi `.mcb` bukan konversi format dan tidak dilakukan.
 
 ## Alur penggunaan
 
-1. Atur diameter, tinggi beton lama/baru dan pembagian mesh. Default: D7,5 m,
+1. Pilih lingkaran atau rectangular, lalu atur diameter atau lebar/panjang,
+   tinggi beton lama/baru dan pembagian mesh. Default lingkaran: D7,5 m,
    H4+4 m; 26.433 node dan 24.576 HEX8 dengan node sambungan bersama.
 2. Periksa preset campuran dari foto. Kolom sumber foto adalah catatan tetap;
    kolom kg/m³, volume batch dan kadar air bebas dapat diubah.
@@ -54,6 +55,31 @@ JSON masukan yang rusak/tidak valid tidak mengganti parameter saat ini. JSON
 lama generator Python memakai format berbeda dan bukan format impor aplikasi.
 **Unduh ringkasan input** menyimpan `.txt` berisi parameter, unit, jadwal,
 node pemantauan dan batas interpretasi. Tombol reset meminta konfirmasi.
+
+## Geometri lingkaran dan rectangular
+
+Pada **Model → Bentuk penampang**, pilih **Persegi panjang / rectangular**.
+Atur **Lebar B (arah X)** dan **Panjang L (arah Y)** dalam meter, tinggi beton
+lama/baru, serta pembagian mesh **X** dan **Y** secara terpisah. B=L menghasilkan
+penampang persegi. Nilai lingkaran dan rectangular tetap tersimpan saat bentuk
+diganti. JSON lama tanpa parameter bentuk dibuka sebagai lingkaran.
+
+Contoh rectangular B6 × L4 m, H4+4 m dengan 16 × 16 × 32 pembagian menghasilkan
+9.537 node, 8.192 HEX8 dan volume 192 m³. Node pada sambungan lama/baru dipakai
+bersama. Muka luar termasuk kedua muka pada elemen sudut diekspor dengan nomor
+muka konveksi yang sesuai; bidang sambungan tidak diberi konveksi setelah H1.
+Orbit, zoom, pan, ISO/depan/atas, filter segmen dan tombol Mesh bekerja pada
+kedua bentuk. Filter tampilan tetap tidak mengubah model ekspor.
+Monitor `NEW_SIDE` menargetkan sisi +X; rectangular menambahkan `NEW_SIDE_Y`
+untuk sisi +Y. Koordinat ekspor memakai node terdekat target pemantauan.
+
+Tombol **Isi ukuran dari penampang rectangular** pada Material Time menghitung
+`h = 2A/u = B·L/(B+L)` dan `V/S = A/u = B·L/[2(B+L)]` untuk paparan sisi
+prismatis saja. Muka ujung diabaikan; periksa paparan efektif sebelum memakai
+angka tersebut. Dimensi geometri tidak otomatis menimpa parameter C&S Anda.
+
+Geometri, pembagian mesh dan bentuk aktif ikut dalam JSON, laporan dan MCT.
+Contoh yang dapat dibuka: [RECTANGULAR.json](../examples/RECTANGULAR.json).
 
 ## Kriteria convection boundaries
 

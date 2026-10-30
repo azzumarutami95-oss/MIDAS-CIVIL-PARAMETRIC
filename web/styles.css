@@ -37,3 +37,7 @@
 @media(max-width:850px){.convection-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:500px){.convection-grid{grid-template-columns:1fr}.convection-field-help{min-height:0}.convection-summary,.convection-instructions{font-size:10px}}
 @media(max-width:650px){.convection-guide-table{display:block;min-width:0}.convection-guide-table thead{display:none}.convection-guide-table tbody{display:block}.convection-guide-table tr{display:grid;grid-template-columns:1fr 1fr;margin:10px 0;border:1px solid #d7e3eb;border-radius:3px;overflow:hidden}.convection-guide-table td{display:block;min-width:0!important;padding:10px 12px;white-space:normal!important;border:0}.convection-guide-table td:first-child{grid-column:1/-1;background:#edf4f9;border-bottom:1px solid #d7e3eb}.convection-guide-table td:nth-child(4),.convection-guide-table td:last-child{grid-column:1/-1}.convection-guide-table td:nth-child(2)::before,.convection-guide-table td:nth-child(3)::before,.convection-guide-table td:nth-child(4)::before{content:attr(data-label);display:block;font-size:9px;color:#7e96a7;margin-bottom:4px;white-space:normal}.convection-guide-table td:last-child{border-top:1px solid #e4edf3}.convection-guide-table td:last-child small{line-height:1.7}}
+
+/* Shape controls retain both sets of dimensions while switching sections. */
+.geometry-shape-field,.geometry-dimensions{margin-bottom:14px}
+[data-geometry-shape][hidden]{display:none!important}

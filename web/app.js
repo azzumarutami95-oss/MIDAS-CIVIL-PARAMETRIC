@@ -40,15 +40,16 @@
   fill(config);
   function svgText(x,y,text,extra=''){return `<text x="${x}" y="${y}" ${extra}>${text}</text>`;}
   function plan(section){
-    const R=config.geometry.diameter/2, scale=145/R, p=xy=>`${(180+xy[0]*scale).toFixed(2)},${(175-xy[1]*scale).toFixed(2)}`;
+    const g=E.geometryInfo(config),scale=290/Math.max(g.width,g.depth),p=xy=>`${(180+xy[0]*scale).toFixed(2)},${(175-xy[1]*scale).toFixed(2)}`;
     const paths=section.quads.map(q=>`M${q.map(i=>p(section.xy[i])).join('L')}Z`).join('');
     $('mesh-plan').innerHTML=`<rect width="360" height="360" fill="#f9faf9"/><path d="${paths}" fill="#e4edf1" stroke="#527184" stroke-width=".65"/>`+
-      '<path d="M35 338H325M35 333V343M325 333V343" stroke="#6c7e8a"/>'+svgText(180,332,`Ø ${format(config.geometry.diameter)} m`,'text-anchor="middle" fill="#536b7b" font-size="12"')+
+      '<path d="M35 338H325M35 333V343M325 333V343" stroke="#6c7e8a"/>'+svgText(180,332,g.shape==='rectangular'?`B ${format(g.width)} × L ${format(g.depth)} m`:`Ø ${format(g.width)} m`,'text-anchor="middle" fill="#536b7b" font-size="12"')+
       svgText(180,178,'+','text-anchor="middle" fill="#243e51" font-size="16"');
+    $('mesh-plan').setAttribute('aria-label',g.shape==='rectangular'?'Mesh penampang rectangular dengan pembagian X dan Y':'Mesh penampang lingkaran lima blok');
   }
   function side(section){
     if(window.HydrationViewport){window.HydrationViewport.render(section,config);return;}
-    const c=config,D=c.geometry.diameter,h1=c.geometry.heightOld,H=h1+c.geometry.heightNew;
+    const c=config,g=E.geometryInfo(c),D=(g.width+g.depth)/2,h1=c.geometry.heightOld,H=h1+c.geometry.heightNew;
     const scale=Math.min(220/(H+D*.3),220/(D*1.45)), p=([x,y],z)=>[220+(x-y)*.72*scale,263+(x+y)*.20*scale-z*scale];
     const coord=q=>q.map(x=>x.map(v=>v.toFixed(2)).join(',')).join(' ');
     let markup='<rect width="440" height="300" fill="#f9faf9"/>';
@@ -56,7 +57,7 @@
     for(let k=1;k<=c.mesh.layersNew;k++)levels.push(h1+c.geometry.heightNew*k/c.mesh.layersNew);
     for(let k=0;k<levels.length-1;k++)for(let i=0;i<section.boundaryCount;i++){
       const a=section.xy[i],b=section.xy[(i+1)%section.boundaryCount];
-      if(a[0]+a[1]+b[0]+b[1]<0)continue;
+      if((b[1]-a[1])-(b[0]-a[0])<=0)continue;
       const pts=[p(a,levels[k]),p(b,levels[k]),p(b,levels[k+1]),p(a,levels[k+1])];
       markup+=`<polygon points="${coord(pts)}" fill="${k<c.mesh.layersOld?'#c4cdd1':'#eab480'}" stroke="#6d7b7e" stroke-width=".4"/>`;
     }
@@ -93,10 +94,11 @@
     $('unit-table').innerHTML=E.units(config).map(r=>`<tr><td>${r[0]}</td><td>${format(r[1],3)}<small>${r[2]}</small></td><td><strong>${format(r[3],3)}</strong><small>${r[4]}</small></td></tr>`).join('');
   }
   function preview(c,checks){
-    const s=E.stages(c),m=c.material,th=E.resolvedThermal(c);
+    const s=E.stages(c),m=c.material,th=E.resolvedThermal(c),g=E.geometryInfo(c);
     const lines=['; RINGKASAN INPUT - unduhan MCT berisi seluruh node dan elemen.',
       '; Asumsi contoh, belum diuji dengan parser atau solver MIDAS Civil.',
       '*UNIT','N, M, KJ, C',
+      `; Geometry shape=${g.shape}; X=${g.width}m; Y=${g.depth}m; height=${c.geometry.heightOld+c.geometry.heightNew}m.`,
       `; NODE=${E.estimate(c).nodes}; SOLID HEX8=${E.estimate(c).elements}; interface nodes=${checks.sharedInterfaceNodes}`,
       `; fc=${m.fc} MPa; E=${(4700*Math.sqrt(m.fc)*1e6).toFixed(3)} N/m2`,
       `; Metode cp=${th.cpMode}; k=${th.kMode}; old=${th.oldMode}; Tref=${th.referenceTemperature} degC`,
@@ -248,12 +250,25 @@
       }
     }catch(error){$('convection-range-note').textContent='Panduan konveksi belum tersedia: '+error.message;}
   }
+  function renderGeometry(){
+    const rect=config.geometry.shape==='rectangular';
+    document.querySelectorAll('[data-geometry-shape]').forEach(group=>{
+      group.hidden=group.dataset.geometryShape!==(rect?'rectangular':'circular');
+      group.querySelectorAll('[data-key]').forEach(field=>{field.disabled=group.hidden;});
+    });
+    $('geometry-shape-label').textContent=rect?'Penampang rectangular solid':'Penampang lingkaran solid';
+    $('geometry-mesh-note').textContent=rect?'Mesh rectangular terstruktur X × Y dengan elemen HEX8. Kedua segmen berbagi node pada sambungan.':'Mesh lingkaran memakai 5 blok HEX8. Kedua segmen berbagi node pada sambungan.';
+    $('geometry-document-subtitle').textContent=rect?'Pilar rectangular dua tahap / hydration input':'Pilar lingkaran dua tahap / hydration input';
+    $('geometry-view-title').textContent=rect?'Pilar rectangular dua tahap':'Pilar lingkaran dua tahap';
+    $('td-use-geometry').textContent=rect?'Isi ukuran dari penampang rectangular':'Isi ukuran dari diameter pilar';
+    $('td-geometry-formula').textContent=rect?'h = B·L/(B+L) dan V/S = B·L/[2(B+L)] untuk penampang rectangular prismatis dengan paparan sisi saja; muka ujung diabaikan.':'h = D/2 dan V/S = D/4 untuk silinder prismatis dengan paparan sisi saja; muka ujung diabaikan.';
+  }
   function render(){
     config=read();lastModel=null;const result=E.validate(config);
     fields.forEach(el=>{const bad=result.errors.some(e=>e.field===el.dataset.key);el.setAttribute('aria-invalid',String(bad));});
     $('export-mct').disabled=!!result.errors.length;$('export-json').disabled=!!result.errors.length;$('download-report').disabled=!!result.errors.length;
     const fixed=config.boundary.baseMode==='fixed';document.querySelector('[data-key="temperature.base"]').disabled=!fixed;
-    renderThermal();renderTimeDependent();renderConvectionGuidance();
+    renderGeometry();renderThermal();renderTimeDependent();renderConvectionGuidance();
     const mix=E.mixMetrics(config),stats=E.estimate(config);
     for(const [id,value,digits]of [['metrics-nodes',stats.nodes,0],['metrics-elements',stats.elements,0],['metrics-volume',stats.volume,2],['metrics-wb',mix.wb,3],
       ['mix-wc',mix.wc,3],['mix-wb',mix.wb,3],['mix-binder',mix.binder,1],['mix-total',mix.total,2],['mix-flyash',mix.flyash,1]])$(id).textContent=format(value,digits);
@@ -261,7 +276,7 @@
     let checks;
     if(!result.errors.length){
       try{const section=E.crossSection(config);checks=E.auditCross(section,config);
-        if(checks.maxRatio>5)result.warnings.push({message:'Rasio rusuk maksimum '+format(checks.maxRatio,1)+' melebihi 5. Sesuaikan pembagian radial/vertikal untuk memperbaiki bentuk elemen.'});
+        if(checks.maxRatio>5)result.warnings.push({message:'Rasio rusuk maksimum '+format(checks.maxRatio,1)+' melebihi 5. Sesuaikan pembagian '+(config.geometry.shape==='rectangular'?'X/Y/vertikal':'radial/vertikal')+' untuk memperbaiki bentuk elemen.'});
         plan(section);side(section);heatChart();renderStages();preview(config,checks);persist(config);}
       catch(error){result.errors.push({message:error.message});$('export-mct').disabled=true;$('download-report').disabled=true;}
     }else{$('save-status').textContent='Perubahan belum disimpan';$('mct-preview').value='Perbaiki masukan yang ditandai sebelum mengekspor file .MCT.';}
@@ -278,10 +293,10 @@
   $('use-mix-density').addEventListener('click',()=>{config=read();const sum=E.mixMetrics(config).total;if(!Number.isFinite(sum))return;
     document.querySelector('[data-key="material.density"]').value=sum.toFixed(2);clearTimeout(timer);render();notify('Massa jenis diisi dari jumlah massa campuran. Ini perkiraan, bukan hasil pengukuran massa jenis.');});
   $('td-use-geometry').addEventListener('click',()=>{
-    const c=read(),D=c.geometry.diameter;if(!Number.isFinite(D)||D<=0)return;
-    document.querySelector('[data-key="timeDependent.notionalSize"]').value=D/2;
-    document.querySelector('[data-key="timeDependent.volumeSurface"]').value=D/4;
-    clearTimeout(timer);render();notify('Ukuran C&S diisi dari diameter: h = D/2 dan V/S = D/4. Asumsi paparan sisi silinder saja; muka ujung diabaikan.');
+    const g=E.geometryInfo(read());if(!Number.isFinite(g.area)||g.area<=0||!Number.isFinite(g.perimeter)||g.perimeter<=0)return;
+    document.querySelector('[data-key="timeDependent.notionalSize"]').value=g.notionalSize;
+    document.querySelector('[data-key="timeDependent.volumeSurface"]').value=g.volumeSurface;
+    clearTimeout(timer);render();notify(g.shape==='rectangular'?'Ukuran C&S diisi dari rectangular: h = B·L/(B+L), V/S = B·L/[2(B+L)]. Asumsi paparan sisi saja; muka ujung diabaikan.':'Ukuran C&S diisi dari diameter: h = D/2 dan V/S = D/4. Asumsi paparan sisi silinder saja; muka ujung diabaikan.');
   });
   $('export-mct').addEventListener('click',async()=>{
     clearTimeout(timer);render();if($('export-mct').disabled){notify('Masukan belum valid. Periksa daftar pemeriksaan.');return;}
@@ -346,11 +361,12 @@
     fill(E.defaults());render();notify('Parameter kembali ke contoh awal.');});
   $('download-report').addEventListener('click',()=>{
     clearTimeout(timer);render();if(E.validate(config).errors.length)return;
-    try{const model=lastModel||E.build(config),mix=E.mixMetrics(config),s=config.schedule,thermal=model.thermal;
+    try{const model=lastModel||E.build(config),mix=E.mixMetrics(config),s=config.schedule,thermal=model.thermal,g=E.geometryInfo(config);
       const rows=['RINGKASAN INPUT PANAS HIDRASI - CIVIL HYDRATION','Asumsi contoh; bukan hasil analisis suhu/tegangan.',
         'Waktu pembuatan: '+new Date().toLocaleString('id-ID',{timeZone:'Asia/Jakarta'})+' WIB','',
         'SATUAN MCT: N, m, kJ, degC; waktu jam, massa kg.',
-        `MODEL: diameter ${config.geometry.diameter} m; beton lama ${config.geometry.heightOld} m; baru ${config.geometry.heightNew} m.`,
+        `MODEL: ${g.shape==='rectangular'?`rectangular; lebar B(X)=${g.width} m; panjang L(Y)=${g.depth} m`:`lingkaran; diameter ${g.width} m`}; beton lama ${config.geometry.heightOld} m; baru ${config.geometry.heightNew} m.`,
+        `PENAMPANG: luas=${g.area}m2; keliling=${g.perimeter}m; mesh ${g.shape==='rectangular'?`X=${config.mesh.divX}, Y=${config.mesh.divY}`:`sisi=${config.mesh.sideDiv}, radial=${config.mesh.radialDiv}`}.`,
         `MESH: ${model.stats.nodes} node, ${model.stats.elements} HEX8; interface ${model.mesh.nn} node bersama.`,
         `Mesh volume=${model.checks.volume}m3, scaled Jacobian min=${model.checks.minScaled}.`,
         '',`BERAT SENDIRI: ${config.selfWeight.caseName}; tipe Dead Load (${config.selfWeight.caseType}); grup ${config.selfWeight.groupName}.`,

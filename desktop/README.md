@@ -2,7 +2,7 @@
 
 **[Buka halaman unduh installer di GitHub Releases](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/latest)**
 
-**[Unduh langsung installer v1.1.1 — panduan konveksi (.exe)](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/download/v1.1.1-convection/Civil-Hydration-NX-Setup-1.1.1-x64.exe)**
+**[Unduh langsung installer v1.1.1 — lingkaran & rectangular (.exe)](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/download/v1.1.1-rectangular/Civil-Hydration-NX-Setup-1.1.1-x64.exe)**
 
 Berkas versi 1.1.1: `Civil-Hydration-NX-Setup-1.1.1-x64.exe`.
 Paket ini ditujukan untuk Windows 10/11 64-bit dengan prosesor x64. Aplikasi
@@ -10,6 +10,12 @@ menyertakan Electron/Chromium sehingga penggunaan normal tidak memerlukan
 instalasi Node.js, Python, browser tambahan, atau koneksi internet.
 
 ## Instalasi dan penggunaan
+
+Versi 1.1.1 kini menyediakan pilihan **lingkaran / rectangular** pada panel
+Model. Rectangular memakai lebar B (X), panjang L (Y), serta pembagian mesh
+X/Y yang dapat diedit. Seluruh kontrol viewport, staging, material, JSON,
+laporan dan ekspor MCT menggunakan bentuk yang dipilih. Proyek JSON lama
+tetap dibuka sebagai lingkaran. [Petunjuk geometri](../web/README.md#geometri-lingkaran-dan-rectangular).
 
 1. Unduh installer `.exe` dari bagian **Assets** pada halaman Releases.
 2. Jalankan installer, pilih folder instalasi untuk akun pengguna Anda, lalu
@@ -57,9 +63,9 @@ pratinjau, laporan, dan JSON. Default menghubungkan beton baru saja. Proyek
 JSON lama yang belum memiliki parameter ini membukanya dalam keadaan
 nonaktif untuk mempertahankan perilaku mekanis sebelumnya.
 [Rumus, satuan dan batas material bergantung waktu](../web/TIME_DEPENDENT_METHODS.md).
-Aset terbaru berada pada revisi rilis `v1.1.1-convection`, termasuk
-[contoh MCT](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/download/v1.1.1-convection/PILAR_TIME_DEPENDENT_EXAMPLE.MCT)
-dan [parameter JSON contoh](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/download/v1.1.1-convection/PARAMETER_TIME_DEPENDENT_EXAMPLE.json).
+Aset terbaru berada pada revisi rilis `v1.1.1-rectangular`, termasuk
+[contoh MCT](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/download/v1.1.1-rectangular/PILAR_TIME_DEPENDENT_EXAMPLE.MCT)
+dan [parameter JSON contoh](https://github.com/azzumarutami95-oss/MIDAS-CIVIL-PARAMETRIC/releases/download/v1.1.1-rectangular/PARAMETER_TIME_DEPENDENT_EXAMPLE.json).
 
 Pembaruan konveksi juga tetap memakai nomor aplikasi **1.1.1**. Panel
 **Konveksi permukaan** menambahkan kriteria rentang h dan petunjuk pemilihan
